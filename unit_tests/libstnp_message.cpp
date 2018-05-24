@@ -198,3 +198,130 @@ BOOST_AUTO_TEST_CASE(DeserializeControllerState) {
     BOOST_CHECK_EQUAL(message.left_pressed, true);
     BOOST_CHECK_EQUAL(message.right_pressed, true);
 }
+
+BOOST_AUTO_TEST_CASE(SerializeNewGameState) {
+	// Create a NewGameState message
+	stnp::message::NewGameState message;
+	message.prediction_id = 42;
+	message.timestamp = 8000;
+	message.state = std::vector<uint8_t>{0x01, 0x02, 0x03};
+
+	// Serialize the message
+	stnp::message::MessageSerializer serializer;
+	message.serial(serializer);
+
+	// Check that serialized form meets expectation
+	std::vector<uint8_t> expected = {
+		// message_type = 2
+		0x02,
+
+		// prediction_id = 42, timestamp = 8000
+		42,
+		0x40, 0x1f, 0x00, 0x00,
+
+		// state
+		0x01, 0x02, 0x03
+	};
+	BOOST_REQUIRE_EQUAL_COLLECTIONS(
+		serializer.serialized().begin(), serializer.serialized().end(),
+		expected.begin(), expected.end()
+	);
+}
+
+BOOST_AUTO_TEST_CASE(DeserializeNewGameState) {
+	// Get a raw NewGameState message
+	std::vector<uint8_t> raw_message = {
+		// message_type = 2
+		0x02,
+
+		// prediction_id = 42, timestamp = 8000
+		42,
+		0x40, 0x1f, 0x00, 0x00,
+
+		// state
+		0x01, 0x02, 0x03
+	};
+
+	// Deserialize the message
+	stnp::message::MessageDeserializer deserializer(raw_message);
+	stnp::message::NewGameState message;
+	message.serial(deserializer);
+
+	// Check that deserialized message is as expected
+	BOOST_CHECK_EQUAL(message.prediction_id, 42);
+	BOOST_CHECK_EQUAL(message.timestamp, 8000);
+	std::vector<uint8_t> expected_state{1, 2, 3};
+	BOOST_CHECK_EQUAL_COLLECTIONS(
+		message.state.begin(), message.state.end(),
+		expected_state.begin(), expected_state.end()
+	);
+}
+
+BOOST_AUTO_TEST_CASE(SerializeGameOver) {
+	// Create a GameOver message
+	stnp::message::GameOver message;
+	message.winner_player_number = 1;
+
+	// Serialize the message
+	stnp::message::MessageSerializer serializer;
+	message.serial(serializer);
+
+	// Check that serialized form meets expectation
+	std::vector<uint8_t> expected = {
+		// message_type = 3
+		0x03,
+
+		// winner_player_number = 1
+		0x01
+	};
+	BOOST_REQUIRE_EQUAL_COLLECTIONS(
+		serializer.serialized().begin(), serializer.serialized().end(),
+		expected.begin(), expected.end()
+	);
+}
+
+BOOST_AUTO_TEST_CASE(DeserializeGameOver) {
+	// Get a raw GameOver message
+	std::vector<uint8_t> raw_message = {
+		// message_type = 1
+		0x03,
+
+		// winner_player_number = 0
+		0x00
+	};
+
+	// Deserialize the message
+	stnp::message::MessageDeserializer deserializer(raw_message);
+	stnp::message::GameOver message;
+	message.serial(deserializer);
+
+	// Check that deserialized message is as expected
+	BOOST_CHECK_EQUAL(message.winner_player_number, 0);
+}
+
+#if 0
+::
+	NewGameState {
+		uint8     message_type = 2;
+		uint8     prediction_id;
+		uint32    timestamp;
+		GameState state;
+	}
+
+**prediction_id**: Indicate if this gamestate is derived from the previous one or uses new inputs. This number should be incremented each time the state is computed because of some inputs. It may loop from 255 to 0.
+**timestamp**: Frame number on which this state is associated.
+**state**: The new state.
+
+NewGameState messages can be periodically updated then resent. In such case, the server should not change the *prediction_id*, set *timestamp* to an estimate of the current frame number being displayed on devices and *state* to an updated state to this timestamp. Clients may discard NewGameState messages when the *prediction_id* match the last one received.
+
+Gameover
+--------
+
+When the game is over the server must stop to send NewGameState messages. If it receives a ControllerState message, it may reply with a GameOver message.
+
+::
+	GameOver {
+		uint8 message_type = 3;
+		uint8 winner_player_number;
+	}
+#endif

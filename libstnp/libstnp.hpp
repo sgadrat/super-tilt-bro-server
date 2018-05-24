@@ -18,10 +18,15 @@ enum class ServerMessageType : uint8_t {
 	Connected = 0,
 	StartGame = 1,
 	NewGameState = 2,
+	GameOver = 3,
 };
 
 class MessageSerializer {
 public:
+	std::vector<uint8_t> const& serialized() const {
+		return mBuffer;
+	}
+
 	void type(ClientMessageType const& t) {
 		assert(mBuffer.size() == 0);
 		mBuffer.push_back(static_cast<uint8_t>(t));
@@ -61,8 +66,9 @@ public:
 		this->uint8(result);
 	}
 
-	std::vector<uint8_t> const& serialized() const {
-		return mBuffer;
+	void dataFill(std::vector<uint8_t>& v) {
+		assert(mBuffer.size() > 0);
+		mBuffer.insert(mBuffer.end(), v.begin(), v.end());
 	}
 
 private:
@@ -106,6 +112,7 @@ public:
 	}
 
 	void flags8(std::vector<bool*> const& v) {
+		assert(mPosition > 0);
 		assert(v.size() == 8);
 		uint8_t raw = 0;
 		this->uint8(raw);
@@ -117,6 +124,15 @@ public:
 		*v[5] = (raw & 0b00000100) != 0;
 		*v[6] = (raw & 0b00000010) != 0;
 		*v[7] = (raw & 0b00000001) != 0;
+	}
+
+	void dataFill(std::vector<uint8_t>& v) {
+		assert(mPosition > 0);
+		assert(v.size() == 0);
+		v.reserve(mBuffer.size() - mPosition);
+		for (; mPosition < mBuffer.size(); ++mPosition) {
+			v.push_back(mBuffer.at(mPosition));
+		}
 	}
 
 private:
@@ -183,6 +199,30 @@ struct ControllerState {
 			&this->left_pressed,
 			&this->right_pressed,
 		});
+	}
+};
+
+struct NewGameState {
+	uint32_t timestamp;
+	uint8_t prediction_id;
+	std::vector<uint8_t> state;
+
+	template <typename SerializationHandler>
+	void serial(SerializationHandler& s) {
+		s.type(ServerMessageType::NewGameState);
+		s.uint8(this->prediction_id);
+		s.uint32(this->timestamp);
+		s.dataFill(this->state);
+	}
+};
+
+struct GameOver {
+	uint8_t winner_player_number;
+
+	template <typename SerializationHandler>
+	void serial(SerializationHandler& s) {
+		s.type(ServerMessageType::GameOver);
+		s.uint8(this->winner_player_number);
 	}
 };
 
