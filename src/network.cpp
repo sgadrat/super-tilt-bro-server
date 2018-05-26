@@ -34,4 +34,31 @@ void UdpInput::stop() {
 	mRun.store(false);
 }
 
+UdpOutput::UdpOutput(uint16_t srcPort, ThreadSafeFifo<OutgoingUdpMessage>* in)
+: mBindPoint(boost::asio::ip::udp::v4(), srcPort)
+, mSocket(mIoContext, mBindPoint)
+, mIn(in)
+, mRun(true)
+{
+}
+
+void UdpOutput::run() {
+	mRun.store(true);
+	while(mRun.load()) {
+		std::shared_ptr<OutgoingUdpMessage> message(nullptr);
+		try {
+			message = mIn->pop();
+		}catch (std::exception const& e) {
+			::usleep(16000);
+			continue;
+		}
+
+		mSocket.send_to(boost::asio::buffer(message->data), message->destination);
+	}
+}
+
+void UdpOutput::stop() {
+	mRun.store(false);
+}
+
 }
