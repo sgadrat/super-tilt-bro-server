@@ -298,30 +298,3 @@ BOOST_AUTO_TEST_CASE(DeserializeGameOver) {
 	// Check that deserialized message is as expected
 	BOOST_CHECK_EQUAL(message.winner_player_number, 0);
 }
-
-#if 0
-::
-	NewGameState {
-		uint8     message_type = 2;
-		uint8     prediction_id;
-		uint32    timestamp;
-		GameState state;
-	}
-
-**prediction_id**: Indicate if this gamestate is derived from the previous one or uses new inputs. This number should be incremented each time the state is computed because of some inputs. It may loop from 255 to 0.
-**timestamp**: Frame number on which this state is associated.
-**state**: The new state.
-
-NewGameState messages can be periodically updated then resent. In such case, the server should not change the *prediction_id*, set *timestamp* to an estimate of the current frame number being displayed on devices and *state* to an updated state to this timestamp. Clients may discard NewGameState messages when the *prediction_id* match the last one received.
-
-Gameover
---------
-
-When the game is over the server must stop to send NewGameState messages. If it receives a ControllerState message, it may reply with a GameOver message.
-
-::
-	GameOver {
-		uint8 message_type = 3;
-		uint8 winner_player_number;
-	}
-#endif
