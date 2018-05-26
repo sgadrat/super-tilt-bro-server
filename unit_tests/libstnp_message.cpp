@@ -3,6 +3,8 @@
 
 #include <libstnp/libstnp.hpp>
 
+// Waiting for a build system: g++ libstnp_message.cpp -I ..
+
 BOOST_AUTO_TEST_CASE(SerializeConnection) {
 	// Create a Connection message
 	stnp::message::Connection message;
