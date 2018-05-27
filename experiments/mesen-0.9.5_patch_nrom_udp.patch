@@ -1,0 +1,126 @@
+diff --git a/Core/NROM.h b/Core/NROM.h
+index dff0624e..a461cadf 100644
+--- a/Core/NROM.h
++++ b/Core/NROM.h
+@@ -1,18 +1,107 @@
+ #pragma once
+ #include "stdafx.h"
+ #include "BaseMapper.h"
++#include <boost/asio.hpp>
++#include <vector>
+ 
+ class NROM : public BaseMapper
+ {
++	public:
++		NROM()
++		: BaseMapper()
++		, mSocket(mIoContext)
++		{}
++
+ 	protected:
+ 		virtual uint16_t GetPRGPageSize() override { return 0x4000; }
+-		virtual uint16_t GetCHRPageSize() override {	return 0x2000; }
++		virtual uint16_t GetCHRPageSize() override { return 0x2000; }
++		virtual bool AllowRegisterRead() override { return true; }
+ 
+ 		virtual void InitMapper() override
+ 		{
++			std::cout << "init NROM" << std::endl;
+ 			SelectPRGPage(0, 0);
+ 			SelectPRGPage(1, 1);
+ 
+ 			SelectCHRPage(0, 0);
++
++			RemoveRegisterRange(0x8000, 0xFFFF, MemoryOperation::Read);
++			AddRegisterRange(0x5000, 0x5FFF, MemoryOperation::Any);
++
++			mReg = 0;
++			mWriteBuffer.resize(256);
++
++			boost::asio::ip::udp::resolver resolver(mIoContext);
++			mServerEndpoint = *resolver.resolve("127.0.0.1", "1234").begin();
++			mSocket.open(boost::asio::ip::udp::v4());
++
++			mReadBufferFresh = false;
++			mSocket.async_receive(boost::asio::buffer(mTmpReadBuffer), [&] (const boost::system::error_code&, std::size_t bytes_transferred) -> void {
++				std::cout << "received " << bytes_transferred << " bytes" << std::endl;
++				this->ReceivedPacket(bytes_transferred);
++			});
++		}
++
++		virtual uint8_t ReadRegister(uint16_t addr) override
++		{
++			if (addr >= 0x5100) {
++				mIoContext.poll_one();
++				uint8_t res = mReadBufferFresh ? mReadBuffer.size() : 0;
++				mReadBufferFresh = false;
++				return res;
++			}
++			if (addr < 0x5000) {
++				return 0;
++			}
++			uint16_t offset = addr - 0x5000;
++			if (offset >= mReadBuffer.size()) {
++				return 0;
++			}
++			return mReadBuffer[offset];
++		}
++
++		virtual void WriteRegister(uint16_t addr, uint8_t value) override
++		{
++			if (addr >= 0x5101) {
++				SendPacket(static_cast<uint16_t>(value) + 1);
++				return;
++			}
++			if (addr < 0x5000) {
++				return;
++			}
++			mWriteBuffer[addr - 0x5000] = value;
+ 		}
++
++	private:
++		void SendPacket(uint16_t payload_size)
++		{
++			mSocket.send_to(boost::asio::buffer(mWriteBuffer, payload_size), mServerEndpoint);
++		}
++
++		void ReceivedPacket(std::size_t bytes_transferred)
++		{
++			std::cout << "received packet" << std::endl;
++			mTmpReadBuffer.resize(bytes_transferred);
++			mReadBuffer = mTmpReadBuffer;
++			mReadBufferFresh = true;
++
++			mTmpReadBuffer.resize(255);
++			mSocket.async_receive(boost::asio::buffer(mTmpReadBuffer), [&] (const boost::system::error_code&, std::size_t bytes_transferred) -> void {
++				std::cout << "received " << bytes_transferred << " bytes" << std::endl;
++				this->ReceivedPacket(bytes_transferred);
++			});
++		}
++
++	private:
++		uint8_t mReg;
++		std::vector<uint8_t> mReadBuffer;
++		std::vector<uint8_t> mTmpReadBuffer;
++		bool mReadBufferFresh;
++
++		std::vector<uint8_t> mWriteBuffer;
++
++
++		boost::asio::io_context mIoContext;
++		boost::asio::ip::udp::endpoint mServerEndpoint;
++		boost::asio::ip::udp::socket mSocket;
+ };
+diff --git a/makefile b/makefile
+index 0ae3dae1..2ae20e0b 100644
+--- a/makefile
++++ b/makefile
+@@ -106,7 +106,7 @@ Linux/$(OBJFOLDER)/%.o: Linux/libevdev/%.c
+ 
+ InteropDLL/$(OBJFOLDER)/$(SHAREDLIB): $(SEVENZIPOBJ) $(LUAOBJ) $(UTILOBJ) $(COREOBJ) $(LIBEVDEVOBJ) $(LINUXOBJ) InteropDLL/ConsoleWrapper.cpp InteropDLL/DebugWrapper.cpp
+ 	mkdir -p InteropDLL/$(OBJFOLDER)
+-	$(CPPC) $(GCCOPTIONS) -Wl,-z,defs -shared -o $(SHAREDLIB) InteropDLL/*.cpp $(SEVENZIPOBJ) $(LUAOBJ) $(LINUXOBJ) $(LIBEVDEVOBJ) $(UTILOBJ) $(COREOBJ) -pthread -lSDL2 -lstdc++fs
++	$(CPPC) $(GCCOPTIONS) -Wl,-z,defs -shared -o $(SHAREDLIB) InteropDLL/*.cpp $(SEVENZIPOBJ) $(LUAOBJ) $(LINUXOBJ) $(LIBEVDEVOBJ) $(UTILOBJ) $(COREOBJ) -pthread -lSDL2 -lstdc++fs -lboost_system
+ 	mv $(SHAREDLIB) InteropDLL/$(OBJFOLDER)
+ 
+ 
