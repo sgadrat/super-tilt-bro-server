@@ -1,5 +1,8 @@
 #include "network.hpp"
 
+#include <stdexcept>
+#include <iostream>
+
 namespace network {
 
 UdpInput::UdpInput(uint16_t port, ThreadSafeFifo<IncommingUdpMessage>* out)
@@ -26,7 +29,11 @@ void UdpInput::run() {
 		std::shared_ptr<IncommingUdpMessage> message(new IncommingUdpMessage);
 		message->data = data;
 		message->sender = sender_endpoint;
-		mOut->push(message);
+		try {
+			mOut->push(message);
+		}catch (std::exception const& e) {
+			std::cerr << "UdpInput: lost a packet due to a full queue" << std::endl;
+		}
 	}
 }
 
