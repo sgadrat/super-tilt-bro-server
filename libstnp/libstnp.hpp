@@ -38,12 +38,10 @@ public:
 	};
 
 	void uint8(uint8_t& v) {
-		assert(mBuffer.size() > 0);
 		mBuffer.push_back(v);
 	}
 
 	void uint32(uint32_t& v) {
-		assert(mBuffer.size() > 0);
 		mBuffer.push_back(v & 0xff);
 		mBuffer.push_back((v >> 8) & 0xff);
 		mBuffer.push_back((v >> 16) & 0xff);
@@ -51,7 +49,6 @@ public:
 	}
 
 	void flags8(std::vector<bool*> const& v) {
-		assert(mBuffer.size() > 0);
 		assert(v.size() == 8);
 		uint8_t result =
 			((*v[0] ? 1 : 0) << 7) +
@@ -67,7 +64,6 @@ public:
 	}
 
 	void dataFill(std::vector<uint8_t>& v) {
-		assert(mBuffer.size() > 0);
 		mBuffer.insert(mBuffer.end(), v.begin(), v.end());
 	}
 
