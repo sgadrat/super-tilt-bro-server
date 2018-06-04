@@ -158,8 +158,8 @@ GameState::GameState(Stage stage)
 		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
 	};
 	mAnimations = {
-		{"anim_sinbad_idle", 0x0000, 120},
-		{"anim_sinbad_spawn", 0x0000, 50},
+		{"anim_sinbad_idle", 49287, 120},
+		{"anim_sinbad_spawn", 53528, 50},
 	};
 
 	// Ensure game state is zero
