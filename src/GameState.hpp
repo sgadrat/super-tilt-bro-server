@@ -1,7 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include <stdint.h>
 #include <vector>
 
@@ -63,7 +62,7 @@ public:
 		}
 	};
 
-	GameState(std::unique_ptr<Stage>&& stage);
+	GameState(Stage stage);
 
 	bool tick();
 
@@ -144,7 +143,7 @@ private:
 	void start_innexistant_player(uint8_t player_number);
 
 private:
-	std::unique_ptr<Stage> mStage;
+	Stage mStage;
 	Player mPlayerA;
 	Player mPlayerB;
 	uint8_t mScreenShakeCounter;
@@ -166,16 +165,24 @@ void GameState::serial(SerializationHandler& s) {
 	s.uint8(filler);
 	s.uint8(mPlayerA.hitstun);
 	s.uint8(mPlayerB.hitstun);
-	s.uint8(mPlayerA.x >> 8);
-	s.uint8(mPlayerB.x >> 8);
-	s.uint8(mPlayerA.y >> 8);
-	s.uint8(mPlayerB.y >> 8);
+	uint8_t v = mPlayerA.x >> 8;
+	s.uint8(v);
+	v = mPlayerB.x >> 8;
+	s.uint8(v);
+	v = mPlayerA.y >> 8;
+	s.uint8(v);
+	v = mPlayerB.y >> 8;
+	s.uint8(v);
 	s.uint8(mPlayerA.direction);
 	s.uint8(mPlayerB.direction);
-	s.uint8(mPlayerA.velocity_v >> 8);
-	s.uint8(mPlayerB.velocity_v >> 8);
-	s.uint8(mPlayerA.velocity_h >> 8);
-	s.uint8(mPlayerB.velocity_h >> 8);
+	v = mPlayerA.velocity_v >> 8;
+	s.uint8(v);
+	v = mPlayerB.velocity_v >> 8;
+	s.uint8(v);
+	v = mPlayerA.velocity_h >> 8;
+	s.uint8(v);
+	v = mPlayerB.velocity_h >> 8;
+	s.uint8(v);
 	s.uint8(mPlayerA.state_field1);
 	s.uint8(mPlayerB.state_field1);
 	s.uint8(mPlayerA.state_field2);
@@ -200,36 +207,62 @@ void GameState::serial(SerializationHandler& s) {
 	s.uint8(mPlayerB.hitbox.position.top);
 	s.uint8(mPlayerA.hitbox.position.bottom);
 	s.uint8(mPlayerB.hitbox.position.bottom);
-	s.uint8(mPlayerA.hitbox.enabled);
-	s.uint8(mPlayerB.hitbox.enabled);
-	s.uint8(mPlayerA.hitbox.force_v >> 8);
-	s.uint8(mPlayerB.hitbox.force_v >> 8);
-	s.uint8(mPlayerA.hitbox.force_h >> 8);
-	s.uint8(mPlayerB.hitbox.force_h >> 8);
+	v = mPlayerA.hitbox.enabled ? 0 : 1;
+	s.uint8(v);
+	v = mPlayerB.hitbox.enabled ? 0 : 1;
+	s.uint8(v);
+	v = mPlayerA.hitbox.force_v >> 8;
+	s.uint8(v);
+	v = mPlayerB.hitbox.force_v >> 8;
+	s.uint8(v);
+	v = mPlayerA.hitbox.force_h >> 8;
+	s.uint8(v);
+	v = mPlayerB.hitbox.force_h >> 8;
+	s.uint8(v);
 	s.uint8(mPlayerA.hitbox.damages);
 	s.uint8(mPlayerB.hitbox.damages);
 	s.uint8(mPlayerA.damages);
 	s.uint8(mPlayerB.damages);
-	s.uint8(mPlayerA.x & 0xff);
-	s.uint8(mPlayerB.x & 0xff);
-	s.uint8(mPlayerA.y & 0xff);
-	s.uint8(mPlayerB.y & 0xff);
-	s.uint8(mPlayerA.velocity_v & 0xff);
-	s.uint8(mPlayerB.velocity_v & 0xff);
-	s.uint8(mPlayerA.velocity_h & 0xff);
-	s.uint8(mPlayerB.velocity_h & 0xff);
-	s.uint8(mPlayerA.hitbox.force_v & 0xff);
-	s.uint8(mPlayerB.hitbox.force_v & 0xff);
-	s.uint8(mPlayerA.hitbox.force_h & 0xff);
-	s.uint8(mPlayerB.hitbox.force_h & 0xff);
-	s.uint8(mPlayerA.hitbox.base_knock_up_v >> 8);
-	s.uint8(mPlayerB.hitbox.base_knock_up_v >> 8);
-	s.uint8(mPlayerA.hitbox.base_knock_up_h >> 8);
-	s.uint8(mPlayerB.hitbox.base_knock_up_h >> 8);
-	s.uint8(mPlayerA.hitbox.base_knock_up_v & 0xff);
-	s.uint8(mPlayerB.hitbox.base_knock_up_v & 0xff);
-	s.uint8(mPlayerA.hitbox.base_knock_up_h & 0xff);
-	s.uint8(mPlayerB.hitbox.base_knock_up_h & 0xff);
+	v = mPlayerA.x & 0xff;
+	s.uint8(v);
+	v = mPlayerB.x & 0xff;
+	s.uint8(v);
+	v = mPlayerA.y & 0xff;
+	s.uint8(v);
+	v = mPlayerB.y & 0xff;
+	s.uint8(v);
+	v = mPlayerA.velocity_v & 0xff;
+	s.uint8(v);
+	v = mPlayerB.velocity_v & 0xff;
+	s.uint8(v);
+	v = mPlayerA.velocity_h & 0xff;
+	s.uint8(v);
+	v = mPlayerB.velocity_h & 0xff;
+	s.uint8(v);
+	v = mPlayerA.hitbox.force_v & 0xff;
+	s.uint8(v);
+	v = mPlayerB.hitbox.force_v & 0xff;
+	s.uint8(v);
+	v = mPlayerA.hitbox.force_h & 0xff;
+	s.uint8(v);
+	v = mPlayerB.hitbox.force_h & 0xff;
+	s.uint8(v);
+	v = mPlayerA.hitbox.base_knock_up_v >> 8;
+	s.uint8(v);
+	v = mPlayerB.hitbox.base_knock_up_v >> 8;
+	s.uint8(v);
+	v = mPlayerA.hitbox.base_knock_up_h >> 8;
+	s.uint8(v);
+	v = mPlayerB.hitbox.base_knock_up_h >> 8;
+	s.uint8(v);
+	v = mPlayerA.hitbox.base_knock_up_v & 0xff;
+	s.uint8(v);
+	v = mPlayerB.hitbox.base_knock_up_v & 0xff;
+	s.uint8(v);
+	v = mPlayerA.hitbox.base_knock_up_h & 0xff;
+	s.uint8(v);
+	v = mPlayerB.hitbox.base_knock_up_h & 0xff;
+	s.uint8(v);
 	s.uint8(mPlayerA.animation_direction);
 	s.uint8(mPlayerB.animation_direction);
 	s.uint8(mPlayerA.num_aerial_jumps);

@@ -41,6 +41,11 @@ public:
 		mBuffer.push_back(v);
 	}
 
+	void uint16(uint16_t& v) {
+		mBuffer.push_back(v & 0xff);
+		mBuffer.push_back((v >> 8) & 0xff);
+	}
+
 	void uint32(uint32_t& v) {
 		mBuffer.push_back(v & 0xff);
 		mBuffer.push_back((v >> 8) & 0xff);
@@ -97,6 +102,12 @@ public:
 	void uint8(uint8_t& v) {
 		assert(mPosition > 0);
 		v = mBuffer[mPosition++];
+	}
+
+	void uint16(uint16_t& v) {
+		assert(mPosition > 0);
+		v = mBuffer[mPosition++];
+		v += static_cast<uint32_t>(mBuffer[mPosition++]) << 8;
 	}
 
 	void uint32(uint32_t& v) {

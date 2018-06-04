@@ -118,8 +118,8 @@ void GameState::start_innexistant_player(uint8_t player_number) {
 *
 ********************************/
 
-GameState::GameState(std::unique_ptr<Stage>&& stage)
-: mStage(std::move(stage))
+GameState::GameState(Stage stage)
+: mStage(stage)
 {
 	// Setup data
 	mPlayerTickRoutines = {
@@ -169,7 +169,7 @@ GameState::GameState(std::unique_ptr<Stage>&& stage)
 	mSlowDownCounter = 0;
 
 	// Call stage initialization routine
-	stage->init();
+	stage.init();
 
 	// Setup logical game state to the game startup configuration
 	mPlayerB.direction = static_cast<uint8_t>(Direction::LEFT);
@@ -177,10 +177,10 @@ GameState::GameState(std::unique_ptr<Stage>&& stage)
 	mPlayerA.hitbox.enabled = false;
 	mPlayerB.hitbox.enabled = false;
 
-	mPlayerA.x = stage->spawn_player_a.x;
-	mPlayerA.y = stage->spawn_player_a.y;
-	mPlayerB.x = stage->spawn_player_b.x;
-	mPlayerB.y = stage->spawn_player_b.y;
+	mPlayerA.x = stage.spawn_player_a.x;
+	mPlayerA.y = stage.spawn_player_a.y;
+	mPlayerB.x = stage.spawn_player_b.x;
+	mPlayerB.y = stage.spawn_player_b.y;
 
 	mPlayerA.gravity = DEFAULT_GRAVITY;
 	mPlayerB.gravity = DEFAULT_GRAVITY;
@@ -213,7 +213,7 @@ bool GameState::tick() {
 	}
 
 	// Call stage's logic
-	mStage->tick();
+	mStage.tick();
 
 	// Update game state (inlined, routine "update_players")
 
@@ -348,7 +348,7 @@ void GameState::move_player(uint8_t player_number) {
 	};
 
 	// Check collisions with stage plaforms
-	for (Stage::Platform const& platform : mStage->platforms) {
+	for (Stage::Platform const& platform : mStage.platforms) {
 		if (platform.is_smooth) {
 			final_position = this->check_top_collision(old_position, final_position, platform.position.left, platform.position.right, platform.position.top);
 		}else {
@@ -433,7 +433,7 @@ bool GameState::boxes_overlap(Rectangle const& rect1, Rectangle const& rect2) co
 }
 
 bool GameState::check_on_ground(uint8_t player_number) {
-	for (Stage::Platform const& platform : mStage->platforms) {
+	for (Stage::Platform const& platform : mStage.platforms) {
 		if (this->check_on_platform(player_number, platform.position)) {
 			return true;
 		}
