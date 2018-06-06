@@ -60,6 +60,19 @@ public:
 		, right_pressed(raw_value & 0b00000001)
 		{
 		}
+
+		uint8_t getRaw() const {
+			return
+				((this->a_pressed ? 1 : 0) << 7) +
+				((this->b_pressed ? 1 : 0) << 6) +
+				((this->select_pressed ? 1 : 0) << 5) +
+				((this->start_pressed ? 1 : 0) << 4) +
+				((this->up_pressed ? 1 : 0) << 3) +
+				((this->down_pressed ? 1 : 0) << 2) +
+				((this->left_pressed ? 1 : 0) << 1) +
+				(this->right_pressed ? 1 : 0)
+			;
+		}
 	};
 
 	GameState(Stage stage);
@@ -132,15 +145,31 @@ private:
 	bool boxes_overlap(Rectangle const& rect1, Rectangle const& rect2) const;
 	Point<uint16_t> check_top_collision(Point<uint8_t> const& old_position, Point<uint16_t> const& final_position, uint8_t platform_position_left, uint8_t platform_position_right, uint8_t platform_position_top) const;
 	Point<uint16_t> check_collision(Point<uint8_t> const& old_position, Point<uint16_t> const& final_position, Rectangle const& block_position) const;
+	void merge_to_player_velocity(uint8_t player_number, int16_t horizontal, int16_t vertical, uint8_t step);
 
 	// Player state routines
 
 	void set_player_animation(uint8_t player_number, uint16_t animation_address);
+	void controller_callbacks(uint8_t player_number, std::vector<uint8_t> gamepad_state, std::vector<std::function<void()>> callbacks);
+
+	void start_innexistant_player(uint8_t player_number);
+
+	void start_respawn_player(uint8_t player_number);
+
+	void start_running_player(uint8_t player_number);
+	void running_player(uint8_t player_number);
+	void running_player_input(uint8_t player_number);
 
 	void start_spawn_player(uint8_t player_number);
-	void start_respawn_player(uint8_t player_number);
+	void spawn_player(uint8_t player_number);
+
+	void start_standing_player(uint8_t player_number);
+	void standing_player(uint8_t player_number);
+	void standing_player_input_left(uint8_t player_number);
+	void standing_player_input_right(uint8_t player_number);
+	void standing_player_input(uint8_t player_number);
+
 	void start_thrown_player(uint8_t player_number);
-	void start_innexistant_player(uint8_t player_number);
 
 private:
 	Stage mStage;

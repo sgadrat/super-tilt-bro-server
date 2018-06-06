@@ -66,8 +66,39 @@ const uint8_t PLAYER_STATE_SHIELDING = 0x16;
 const uint8_t PLAYER_STATE_INNEXISTANT = 0x17;
 const uint8_t PLAYER_STATE_SPAWN = 0x18;
 
+const uint8_t DIRECTION_LEFT = 0x00;
+const uint8_t DIRECTION_RIGHT = 0x01;
+
 const uint8_t HITSTUN_PARRY_NB_FRAMES = 10;
 const uint8_t SCREENSHAKE_PARRY_NB_FRAMES = 2;
+
+const uint8_t CONTROLLER_BTN_A = 0b10000000;
+const uint8_t CONTROLLER_BTN_B = 0b01000000;
+const uint8_t CONTROLLER_BTN_SELECT = 0b00100000;
+const uint8_t CONTROLLER_BTN_START = 0b00010000;
+const uint8_t CONTROLLER_BTN_UP = 0b00001000;
+const uint8_t CONTROLLER_BTN_DOWN = 0b00000100;
+const uint8_t CONTROLLER_BTN_LEFT = 0b00000010;
+const uint8_t CONTROLLER_BTN_RIGHT = 0b00000001;
+
+const uint8_t CONTROLLER_INPUT_JUMP = CONTROLLER_BTN_UP;
+const uint8_t CONTROLLER_INPUT_JAB = CONTROLLER_BTN_A;
+const uint8_t CONTROLLER_INPUT_LEFT = CONTROLLER_BTN_LEFT;
+const uint8_t CONTROLLER_INPUT_RIGHT = CONTROLLER_BTN_RIGHT;
+const uint8_t CONTROLLER_INPUT_JUMP_RIGHT = CONTROLLER_BTN_UP | CONTROLLER_BTN_RIGHT;
+const uint8_t CONTROLLER_INPUT_JUMP_LEFT = CONTROLLER_BTN_UP | CONTROLLER_BTN_LEFT;
+const uint8_t CONTROLLER_INPUT_ATTACK_LEFT = CONTROLLER_BTN_LEFT | CONTROLLER_BTN_A;
+const uint8_t CONTROLLER_INPUT_ATTACK_RIGHT = CONTROLLER_BTN_RIGHT | CONTROLLER_BTN_A;
+const uint8_t CONTROLLER_INPUT_ATTACK_UP = CONTROLLER_BTN_UP | CONTROLLER_BTN_A;
+const uint8_t CONTROLLER_INPUT_SPECIAL = CONTROLLER_BTN_B;
+const uint8_t CONTROLLER_INPUT_SPECIAL_RIGHT = CONTROLLER_BTN_B | CONTROLLER_BTN_RIGHT;
+const uint8_t CONTROLLER_INPUT_SPECIAL_LEFT = CONTROLLER_BTN_B | CONTROLLER_BTN_LEFT;
+const uint8_t CONTROLLER_INPUT_SPECIAL_DOWN = CONTROLLER_BTN_B | CONTROLLER_BTN_DOWN;
+const uint8_t CONTROLLER_INPUT_SPECIAL_UP = CONTROLLER_BTN_B | CONTROLLER_BTN_UP;
+const uint8_t CONTROLLER_INPUT_TECH = CONTROLLER_BTN_DOWN;
+const uint8_t CONTROLLER_INPUT_TECH_RIGHT = CONTROLLER_BTN_DOWN | CONTROLLER_BTN_RIGHT;
+const uint8_t CONTROLLER_INPUT_TECH_LEFT = CONTROLLER_BTN_DOWN | CONTROLLER_BTN_LEFT;
+const uint8_t CONTROLLER_INPUT_DOWN_TILT = CONTROLLER_BTN_DOWN | CONTROLLER_BTN_A;
 
 const uint8_t SLOWDOWN_TIME = 100;
 
@@ -90,6 +121,167 @@ void GameState::set_player_animation(uint8_t player_number, uint16_t animation_a
 	player.animation_direction = player.direction;
 }
 
+void GameState::controller_callbacks(uint8_t player_number, std::vector<uint8_t> gamepad_state, std::vector<std::function<void()>> callbacks) {
+	assert(callbacks.size() == gamepad_state.size() + 1);
+	Player& player = this->getPlayer(player_number);
+
+	std::size_t i = 0;
+	for (; i < gamepad_state.size(); ++i) {
+		if (gamepad_state[i] == player.btns.getRaw()) {
+			break;
+		}
+	}
+	callbacks[i]();
+}
+
+void GameState::start_innexistant_player(uint8_t player_number) {
+	//TODO
+	dbg("TODO start_innexistant_player");
+}
+
+void GameState::start_respawn_player(uint8_t player_number) {
+	//TODO
+	dbg("TODO start_respawn_player");
+}
+
+void GameState::start_running_player(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	player.state = PLAYER_STATE_RUNNING;
+
+	// Set the appropriate animation
+	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_run").address);
+
+	// Set initial velocity
+	if (player.direction == DIRECTION_LEFT) {
+		player.velocity_h = -1 * 0x0100;
+	}else {
+		player.velocity_h = 0x0100;
+	}
+}
+
+void GameState::running_player(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	if (player.direction != DIRECTION_LEFT) {
+		this->merge_to_player_velocity(player_number, 0x0200, 0, 0x40);
+	}else {
+		this->merge_to_player_velocity(player_number, -0x0200, 0, 0x40);
+	}
+}
+
+void GameState::running_player_input(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	// If in hitstun, stop running
+	if (player.hitstun != 0) {
+		this->start_standing_player(player_number);
+		return;
+	}
+
+	this->controller_callbacks(
+		player_number,
+		{
+			CONTROLLER_INPUT_LEFT,        CONTROLLER_INPUT_RIGHT,        CONTROLLER_INPUT_JUMP,    CONTROLLER_INPUT_JUMP_RIGHT,    CONTROLLER_INPUT_JUMP_LEFT,
+			CONTROLLER_INPUT_ATTACK_LEFT, CONTROLLER_INPUT_ATTACK_RIGHT, CONTROLLER_INPUT_SPECIAL, CONTROLLER_INPUT_SPECIAL_RIGHT, CONTROLLER_INPUT_SPECIAL_LEFT,
+			CONTROLLER_INPUT_SPECIAL_UP,  CONTROLLER_INPUT_SPECIAL_DOWN
+		},
+		{
+			[&](){
+				if(player.direction != DIRECTION_LEFT) {
+					player.direction = DIRECTION_LEFT;
+					this->start_running_player(player_number);
+				}
+			},
+			[&](){
+				if(player.direction != DIRECTION_RIGHT) {
+					player.direction = DIRECTION_RIGHT;
+					this->start_running_player(player_number);
+				}
+			},
+			[&](){dbg("TODO running_player_input");},
+			[&](){dbg("TODO running_player_input");},
+			[&](){dbg("TODO running_player_input");},
+
+			[&](){dbg("TODO running_player_input");},
+			[&](){dbg("TODO running_player_input");},
+			[&](){dbg("TODO running_player_input");},
+			[&](){dbg("TODO running_player_input");},
+			[&](){dbg("TODO running_player_input");},
+
+			[&](){dbg("TODO running_player_input");},
+			[&](){dbg("TODO running_player_input");},
+
+			[&](){this->start_standing_player(player_number);},
+		}
+	);
+}
+
+void GameState::start_standing_player(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	player.state = PLAYER_STATE_STANDING;
+	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_idle").address);
+}
+
+void GameState::standing_player(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	this->merge_to_player_velocity(player_number, 0, 0, 255);
+
+	// Force the handling of directional controls
+	if (player.btns.getRaw() == CONTROLLER_INPUT_LEFT) {
+		this->standing_player_input_left(player_number);
+	}else if (player.btns.getRaw() == CONTROLLER_INPUT_RIGHT) {
+		this->standing_player_input_right(player_number);
+	}
+}
+
+void GameState::standing_player_input_left(uint8_t player_number) {
+	this->getPlayer(player_number).direction = DIRECTION_LEFT;
+	this->start_running_player(player_number);
+}
+
+void GameState::standing_player_input_right(uint8_t player_number) {
+	this->getPlayer(player_number).direction = DIRECTION_LEFT;
+	this->start_running_player(player_number);
+}
+
+void GameState::standing_player_input(uint8_t player_number) {
+	this->controller_callbacks(
+		player_number,
+		{
+			CONTROLLER_INPUT_LEFT,         CONTROLLER_INPUT_RIGHT,        CONTROLLER_INPUT_JUMP,         CONTROLLER_INPUT_JUMP_RIGHT,   CONTROLLER_INPUT_JUMP_LEFT,
+			CONTROLLER_INPUT_JAB,          CONTROLLER_INPUT_ATTACK_LEFT,  CONTROLLER_INPUT_ATTACK_RIGHT, CONTROLLER_INPUT_SPECIAL,      CONTROLLER_INPUT_SPECIAL_RIGHT,
+			CONTROLLER_INPUT_SPECIAL_LEFT, CONTROLLER_INPUT_DOWN_TILT,    CONTROLLER_INPUT_SPECIAL_UP,   CONTROLLER_INPUT_SPECIAL_DOWN, CONTROLLER_INPUT_ATTACK_UP,
+			CONTROLLER_INPUT_TECH
+		},
+		{
+			[&](){this->standing_player_input_left(player_number);},
+			[&](){this->standing_player_input_right(player_number);},
+			[&](){dbg("TODO standing_player_input");},
+			[&](){dbg("TODO standing_player_input");},
+			[&](){dbg("TODO standing_player_input");},
+
+			[&](){dbg("TODO standing_player_input");},
+			[&](){dbg("TODO standing_player_input");},
+			[&](){dbg("TODO standing_player_input");},
+			[&](){dbg("TODO standing_player_input");},
+			[&](){dbg("TODO standing_player_input");},
+
+			[&](){dbg("TODO standing_player_input");},
+			[&](){dbg("TODO standing_player_input");},
+			[&](){dbg("TODO standing_player_input");},
+			[&](){dbg("TODO standing_player_input");},
+			[&](){dbg("TODO standing_player_input");},
+
+			[&](){dbg("TODO standing_player_input");},
+
+			[](){},
+		}
+	);
+}
+
 void GameState::start_spawn_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 
@@ -97,19 +289,16 @@ void GameState::start_spawn_player(uint8_t player_number) {
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_spawn").address);
 };
 
-void GameState::start_respawn_player(uint8_t player_number) {
-	//TODO
-	dbg("TODO start_respawn_player");
+void GameState::spawn_player(uint8_t player_number) {
+	const uint8_t STATE_SINBAD_SPAWN_DURATION = 50;
+	if(this->getPlayer(player_number).anim_clock == STATE_SINBAD_SPAWN_DURATION) {
+		this->start_standing_player(player_number);
+	}
 }
 
 void GameState::start_thrown_player(uint8_t player_number) {
 	//TODO
 	dbg("TODO start_thrown_player");
-}
-
-void GameState::start_innexistant_player(uint8_t player_number) {
-	//TODO
-	dbg("TODO start_innexistant_player");
 }
 
 /********************************
@@ -123,18 +312,18 @@ GameState::GameState(Stage stage)
 {
 	// Setup data
 	mPlayerTickRoutines = {
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
+		&GameState::standing_player, &GameState::running_player, &place_holder, &place_holder, &place_holder,
+		&place_holder,               &place_holder,              &place_holder, &place_holder, &place_holder,
+		&place_holder,               &place_holder,              &place_holder, &place_holder, &place_holder,
+		&place_holder,               &place_holder,              &place_holder, &place_holder, &place_holder,
+		&place_holder,               &place_holder,              &place_holder, &place_holder, &GameState::spawn_player,
 	};
 	mPlayerInputRoutines = {
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
+		&GameState::standing_player_input, &GameState::running_player_input, &place_holder, &place_holder, &place_holder,
+		&place_holder,                     &place_holder,                    &place_holder, &place_holder, &place_holder,
+		&place_holder,                     &place_holder,                    &place_holder, &place_holder, &place_holder,
+		&place_holder,                     &place_holder,                    &place_holder, &place_holder, &place_holder,
+		&place_holder,                     &place_holder,                    &place_holder, &place_holder, &place_holder,
 	};
 	mPlayerOnhurtRoutines = {
 		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
@@ -158,8 +347,9 @@ GameState::GameState(Stage stage)
 		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
 	};
 	mAnimations = {
-		{"anim_sinbad_idle", 49287, 120},
-		{"anim_sinbad_spawn", 53528, 50},
+		{"anim_sinbad_idle", 49291, 120},
+		{"anim_sinbad_run", 49346, 15},
+		{"anim_sinbad_spawn", 53532, 50},
 	};
 
 	// Ensure game state is zero
@@ -514,4 +704,27 @@ Point<uint16_t> GameState::check_collision(Point<uint8_t> const& old_position, P
 	}
 
 	return result;
+}
+
+void GameState::merge_to_player_velocity(uint8_t player_number, int16_t horizontal, int16_t vertical, uint8_t step) {
+	Player& player = this->getPlayer(player_number);
+	std::vector<int16_t*> player_components = { &player.velocity_v, &player.velocity_h };
+	std::vector<int16_t*> merged_components = { &vertical, &horizontal };
+
+	for (std::size_t i = 0; i < 2; ++i) {
+		// Avoid to pass through merged velocity
+		int16_t diff = *(player_components[i]) - *(merged_components[i]);
+		if (diff < 0) diff *= -1;
+
+		if (diff <= step) {
+			*(player_components[i]) = *(merged_components[i]);
+		}else {
+			// Add or substract step size from velocity component to be closer to the merged component
+			if (*(player_components[i]) < *(merged_components[i])) {
+				*(player_components[i]) += step;
+			}else {
+				*(player_components[i]) -= step;
+			}
+		}
+	}
 }
