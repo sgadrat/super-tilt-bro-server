@@ -4,10 +4,25 @@
 
 #include <atomic>
 #include <boost/asio.hpp>
+#include <memory>
+#include <mutex>
 #include <vector>
 #include <stdint.h>
 
 namespace network {
+
+class SocketPool {
+public:
+	SocketPool();
+
+	std::shared_ptr<boost::asio::ip::udp::socket> get(uint16_t port);
+
+private:
+	std::mutex mMutex;
+	boost::asio::io_context mIoContext;
+	std::vector<boost::asio::ip::udp::endpoint> mBindPoints;
+	std::vector<std::shared_ptr<boost::asio::ip::udp::socket>> mSockets;
+};
 
 struct IncommingUdpMessage {
 	std::vector<uint8_t> data;
@@ -21,33 +36,26 @@ struct OutgoingUdpMessage {
 
 class UdpInput {
 public:
-	UdpInput(uint16_t port, ThreadSafeFifo<IncommingUdpMessage>* out);
+	UdpInput(uint16_t port, SocketPool* sockets, ThreadSafeFifo<IncommingUdpMessage>* out);
 	void run();
 	void stop();
-
 private:
-	boost::asio::io_context mIoContext;
-	boost::asio::ip::udp::endpoint mBindPoint;
-	boost::asio::ip::udp::socket mSocket;
-
+	SocketPool* mSockets;
 	ThreadSafeFifo<IncommingUdpMessage>* mOut;
-
+	uint16_t mPort;
 	std::atomic<bool> mRun;
 };
 
 class UdpOutput {
 public:
-	UdpOutput(uint16_t srcPort, ThreadSafeFifo<OutgoingUdpMessage>* in);
+	UdpOutput(uint16_t srcPort, SocketPool* sockets, ThreadSafeFifo<OutgoingUdpMessage>* in);
 	void run();
 	void stop();
 
 private:
-	boost::asio::io_context mIoContext;
-	boost::asio::ip::udp::endpoint mBindPoint;
-	boost::asio::ip::udp::socket mSocket;
-
+	SocketPool* mSockets;
 	ThreadSafeFifo<OutgoingUdpMessage>* mIn;
-
+	uint16_t mPort;
 	std::atomic<bool> mRun;
 };
 

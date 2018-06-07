@@ -1,13 +1,42 @@
 diff --git a/Core/NROM.h b/Core/NROM.h
-index dff0624e..a461cadf 100644
+index dff0624e..0feeb8a4 100644
 --- a/Core/NROM.h
 +++ b/Core/NROM.h
-@@ -1,18 +1,107 @@
+@@ -1,18 +1,138 @@
  #pragma once
  #include "stdafx.h"
  #include "BaseMapper.h"
 +#include <boost/asio.hpp>
 +#include <vector>
++#include <map>
++#include <string>
++#include <fstream>
++
++static std::map<std::string, std::string> GetConfig() {
++	// Fill default fields
++	std::map<std::string, std::string> config = {
++		{"server_address", "127.0.0.1"},
++		{"server_port", "1234"},
++	};
++
++	// Parse config file
++	std::ifstream ifs("/tmp/nes_net.cfg");
++	while (ifs.good()) {
++		std::string key, value;
++		ifs >> key >> value;
++		if (ifs.good()) {
++			config[key] = value;
++		}
++	}
++
++	// debug
++	std::cout << "Parsed config:" << std::endl;
++	for (std::pair<std::string, std::string> const& record : config) {
++		std::cout << "  " << record.first << " = " << record.second << std::endl;
++	}
++
++	return config;
++}
  
  class NROM : public BaseMapper
  {
@@ -31,6 +60,8 @@ index dff0624e..a461cadf 100644
  
  			SelectCHRPage(0, 0);
 +
++			std::map<std::string, std::string> config = GetConfig();
++
 +			RemoveRegisterRange(0x8000, 0xFFFF, MemoryOperation::Read);
 +			AddRegisterRange(0x5000, 0x5FFF, MemoryOperation::Any);
 +
@@ -38,7 +69,7 @@ index dff0624e..a461cadf 100644
 +			mWriteBuffer.resize(256);
 +
 +			boost::asio::ip::udp::resolver resolver(mIoContext);
-+			mServerEndpoint = *resolver.resolve("127.0.0.1", "1234").begin();
++			mServerEndpoint = *resolver.resolve(config["server_address"], config["server_port"]).begin();
 +			mSocket.open(boost::asio::ip::udp::v4());
 +
 +			mReadBufferFresh = false;
@@ -64,7 +95,7 @@ index dff0624e..a461cadf 100644
 +				return 0;
 +			}
 +			return mReadBuffer[offset];
-+		}
+ 		}
 +
 +		virtual void WriteRegister(uint16_t addr, uint8_t value) override
 +		{
@@ -76,7 +107,7 @@ index dff0624e..a461cadf 100644
 +				return;
 +			}
 +			mWriteBuffer[addr - 0x5000] = value;
- 		}
++		}
 +
 +	private:
 +		void SendPacket(uint16_t payload_size)

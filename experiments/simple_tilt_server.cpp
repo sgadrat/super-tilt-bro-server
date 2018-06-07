@@ -10,10 +10,11 @@
 
 int main() {
 	// Prepare component threads
+	network::SocketPool socket_pool;
 	ThreadSafeFifo<network::IncommingUdpMessage> in_messages(5);
-	network::UdpInput udp_receiver(1234, &in_messages);
+	network::UdpInput udp_receiver(1234, &socket_pool, &in_messages);
 	ThreadSafeFifo<network::OutgoingUdpMessage> out_messages(5);
-	network::UdpOutput udp_sender(1235, &out_messages);
+	network::UdpOutput udp_sender(1234, &socket_pool, &out_messages);
 
 	// Start component threads
 	std::thread udp_receiver_thread(&network::UdpInput::run, &udp_receiver);
