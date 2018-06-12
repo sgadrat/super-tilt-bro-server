@@ -135,12 +135,15 @@ private:
 
 	// Engine routines
 
-	void update_sprites();
-	void check_player_hit(uint8_t player_number);
-	void move_player(uint8_t player_number);
-	void check_player_position(uint8_t player_number, Point<uint8_t> const& old_position);
 	bool check_on_ground(uint8_t player_number);
 	bool check_on_platform(uint8_t player_number, Rectangle const& platform_position);
+	void check_player_hit(uint8_t player_number);
+	void check_player_position(uint8_t player_number, Point<uint8_t> const& old_position);
+	void dummy_routine(uint8_t player_number);
+	void hurt_player(uint8_t player_number);
+	void keep_input_dirty(uint8_t player_number);
+	void move_player(uint8_t player_number);
+	void update_sprites();
 
 	bool boxes_overlap(Rectangle const& rect1, Rectangle const& rect2) const;
 	Point<uint16_t> check_top_collision(Point<uint8_t> const& old_position, Point<uint16_t> const& final_position, uint8_t platform_position_left, uint8_t platform_position_right, uint8_t platform_position_top) const;
@@ -151,6 +154,8 @@ private:
 
 	void set_player_animation(uint8_t player_number, uint16_t animation_address);
 	void controller_callbacks(uint8_t player_number, std::vector<uint8_t> gamepad_state, std::vector<std::function<void()>> callbacks);
+
+	void start_falling_player(uint8_t player_number);
 
 	void start_innexistant_player(uint8_t player_number);
 

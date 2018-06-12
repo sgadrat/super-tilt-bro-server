@@ -134,6 +134,11 @@ void GameState::controller_callbacks(uint8_t player_number, std::vector<uint8_t>
 	callbacks[i]();
 }
 
+void GameState::start_falling_player(uint8_t player_number) {
+	//TODO
+	dbg("TODO start_falling_player");
+}
+
 void GameState::start_innexistant_player(uint8_t player_number) {
 	//TODO
 	dbg("TODO start_innexistant_player");
@@ -318,33 +323,33 @@ GameState::GameState(Stage stage)
 		&place_holder,               &place_holder,              &place_holder, &place_holder, &place_holder,
 		&place_holder,               &place_holder,              &place_holder, &place_holder, &GameState::spawn_player,
 	};
+	mPlayerOffgroundRoutines = {
+		&GameState::start_falling_player, &GameState::start_falling_player, &place_holder, &place_holder, &place_holder,
+		&place_holder,                    &place_holder,                    &place_holder, &place_holder, &place_holder,
+		&place_holder,                    &place_holder,                    &place_holder, &place_holder, &place_holder,
+		&place_holder,                    &place_holder,                    &place_holder, &place_holder, &place_holder,
+		&place_holder,                    &place_holder,                    &place_holder, &place_holder, &dummy_routine,
+	};
+	mPlayerOngroundRoutines = {
+		&dummy_routine, &dummy_routine, &place_holder, &place_holder, &place_holder,
+		&place_holder,  &place_holder,  &place_holder, &place_holder, &place_holder,
+		&place_holder,  &place_holder,  &place_holder, &place_holder, &place_holder,
+		&place_holder,  &place_holder,  &place_holder, &place_holder, &place_holder,
+		&place_holder,  &place_holder,  &place_holder, &place_holder, &dummy_routine,
+	};
 	mPlayerInputRoutines = {
 		&GameState::standing_player_input, &GameState::running_player_input, &place_holder, &place_holder, &place_holder,
 		&place_holder,                     &place_holder,                    &place_holder, &place_holder, &place_holder,
 		&place_holder,                     &place_holder,                    &place_holder, &place_holder, &place_holder,
 		&place_holder,                     &place_holder,                    &place_holder, &place_holder, &place_holder,
-		&place_holder,                     &place_holder,                    &place_holder, &place_holder, &place_holder,
+		&place_holder,                     &place_holder,                    &place_holder, &place_holder, &keep_input_dirty,
 	};
 	mPlayerOnhurtRoutines = {
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-	};
-	mPlayerOngroundRoutines = {
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-	};
-	mPlayerOffgroundRoutines = {
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
-		&place_holder, &place_holder, &place_holder, &place_holder, &place_holder,
+		&GameState::hurt_player, &GameState::hurt_player, &place_holder, &place_holder, &place_holder,
+		&place_holder,           &place_holder,           &place_holder, &place_holder, &place_holder,
+		&place_holder,           &place_holder,           &place_holder, &place_holder, &place_holder,
+		&place_holder,           &place_holder,           &place_holder, &place_holder, &place_holder,
+		&place_holder,           &place_holder,           &place_holder, &place_holder, &dummy_routine,
 	};
 	mAnimations = {
 		{"anim_sinbad_idle", 49291, 120},
@@ -595,6 +600,20 @@ void GameState::check_player_position(uint8_t player_number, Point<uint8_t> cons
 
 	end:
 		return;
+}
+
+void GameState::dummy_routine(uint8_t) {
+}
+
+void GameState::hurt_player(uint8_t player_number) {
+	//TODO
+	dbg("TODO hurt_player");
+}
+
+void GameState::keep_input_dirty(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	player.btns = player.last_frame_btns;
 }
 
 bool GameState::boxes_overlap(Rectangle const& rect1, Rectangle const& rect2) const {
