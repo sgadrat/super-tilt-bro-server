@@ -147,6 +147,7 @@ void GameState::controller_callbacks(uint8_t player_number, std::vector<uint8_t>
 }
 
 void GameState::start_falling_player(uint8_t player_number) {
+	dbg("start_falling_player " << (uint16_t)player_number);
 	Player& player = this->getPlayer(player_number);
 
 	player.state = PLAYER_STATE_FALLING;
@@ -161,20 +162,24 @@ void GameState::falling_player(uint8_t player_number) {
 }
 
 void GameState::start_innexistant_player(uint8_t player_number) {
+	dbg("start_innexistant_player " << (uint16_t)player_number);
 	//TODO
 	dbg("TODO start_innexistant_player");
 }
 
 void GameState::start_landing_player(uint8_t player_number) {
+	dbg("start_landing_player " << (uint16_t)player_number);
 	dbg("TODO start_landing_player");
 }
 
 void GameState::start_respawn_player(uint8_t player_number) {
+	dbg("start_respawn_player " << (uint16_t)player_number);
 	//TODO
 	dbg("TODO start_respawn_player");
 }
 
 void GameState::start_running_player(uint8_t player_number) {
+	dbg("start_running_player " << (uint16_t)player_number);
 	Player& player = this->getPlayer(player_number);
 
 	player.state = PLAYER_STATE_RUNNING;
@@ -248,6 +253,7 @@ void GameState::running_player_input(uint8_t player_number) {
 }
 
 void GameState::start_standing_player(uint8_t player_number) {
+	dbg("start_standing_player " << (uint16_t)player_number);
 	Player& player = this->getPlayer(player_number);
 
 	player.state = PLAYER_STATE_STANDING;
@@ -313,6 +319,7 @@ void GameState::standing_player_input(uint8_t player_number) {
 }
 
 void GameState::start_spawn_player(uint8_t player_number) {
+	dbg("start_spawn_player " << (uint16_t)player_number);
 	Player& player = this->getPlayer(player_number);
 
 	player.state = PLAYER_STATE_SPAWN;
@@ -327,6 +334,7 @@ void GameState::spawn_player(uint8_t player_number) {
 }
 
 void GameState::start_thrown_player(uint8_t player_number) {
+	dbg("start_thrown_player " << (uint16_t)player_number);
 	//TODO
 	dbg("TODO start_thrown_player");
 }
@@ -416,6 +424,8 @@ GameState::GameState(Stage stage)
 }
 
 bool GameState::tick() {
+	dbg("===== tick =====");
+
 	// Shake screen and do nothing until shaking is over
 	if (mScreenShakeCounter > 0) {
 		--mScreenShakeCounter;
