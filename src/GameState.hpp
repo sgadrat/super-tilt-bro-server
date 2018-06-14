@@ -152,12 +152,18 @@ private:
 
 	// Player state routines
 
-	void set_player_animation(uint8_t player_number, uint16_t animation_address);
+	void aerial_directional_influence(uint8_t player_number);
+	void apply_gravity(uint8_t player_number);
+	void check_aerial_inputs(uint8_t player_nummber);
 	void controller_callbacks(uint8_t player_number, std::vector<uint8_t> gamepad_state, std::vector<std::function<void()>> callbacks);
+	void set_player_animation(uint8_t player_number, uint16_t animation_address);
 
 	void start_falling_player(uint8_t player_number);
+	void falling_player(uint8_t player_number);
 
 	void start_innexistant_player(uint8_t player_number);
+
+	void start_landing_player(uint8_t player_number);
 
 	void start_respawn_player(uint8_t player_number);
 
