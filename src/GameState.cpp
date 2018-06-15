@@ -700,7 +700,7 @@ bool GameState::check_on_platform(uint8_t player_number, Rectangle const& platfo
 	}
 
 	// if (Y != platform_top - 1) then offground
-	if (msb(player.y) != platform_position.top) {
+	if (msb(player.y) != platform_position.top - 1) {
 		return false;
 	}
 
