@@ -166,6 +166,8 @@ private:
 	void start_landing_player(uint8_t player_number);
 
 	void start_respawn_player(uint8_t player_number);
+	void respawn_player(uint8_t player_number);
+	void respawn_player_input(uint8_t player_number);
 
 	void start_running_player(uint8_t player_number);
 	void running_player(uint8_t player_number);

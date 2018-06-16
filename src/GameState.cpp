@@ -264,13 +264,60 @@ void GameState::start_innexistant_player(uint8_t player_number) {
 
 void GameState::start_landing_player(uint8_t player_number) {
 	dbg("start_landing_player " << (uint16_t)player_number);
-	dbg("TODO start_landing_player");
+	dbg("TODO start_landing_player (skipped to standing)");
+	this->start_standing_player(player_number);
 }
 
 void GameState::start_respawn_player(uint8_t player_number) {
 	dbg("start_respawn_player " << (uint16_t)player_number);
-	//TODO
-	dbg("TODO start_respawn_player");
+	Player& player = this->getPlayer(player_number);
+	const uint8_t RESPAWN_PLAYER_MAX_DURATION = 250;
+
+	// Set the player's state
+	player.state = PLAYER_STATE_RESPAWN;
+
+	// Place player to the respawn spot
+	Stage::Spawn const& spawn = this->mStage.respawn;
+	player.x = spawn.x;
+	player.y = spawn.y;
+	player.velocity_h = 0;
+	player.velocity_v = 0;
+	player.damages = 0;
+
+	// Initialise state's timer
+	player.state_field1 = RESPAWN_PLAYER_MAX_DURATION;
+
+	// Set the appropriate animation
+	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_respawn").address);
+}
+
+void GameState::respawn_player(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	// Check for timeout
+	--player.state_field1;
+	if(player.state_field1 == 0) {
+		this->start_falling_player(player_number);
+	}
+}
+
+void GameState::respawn_player_input(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	// Avoid doing anything until controller has returned to neutral since after
+	// death the player can release buttons without expecting to take action
+	if (player.last_frame_btns.getRaw() != 0) {
+		return;
+	}
+
+	// Call check_aerial_inputs
+	//  If it does not change the player state, go to falling state
+	//  so that any button press makes the player falls from revival
+	//  platform
+	this->check_aerial_inputs(player_number);
+	if (player.state == PLAYER_STATE_RESPAWN) {
+		this->start_falling_player(player_number);
+	}
 }
 
 void GameState::start_running_player(uint8_t player_number) {
@@ -446,42 +493,43 @@ GameState::GameState(Stage stage)
 	// Setup data
 	mPlayerTickRoutines = {
 		&GameState::standing_player, &GameState::running_player, &GameState::falling_player, &place_holder, &place_holder,
-		&place_holder,               &place_holder,              &place_holder,              &place_holder, &place_holder,
+		&place_holder,               &GameState::respawn_player, &place_holder,              &place_holder, &place_holder,
 		&place_holder,               &place_holder,              &place_holder,              &place_holder, &place_holder,
 		&place_holder,               &place_holder,              &place_holder,              &place_holder, &place_holder,
 		&place_holder,               &place_holder,              &place_holder,              &place_holder, &GameState::spawn_player,
 	};
 	mPlayerOffgroundRoutines = {
 		&GameState::start_falling_player, &GameState::start_falling_player, &GameState::dummy_routine, &place_holder, &place_holder,
-		&place_holder,                    &place_holder,                    &place_holder,             &place_holder, &place_holder,
+		&place_holder,                    &GameState::dummy_routine,         &place_holder,             &place_holder, &place_holder,
 		&place_holder,                    &place_holder,                    &place_holder,             &place_holder, &place_holder,
 		&place_holder,                    &place_holder,                    &place_holder,             &place_holder, &place_holder,
 		&place_holder,                    &place_holder,                    &place_holder,             &place_holder, &GameState::dummy_routine,
 	};
 	mPlayerOngroundRoutines = {
 		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::start_landing_player, &place_holder, &place_holder,
-		&place_holder,             &place_holder,             &place_holder,                    &place_holder, &place_holder,
+		&place_holder,             &GameState::dummy_routine, &place_holder,                    &place_holder, &place_holder,
 		&place_holder,             &place_holder,             &place_holder,                    &place_holder, &place_holder,
 		&place_holder,             &place_holder,             &place_holder,                    &place_holder, &place_holder,
 		&place_holder,             &place_holder,             &place_holder,                    &place_holder, &GameState::dummy_routine,
 	};
 	mPlayerInputRoutines = {
 		&GameState::standing_player_input, &GameState::running_player_input, &GameState::check_aerial_inputs, &place_holder, &place_holder,
-		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder, &place_holder,
+		&place_holder,                     &GameState::respawn_player_input, &place_holder,                   &place_holder, &place_holder,
 		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder, &place_holder,
 		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder, &place_holder,
 		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder, &GameState::keep_input_dirty,
 	};
 	mPlayerOnhurtRoutines = {
-		&GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player, &place_holder, &place_holder,
-		&place_holder,           &place_holder,           &place_holder,           &place_holder, &place_holder,
-		&place_holder,           &place_holder,           &place_holder,           &place_holder, &place_holder,
-		&place_holder,           &place_holder,           &place_holder,           &place_holder, &place_holder,
-		&place_holder,           &place_holder,           &place_holder,           &place_holder, &GameState::dummy_routine,
+		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player, &place_holder, &place_holder,
+		&place_holder,           &GameState::dummy_routine, &place_holder,           &place_holder, &place_holder,
+		&place_holder,           &place_holder,             &place_holder,           &place_holder, &place_holder,
+		&place_holder,           &place_holder,             &place_holder,           &place_holder, &place_holder,
+		&place_holder,           &place_holder,             &place_holder,           &place_holder, &GameState::dummy_routine,
 	};
 	mAnimations = {
 		{"anim_sinbad_falling", 51389, 100},
 		{"anim_sinbad_idle", 49291, 120},
+		{"anim_sinbad_respawn", 53449, 3},
 		{"anim_sinbad_run", 49346, 15},
 		{"anim_sinbad_spawn", 53532, 50},
 	};
@@ -562,7 +610,9 @@ bool GameState::tick() {
 		mPlayerTickRoutines.at(this->getPlayer(player_num).state)(this, player_num);
 
 		// Call the state input routine if input changed
-		mPlayerInputRoutines.at(this->getPlayer(player_num).state)(this, player_num);
+		if (this->getPlayer(player_num).btns.getRaw() != this->getPlayer(player_num).last_frame_btns.getRaw()) {
+			mPlayerInputRoutines.at(this->getPlayer(player_num).state)(this, player_num);
+		}
 
 		// Call generic update routines
 		Point<uint8_t> initial_position = {
@@ -576,6 +626,10 @@ bool GameState::tick() {
 	// Update game state (end of inlined "update_players")
 
 	this->update_sprites();
+
+	// Input change handling
+	mPlayerA.last_frame_btns = mPlayerA.btns;
+	mPlayerB.last_frame_btns = mPlayerB.btns;
 
 	return true;
 }
@@ -832,7 +886,7 @@ Point<uint16_t> GameState::check_collision(Point<uint8_t> const& old_position, P
 	// Check collision with left edge
 	if (msb(result.y) >= block_position.top && block_position.bottom >= msb(result.y)) {
 		if (old_position.x < block_position.left && msb(result.x) >= block_position.left) {
-			result.x = (((uint16_t)block_position.left) << 8) + 0xff;
+			result.x = (((uint16_t)block_position.left - 1) << 8) + 0xff;
 		}
 
 		// Check collision with right edge
@@ -844,7 +898,7 @@ Point<uint16_t> GameState::check_collision(Point<uint8_t> const& old_position, P
 	// Check collision with top edge
 	if (msb(result.x) >= block_position.left && block_position.right >= msb(result.x)) {
 		if (old_position.y < block_position.top && msb(result.y) >= block_position.top) {
-			result.y = (((uint16_t)block_position.top) << 8) + 0xff;
+			result.y = (((uint16_t)block_position.top - 1) << 8) + 0xff;
 		}
 
 		// Check collision with bottom edge
