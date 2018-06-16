@@ -26,6 +26,15 @@ static uint8_t lsb(uint16_t v) {
 	return v & 0xff;
 }
 
+/*
+ * usage:
+ *  bin_int(0x000a) => 10
+ *  bin_int(0xfff6) => -10
+ */
+static int16_t bin_int(uint16_t v) {
+	return static_cast<int16_t>(v);
+}
+
 static void place_holder(GameState*, uint8_t) {
 	//TODO all reference to this function are temporary place holders and must be replaced by some real implementation
 	dbg("TODO place_holder function");
@@ -122,15 +131,101 @@ void GameState::set_player_animation(uint8_t player_number, uint16_t animation_a
 }
 
 void GameState::aerial_directional_influence(uint8_t player_number) {
-	dbg("TODO aerial_directional_influence");
+	Player& player = this->getPlayer(player_number);
+
+	if (player.btns.left_pressed) {
+		if (bin_int(0xff00) < player.velocity_h) {
+			merge_to_player_velocity(player_number, bin_int(0xff00), player.velocity_v, 0x80);
+		}
+	}else if (player.btns.right_pressed) {
+		if (player.velocity_h < bin_int(0x0100)) {
+			merge_to_player_velocity(player_number, bin_int(0x0100), player.velocity_v, 0x80);
+		}
+	}
 }
 
 void GameState::apply_gravity(uint8_t player_number) {
-	dbg("TODO apply_gravity");
+	Player& player = this->getPlayer(player_number);
+
+	this->merge_to_player_velocity(player_number, player.velocity_h, static_cast<int16_t>(player.gravity) << 8, 0x60);
 }
 
 void GameState::check_aerial_inputs(uint8_t player_number) {
-	dbg("TODO check_aerial_inputs");
+	Player& player = this->getPlayer(player_number);
+
+	// Refuse to do anything if under hitstun
+	if (player.hitstun != 0) {
+		return;
+	}
+
+	// Do nothing if the only changes concern the left-right buttons
+	if (
+		player.btns.a_pressed == player.last_frame_btns.a_pressed &&
+		player.btns.b_pressed == player.last_frame_btns.b_pressed &&
+		player.btns.up_pressed == player.last_frame_btns.up_pressed &&
+		player.btns.down_pressed == player.last_frame_btns.down_pressed
+	)
+	{
+		return;
+	}
+
+	// Save current direction
+	uint8_t original_direction = player.direction;
+
+	// Change player's direction according to input direction
+	if (player.btns.left_pressed) {
+		player.direction = DIRECTION_LEFT;
+	}else if (player.btns.right_pressed) {
+		player.direction = DIRECTION_RIGHT;
+	}
+
+	// Start the good state according to input
+
+	// Take inpput (inlined, routine "take_input")
+
+	// Mark input
+	uint8_t input_marker = 1;
+
+	// Call aerial subroutines, in case of input it will return with input marked
+	this->controller_callbacks(
+		player_number,
+		{
+			CONTROLLER_INPUT_SPECIAL_RIGHT, CONTROLLER_INPUT_SPECIAL_LEFT, CONTROLLER_INPUT_JUMP,         CONTROLLER_INPUT_JUMP_RIGHT,  CONTROLLER_INPUT_JUMP_LEFT,
+			CONTROLLER_INPUT_ATTACK_LEFT,   CONTROLLER_INPUT_ATTACK_RIGHT, CONTROLLER_INPUT_DOWN_TILT,    CONTROLLER_INPUT_ATTACK_UP,   CONTROLLER_INPUT_JAB,
+			CONTROLLER_INPUT_SPECIAL,       CONTROLLER_INPUT_SPECIAL_UP,   CONTROLLER_INPUT_SPECIAL_DOWN, CONTROLLER_INPUT_TECH,
+		},
+		{
+			[&](){dbg("TODO aerial_input");},
+			[&](){dbg("TODO aerial_input");},
+			[&](){dbg("TODO aerial_input");},
+			[&](){dbg("TODO aerial_input");},
+			[&](){dbg("TODO aerial_input");},
+
+			[&](){dbg("TODO aerial_input");},
+			[&](){dbg("TODO aerial_input");},
+			[&](){dbg("TODO aerial_input");},
+			[&](){dbg("TODO aerial_input");},
+			[&](){dbg("TODO aerial_input");},
+
+			[&](){dbg("TODO aerial_input");},
+			[&](){dbg("TODO aerial_input");},
+			[&](){dbg("TODO aerial_input");},
+			[&](){
+				// Fast fall, gravity * 1.5
+				player.gravity = DEFAULT_GRAVITY * 1.5;
+				player.velocity_v = DEFAULT_GRAVITY * 1.5;
+			},
+
+			[&](){input_marker = 0;},
+		}
+	);
+
+	// Take input (end of inlined "take_input")
+
+	// Restore player's direction if there was no input, else discard saved direction
+	if (input_marker == 0) {
+		player.direction = original_direction;
+	}
 }
 
 void GameState::controller_callbacks(uint8_t player_number, std::vector<uint8_t> gamepad_state, std::vector<std::function<void()>> callbacks) {
