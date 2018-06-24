@@ -527,11 +527,11 @@ GameState::GameState(Stage stage)
 		&place_holder,           &place_holder,             &place_holder,           &place_holder, &GameState::dummy_routine,
 	};
 	mAnimations = {
-		{"anim_sinbad_falling", 51389, 100},
-		{"anim_sinbad_idle", 49291, 120},
-		{"anim_sinbad_respawn", 53449, 3},
-		{"anim_sinbad_run", 49346, 15},
-		{"anim_sinbad_spawn", 53532, 50},
+		{"anim_sinbad_falling", 51526, 100},
+		{"anim_sinbad_idle", 49428, 120},
+		{"anim_sinbad_respawn", 53586, 3},
+		{"anim_sinbad_run", 49483, 15},
+		{"anim_sinbad_spawn", 53669, 50},
 	};
 
 	// Ensure game state is zero
