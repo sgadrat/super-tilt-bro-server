@@ -527,11 +527,7 @@ GameState::GameState(Stage stage)
 		&place_holder,           &place_holder,             &place_holder,           &place_holder, &GameState::dummy_routine,
 	};
 	mAnimations = {
-		{"anim_sinbad_falling", 51526, 100},
-		{"anim_sinbad_idle", 49428, 120},
-		{"anim_sinbad_respawn", 53586, 3},
-		{"anim_sinbad_run", 49483, 15},
-		{"anim_sinbad_spawn", 53669, 50},
+#include "GameState.animations.inc.cpp"
 	};
 
 	// Ensure game state is zero
@@ -652,7 +648,7 @@ GameState::Player& GameState::getPlayer(uint8_t player_number) {
 	}
 }
 
-Animation& GameState::findAnimation(uint16_t address) {
+GameState::Animation& GameState::findAnimation(uint16_t address) {
 	for (Animation& anim : mAnimations) {
 		if (anim.address == address) {
 			return anim;
@@ -662,7 +658,7 @@ Animation& GameState::findAnimation(uint16_t address) {
 	throw std::runtime_error("animation not found by address");
 }
 
-Animation& GameState::findAnimation(std::string const& name) {
+GameState::Animation& GameState::findAnimation(std::string const& name) {
 	for (Animation& anim : mAnimations) {
 		if (anim.name == name) {
 			return anim;
@@ -673,16 +669,90 @@ Animation& GameState::findAnimation(std::string const& name) {
 }
 
 void GameState::update_sprites() {
-	/* Light version of the real subroutine, placing sprites is useless, just compute anim_clock */
+	/* Light version of the real subroutine, placing sprites is useless, just compute anim_clock and move hitboxes */
 	for (uint8_t player_number = 0; player_number < 2; ++player_number) {
 		Player& player = getPlayer(player_number);
 
-		if (player.anim_clock > findAnimation(player.animation).duration) {
+		// Search for the frame on time with clock
+		uint8_t frame_first_tick = 0;
+		bool found = false;
+		for (Animation::Frame const& frame : findAnimation(player.animation).frames) {
+			uint8_t frame_end_tick = frame_first_tick + frame.duration;
+			if (frame_end_tick > player.anim_clock) {
+				this->draw_anim_frame(frame, Point<uint8_t>{ .x = msb(player.x), .y = msb(player.y) }, player.animation_direction, frame_first_tick, player_number);
+				++player.anim_clock;
+				found = true;
+				break;
+			}else {
+				frame_first_tick = frame_end_tick;
+			}
+		}
+		if (! found) {
 			player.anim_clock = 0;
-		}else {
-			++player.anim_clock;
 		}
 	}
+}
+
+void GameState::draw_anim_frame(GameState::Animation::Frame const& frame, Point<uint8_t> position, uint8_t direction, uint8_t first_tick, uint8_t player_number) {
+	Player& player = getPlayer(player_number);
+
+	// Compute is_first_tick
+	bool is_first_tick = first_tick == player.anim_clock;
+
+	// Move hurtbox (inlined "anim_frame_move_hurtbox")
+
+	// Extract relative position
+	player.hurtbox = frame.hurtbox;
+
+	// If the animation is flipped, flip the box
+	if (direction != DIRECTION_LEFT) {
+		uint8_t width = player.hurtbox.position.right - player.hurtbox.position.left;
+		player.hurtbox.position.right = (player.hurtbox.position.left ^ 0b11111111) + 8; // right = -left + 7
+		player.hurtbox.position.left = player.hurtbox.position.right - width;
+	}
+
+	// Apply offset to the box
+	player.hurtbox.position.left += position.x;
+	player.hurtbox.position.right += position.x;
+	player.hurtbox.position.top += position.y;
+	player.hurtbox.position.bottom += position.y;
+
+	// Move hurtbox (end of inlined "anim_frame_move_hurtbox")
+
+	// Move hitbox (inlined "anim_frame_move_hitbox")
+
+	if (frame.has_hitbox) {
+		// Copy hitbox with special handling for reenabling
+		bool enabled = player.hitbox.enabled;
+		if (is_first_tick) {
+			enabled = enabled || frame.hitbox.enabled;
+		}
+		player.hitbox = frame.hitbox;
+		player.hitbox.enabled = enabled;
+
+		// If the player is right facing, flip the box
+		if (direction != DIRECTION_LEFT) {
+			// Flip box position
+			uint8_t width = player.hitbox.position.right - player.hitbox.position.left;
+			player.hitbox.position.right = (player.hitbox.position.left ^ 0b11111111) + 8; // right = -left + 7
+			player.hitbox.position.left = player.hitbox.position.right - width;
+
+			// Flip box knockback
+			player.hitbox.base_knock_up_h ^= 0b1111111111111111;
+			++player.hitbox.base_knock_up_h;
+
+			player.hitbox.force_h ^= 0b1111111111111111;
+			++player.hitbox.force_h;
+
+			// Apply offset to the box
+			player.hitbox.position.left += position.x;
+			player.hitbox.position.right += position.x;
+			player.hitbox.position.top += position.y;
+			player.hitbox.position.bottom += position.y;
+		}
+	}
+
+	// Move hitbox (end of inlined "anim_frame_move_hitbox")
 }
 
 void GameState::check_player_hit(uint8_t player_number) {

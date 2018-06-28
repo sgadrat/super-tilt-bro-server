@@ -13,12 +13,6 @@ struct Point {
 	T x, y;
 };
 
-struct Animation {
-	std::string name;
-	uint16_t address;
-	uint8_t duration;
-};
-
 class Stage {
 public:
 	struct Platform {
@@ -126,6 +120,19 @@ private:
 		ControllerState last_frame_btns;
 	};
 
+	struct Animation {
+		struct Frame {
+			uint8_t duration;
+			bool has_hitbox;
+			Hurtbox hurtbox;
+			Hitbox hitbox;
+		};
+
+		std::string name;
+		uint16_t address;
+		std::vector<Frame> frames;
+	};
+
 private:
 	// Utility functions
 
@@ -139,6 +146,7 @@ private:
 	bool check_on_platform(uint8_t player_number, Rectangle const& platform_position);
 	void check_player_hit(uint8_t player_number);
 	void check_player_position(uint8_t player_number, Point<uint8_t> const& old_position);
+	void draw_anim_frame(Animation::Frame const& frame, Point<uint8_t> position, uint8_t direction, uint8_t first_tick, uint8_t player_number);
 	void dummy_routine(uint8_t player_number);
 	void hurt_player(uint8_t player_number);
 	void keep_input_dirty(uint8_t player_number);
