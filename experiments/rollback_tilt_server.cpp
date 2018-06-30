@@ -3,6 +3,7 @@
 #include <libstnp/libstnp.hpp>
 
 #include <algorithm>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -183,6 +184,17 @@ int main() {
 				out_message->data = serializer.serialized();
 				out_messages.push(out_message);
 				std::cout << "send state to " << client_endpoint.address() << ":" << client_endpoint.port() << std::endl;
+			}
+
+			// Save replay file
+			std::ofstream ofs("/tmp/tilt.replay");
+			ofs << controller_a_history.size();
+			for (std::pair<uint32_t, GameState::ControllerState> const& entry : controller_a_history) {
+				ofs << ' ' << entry.first << ' ' << (uint16_t)entry.second.getRaw();
+			}
+			ofs << ' ' << controller_b_history.size();
+			for (std::pair<uint32_t, GameState::ControllerState> const& entry : controller_b_history) {
+				ofs << ' ' << entry.first << ' ' << (uint16_t)entry.second.getRaw();
 			}
 		}
 
