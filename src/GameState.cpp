@@ -421,7 +421,7 @@ void GameState::standing_player_input_left(uint8_t player_number) {
 }
 
 void GameState::standing_player_input_right(uint8_t player_number) {
-	this->getPlayer(player_number).direction = DIRECTION_LEFT;
+	this->getPlayer(player_number).direction = DIRECTION_RIGHT;
 	this->start_running_player(player_number);
 }
 
