@@ -15,6 +15,12 @@ def asmint(s):
 		return int(s[1:], 2)
 	return int(s)
 
+def asmsint16(s):
+	i = asmint(s)
+	if i >= 0x8000:
+		i = -(0x10000 - i)
+	return i
+
 RE_ANIM_LINE = re.compile('(?P<name>[a-z0-9_]+)=[a-z0-9_]+=(?P<addr>[0-9]+)')
 
 animations_blacklist = [
@@ -70,10 +76,10 @@ with open('/tmp/anims.asm', 'r') as anim_file:
 			current_anim.frames[-1].hitbox = stblib.animations.Hitbox(
 				enabled = asmint(m.group('enabled')) != 0,
 				damages = asmint(m.group('damages')),
-				base_h = asmint(m.group('base_h')),
-				base_v = asmint(m.group('base_v')),
-				force_h = asmint(m.group('force_h')),
-				force_v = asmint(m.group('force_v')),
+				base_h = asmsint16(m.group('base_h')),
+				base_v = asmsint16(m.group('base_v')),
+				force_h = asmsint16(m.group('force_h')),
+				force_v = asmsint16(m.group('force_v')),
 				left = asmint(m.group('left')),
 				right = asmint(m.group('right')),
 				top = asmint(m.group('top')),

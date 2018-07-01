@@ -9,7 +9,7 @@
 #include <thread>
 #include <vector>
 
-// g++ replay_player.cpp ../src/GameState.cpp -I .. -I ../src
+// g++ -o replay_player replay_player.cpp ../src/GameState.cpp -I .. -I ../src
 
 class GameStateInfo {
 public:
@@ -18,6 +18,14 @@ public:
 		"player_a.state", "player_b.state", "filler", "player_a.hitstun", "player_b.hitstun",
 		"player_a.x.msb", "player_b.x.msb", "player_a.y.msb", "player_b.y.msb",
 		"player_a.direction", "player_b.direction",
+		"player_a.velocity_v.msb", "player_b.velocity_v.msb", "player_a.velocity_h.msb", "player_b.velocity_h.msb",
+		"player_a.state_field1", "player_b.state_field1", "player_a.state_field2", "player_b.state_field2",
+		"player_a.anim_clock", "player_b.anim_clock",
+		"player_a.hurtbox.left", "player_b.hurtbox.left", "player_a.hurtbox.right", "player_b.hurtbox.right",
+		"player_a.hurtbox.top", "player_b.hurtbox.top", "player_a.hurtbox.bottom", "player_b.hurtbox.bottom",
+		"player_a.hitbox.left", "player_b.hitbox.left", "player_a.hitbox.right", "player_b.hitbox.right",
+		"player_a.hitbox.top", "player_b.hitbox.top", "player_a.hitbox.bottom", "player_b.hitbox.bottom",
+		"player_a.hitbox.enabled", "player_b.hitbox.enabled"
 	})
 	, mNextFieldUint8(mFieldsUint8.begin())
 	{
@@ -104,6 +112,9 @@ int main() {
 		std::cerr << "player_a.state .....: " << gamestate_info.mValues["player_a.state"] << std::endl;
 		std::cerr << "player_a.x .........: " << gamestate_info.mValues["player_a.x.msb"] << std::endl;
 		std::cerr << "player_a.direction .: " << (gamestate_info.mValues["player_a.direction"] == "0" ? "LEFT" : "RIGHT") << std::endl;
+		if (gamestate_info.mValues["player_a.hitbox.enabled"] != "0") {
+			std::cerr << "player_a.hitbox ....: left=" << gamestate_info.mValues["player_a.hitbox.left"] << " right=" << gamestate_info.mValues["player_a.hitbox.right"] << " top=" << gamestate_info.mValues["player_a.hitbox.top"] << " bottom=" << gamestate_info.mValues["player_a.hitbox.bottom"] << std::endl;
+		}
 
 		// Indicate the begining of the new frame
 		std::cerr << std::endl << "tick " << current_frame << ':' << std::endl;

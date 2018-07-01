@@ -2,3 +2,4 @@
 *.gch
 *.swp
 a.out
+experiments/replay_player

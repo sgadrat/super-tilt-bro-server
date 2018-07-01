@@ -92,8 +92,8 @@ private:
 	struct Hitbox {
 		bool enabled;
 		Rectangle position;
-		uint16_t force_v, force_h;
-		uint16_t base_knock_up_v, base_knock_up_h;
+		int16_t force_v, force_h;
+		int16_t base_knock_up_v, base_knock_up_h;
 		uint8_t damages;
 	};
 
@@ -166,12 +166,17 @@ private:
 	void controller_callbacks(uint8_t player_number, std::vector<uint8_t> gamepad_state, std::vector<std::function<void()>> callbacks);
 	void set_player_animation(uint8_t player_number, uint16_t animation_address);
 
+	void start_crashing_player(uint8_t player_number);
+
 	void start_falling_player(uint8_t player_number);
 	void falling_player(uint8_t player_number);
 
 	void start_helpless_player(uint8_t player_number);
 
 	void start_innexistant_player(uint8_t player_number);
+
+	void start_jabbing_player(uint8_t player_number);
+	void jabbing_player(uint8_t player_number);
 
 	void start_landing_player(uint8_t player_number);
 	void landing_player(uint8_t player_number);
@@ -194,6 +199,9 @@ private:
 	void standing_player_input(uint8_t player_number);
 
 	void start_thrown_player(uint8_t player_number);
+	void thrown_player(uint8_t player_number);
+	void thrown_player_input(uint8_t player_number);
+	void thrown_player_on_ground(uint8_t player_number);
 
 private:
 	Stage mStage;
@@ -260,9 +268,9 @@ void GameState::serial(SerializationHandler& s) {
 	s.uint8(mPlayerB.hitbox.position.top);
 	s.uint8(mPlayerA.hitbox.position.bottom);
 	s.uint8(mPlayerB.hitbox.position.bottom);
-	v = mPlayerA.hitbox.enabled ? 0 : 1;
+	v = mPlayerA.hitbox.enabled ? 1 : 0;
 	s.uint8(v);
-	v = mPlayerB.hitbox.enabled ? 0 : 1;
+	v = mPlayerB.hitbox.enabled ? 1 : 0;
 	s.uint8(v);
 	v = mPlayerA.hitbox.force_v >> 8;
 	s.uint8(v);

@@ -241,6 +241,14 @@ void GameState::controller_callbacks(uint8_t player_number, std::vector<uint8_t>
 	callbacks[i]();
 }
 
+void GameState::start_crashing_player(uint8_t player_number) {
+	dbg("start_crashing_player " << (uint16_t)player_number);
+
+	//TODO
+	dbg("TODO start_crashing_player, skipping to landing");
+	this->start_landing_player(player_number);
+}
+
 void GameState::start_falling_player(uint8_t player_number) {
 	dbg("start_falling_player " << (uint16_t)player_number);
 	Player& player = this->getPlayer(player_number);
@@ -267,6 +275,23 @@ void GameState::start_innexistant_player(uint8_t player_number) {
 	dbg("start_innexistant_player " << (uint16_t)player_number);
 	//TODO
 	dbg("TODO start_innexistant_player");
+}
+
+void GameState::start_jabbing_player(uint8_t player_number) {
+	dbg("start_jabbing_player " << (uint16_t)player_number);
+	Player& player = this->getPlayer(player_number);
+
+	player.state = PLAYER_STATE_JABBING;
+	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_jab").address);
+}
+
+void GameState::jabbing_player(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+	const uint8_t STATE_SINBAD_JAB_DURATION = 8;
+
+	if (player.anim_clock == STATE_SINBAD_JAB_DURATION) {
+		this->start_standing_player(player_number);
+	}
 }
 
 void GameState::start_landing_player(uint8_t player_number) {
@@ -475,7 +500,7 @@ void GameState::standing_player_input(uint8_t player_number) {
 			[&](){dbg("TODO standing_player_input");},
 			[&](){dbg("TODO standing_player_input");},
 
-			[&](){dbg("TODO standing_player_input");},
+			[&](){this->start_jabbing_player(player_number);},
 			[&](){dbg("TODO standing_player_input");},
 			[&](){dbg("TODO standing_player_input");},
 			[&](){dbg("TODO standing_player_input");},
@@ -509,10 +534,95 @@ void GameState::spawn_player(uint8_t player_number) {
 	}
 }
 
+const uint8_t TECH_MAX_FRAMES_BEFORE_COLLISION = 5;
+const uint8_t TECH_NB_FORBIDDEN_FRAMES = 60;
 void GameState::start_thrown_player(uint8_t player_number) {
 	dbg("start_thrown_player " << (uint16_t)player_number);
-	//TODO
-	dbg("TODO start_thrown_player");
+	Player& player = this->getPlayer(player_number);
+
+	// Set player's state
+	player.state = PLAYER_STATE_THROWN;
+
+	// Initialize tech counter
+	player.state_field1 = 0;
+
+	// Set animation
+	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_thrown").address);
+	if (player.velocity_h >= 0) {
+		player.animation_direction = DIRECTION_RIGHT;
+	}else {
+		player.animation_direction = DIRECTION_LEFT;
+	}
+}
+
+void GameState::thrown_player(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	// Update velocity
+	if (player.hitstun == 0) {
+		this->aerial_directional_influence(player_number);
+	}
+	this->apply_gravity(player_number);
+
+	// Decrement tech counter (to zero minimum)
+	if (player.state_field1 != 0) {
+		--player.state_field1;
+	}
+}
+
+void GameState::thrown_player_input(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	this->controller_callbacks(
+		player_number,
+		{
+			CONTROLLER_INPUT_TECH, CONTROLLER_INPUT_TECH_RIGHT, CONTROLLER_INPUT_TECH_LEFT,
+		},
+		{
+			[&](){
+				player.state_field2 = 0;
+				if (player.state_field1 == 0) {
+					player.state_field1 = TECH_MAX_FRAMES_BEFORE_COLLISION + TECH_NB_FORBIDDEN_FRAMES;
+					this->check_aerial_inputs(player_number);
+				}
+			},
+			[&](){
+				player.state_field2 = 1;
+				if (player.state_field1 == 0) {
+					player.state_field1 = TECH_MAX_FRAMES_BEFORE_COLLISION + TECH_NB_FORBIDDEN_FRAMES;
+					this->check_aerial_inputs(player_number);
+				}
+			},
+			[&](){
+				player.state_field2 = 2;
+				if (player.state_field1 == 0) {
+					player.state_field1 = TECH_MAX_FRAMES_BEFORE_COLLISION + TECH_NB_FORBIDDEN_FRAMES;
+					this->check_aerial_inputs(player_number);
+				}
+			},
+
+			[&](){this->check_aerial_inputs(player_number);},
+		}
+	);
+}
+
+void GameState::thrown_player_on_ground(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	// If the tech counter is bellow the threshold, just crash
+	if (TECH_NB_FORBIDDEN_FRAMES >= player.state_field1) {
+		this->start_crashing_player(player_number);
+	}else {
+		// A valid tech was entered, land with momentum depending on tech's direction
+		this->start_landing_player(player_number);
+		if (player.state_field2 == 0) {
+			player.velocity_h = 0;
+		}else if (player.state_field2 == 1) {
+			player.velocity_h = 0x0400;
+		}else {
+			player.velocity_h = bin_int(0xfc00);
+		}
+	}
 }
 
 /********************************
@@ -526,36 +636,36 @@ GameState::GameState(Stage stage)
 {
 	// Setup data
 	mPlayerTickRoutines = {
-		&GameState::standing_player, &GameState::running_player, &GameState::falling_player, &place_holder, &place_holder,
-		&place_holder,               &GameState::respawn_player, &place_holder,              &place_holder, &place_holder,
+		&GameState::standing_player, &GameState::running_player, &GameState::falling_player, &place_holder, &GameState::jabbing_player,
+		&GameState::thrown_player,   &GameState::respawn_player, &place_holder,              &place_holder, &place_holder,
 		&place_holder,               &GameState::landing_player, &place_holder,              &place_holder, &place_holder,
 		&place_holder,               &place_holder,              &place_holder,              &place_holder, &place_holder,
 		&place_holder,               &place_holder,              &place_holder,              &place_holder, &GameState::spawn_player,
 	};
 	mPlayerOffgroundRoutines = {
-		&GameState::start_falling_player, &GameState::start_falling_player,  &GameState::dummy_routine, &place_holder, &place_holder,
-		&place_holder,                    &GameState::dummy_routine,         &place_holder,             &place_holder, &place_holder,
+		&GameState::start_falling_player, &GameState::start_falling_player,  &GameState::dummy_routine, &place_holder, &GameState::start_falling_player,
+		&GameState::dummy_routine,        &GameState::dummy_routine,         &place_holder,             &place_holder, &place_holder,
 		&place_holder,                    &GameState::start_helpless_player, &place_holder,             &place_holder, &place_holder,
 		&place_holder,                    &place_holder,                     &place_holder,             &place_holder, &place_holder,
 		&place_holder,                    &place_holder,                     &place_holder,             &place_holder, &GameState::dummy_routine,
 	};
 	mPlayerOngroundRoutines = {
-		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::start_landing_player, &place_holder, &place_holder,
-		&place_holder,             &GameState::dummy_routine, &place_holder,                    &place_holder, &place_holder,
-		&place_holder,             &GameState::dummy_routine, &place_holder,                    &place_holder, &place_holder,
-		&place_holder,             &place_holder,             &place_holder,                    &place_holder, &place_holder,
-		&place_holder,             &place_holder,             &place_holder,                    &place_holder, &GameState::dummy_routine,
+		&GameState::dummy_routine,           &GameState::dummy_routine, &GameState::start_landing_player, &place_holder, &GameState::dummy_routine,
+		&GameState::thrown_player_on_ground, &GameState::dummy_routine, &place_holder,                    &place_holder, &place_holder,
+		&place_holder,                       &GameState::dummy_routine, &place_holder,                    &place_holder, &place_holder,
+		&place_holder,                       &place_holder,             &place_holder,                    &place_holder, &place_holder,
+		&place_holder,                       &place_holder,             &place_holder,                    &place_holder, &GameState::dummy_routine,
 	};
 	mPlayerInputRoutines = {
-		&GameState::standing_player_input, &GameState::running_player_input, &GameState::check_aerial_inputs, &place_holder, &place_holder,
-		&place_holder,                     &GameState::respawn_player_input, &place_holder,                   &place_holder, &place_holder,
+		&GameState::standing_player_input, &GameState::running_player_input, &GameState::check_aerial_inputs, &place_holder, &GameState::keep_input_dirty,
+		&GameState::thrown_player_input,   &GameState::respawn_player_input, &place_holder,                   &place_holder, &place_holder,
 		&place_holder,                     &GameState::keep_input_dirty,     &place_holder,                   &place_holder, &place_holder,
 		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder, &place_holder,
 		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder, &GameState::keep_input_dirty,
 	};
 	mPlayerOnhurtRoutines = {
-		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player, &place_holder, &place_holder,
-		&place_holder,           &GameState::dummy_routine, &place_holder,           &place_holder, &place_holder,
+		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player, &place_holder, &GameState::hurt_player,
+		&GameState::hurt_player, &GameState::dummy_routine, &place_holder,           &place_holder, &place_holder,
 		&place_holder,           &GameState::hurt_player,   &place_holder,           &place_holder, &place_holder,
 		&place_holder,           &place_holder,             &place_holder,           &place_holder, &place_holder,
 		&place_holder,           &place_holder,             &place_holder,           &place_holder, &GameState::dummy_routine,
@@ -772,18 +882,18 @@ void GameState::draw_anim_frame(GameState::Animation::Frame const& frame, Point<
 			player.hitbox.position.left = player.hitbox.position.right - width;
 
 			// Flip box knockback
-			player.hitbox.base_knock_up_h ^= 0b1111111111111111;
-			++player.hitbox.base_knock_up_h;
-
-			player.hitbox.force_h ^= 0b1111111111111111;
-			++player.hitbox.force_h;
-
-			// Apply offset to the box
-			player.hitbox.position.left += position.x;
-			player.hitbox.position.right += position.x;
-			player.hitbox.position.top += position.y;
-			player.hitbox.position.bottom += position.y;
+			player.hitbox.base_knock_up_h *= -1;
+			player.hitbox.force_h *= -1;
 		}
+
+		// Apply offset to the box
+		player.hitbox.position.left += position.x;
+		player.hitbox.position.right += position.x;
+		player.hitbox.position.top += position.y;
+		player.hitbox.position.bottom += position.y;
+	}else {
+		// Deactivate the hitbox if it was not placed by this frame
+		player.hitbox.enabled = false;
 	}
 
 	// Move hitbox (end of inlined "anim_frame_move_hitbox")
@@ -895,8 +1005,34 @@ void GameState::dummy_routine(uint8_t) {
 }
 
 void GameState::hurt_player(uint8_t player_number) {
-	//TODO
-	dbg("TODO hurt_player");
+	Player& stroke_player = this->getPlayer(player_number);
+	Player& striker_player = this->getPlayer(player_number == 0 ? 1 : 0);
+
+	// Apply force vector to the opponent
+	uint8_t force_multiplier = stroke_player.damages / 4;
+	int16_t knockback_h = striker_player.hitbox.force_h * force_multiplier + striker_player.hitbox.base_knock_up_h;
+	stroke_player.velocity_h = knockback_h;
+	int16_t knockback_v = striker_player.hitbox.force_v * force_multiplier + striker_player.hitbox.base_knock_up_v;
+	stroke_player.velocity_v = knockback_v;
+
+	// Apply hitstun to the opponent
+	// hitstun duration = high byte of 2 * (abs(velocity_v) + abs(velocity_h))
+	stroke_player.hitstun = msb(2 * (std::abs(stroke_player.velocity_v) + std::abs(stroke_player.velocity_h)));
+
+	// Start screenshake of duration = hitstun / 2
+	mScreenShakeCounter = stroke_player.hitstun / 2;
+
+	// Apply damages to the opponent
+	stroke_player.damages += striker_player.hitbox.damages;
+	if (stroke_player.damages >= 200) {
+		stroke_player.damages = 199;
+	}
+
+	// Set opponent to thrown state
+	this->start_thrown_player(player_number);
+
+	// Disable the hitbox to avoid multi-hits
+	striker_player.hitbox.enabled = false;
 }
 
 void GameState::keep_input_dirty(uint8_t player_number) {
