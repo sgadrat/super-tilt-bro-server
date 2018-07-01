@@ -169,9 +169,12 @@ private:
 	void start_falling_player(uint8_t player_number);
 	void falling_player(uint8_t player_number);
 
+	void start_helpless_player(uint8_t player_number);
+
 	void start_innexistant_player(uint8_t player_number);
 
 	void start_landing_player(uint8_t player_number);
+	void landing_player(uint8_t player_number);
 
 	void start_respawn_player(uint8_t player_number);
 	void respawn_player(uint8_t player_number);
