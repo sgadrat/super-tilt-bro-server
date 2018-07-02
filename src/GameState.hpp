@@ -167,6 +167,7 @@ private:
 	void set_player_animation(uint8_t player_number, uint16_t animation_address);
 
 	void start_crashing_player(uint8_t player_number);
+	void crashing_player(uint8_t player_number);
 
 	void start_falling_player(uint8_t player_number);
 	void falling_player(uint8_t player_number);
