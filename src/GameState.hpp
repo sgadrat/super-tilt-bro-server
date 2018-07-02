@@ -179,6 +179,10 @@ private:
 	void start_jabbing_player(uint8_t player_number);
 	void jabbing_player(uint8_t player_number);
 
+	void start_jumping_player(uint8_t player_number);
+	void jumping_player(uint8_t player_number);
+	void jumping_player_input(uint8_t player_number);
+
 	void start_landing_player(uint8_t player_number);
 	void landing_player(uint8_t player_number);
 
@@ -193,6 +197,8 @@ private:
 	void start_spawn_player(uint8_t player_number);
 	void spawn_player(uint8_t player_number);
 
+	void start_spe_up_player(uint8_t player_number);
+
 	void start_standing_player(uint8_t player_number);
 	void standing_player(uint8_t player_number);
 	void standing_player_input_left(uint8_t player_number);
@@ -203,6 +209,8 @@ private:
 	void thrown_player(uint8_t player_number);
 	void thrown_player_input(uint8_t player_number);
 	void thrown_player_on_ground(uint8_t player_number);
+
+	void start_up_tilt_player(uint8_t player_number);
 
 private:
 	Stage mStage;

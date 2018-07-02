@@ -22,6 +22,12 @@ static uint8_t msb(uint16_t v) {
 	return v >> 8;
 }
 
+static uint8_t msb(int16_t v) {
+	return msb(
+		v >= 0 ? static_cast<uint16_t>(v) : static_cast<uint16_t>(0x10000 + v)
+	);
+}
+
 static uint8_t lsb(uint16_t v) {
 	return v & 0xff;
 }
@@ -300,10 +306,83 @@ void GameState::start_jabbing_player(uint8_t player_number) {
 
 void GameState::jabbing_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
-	const uint8_t STATE_SINBAD_JAB_DURATION = 8;
+	uint8_t const STATE_SINBAD_JAB_DURATION = 8;
 
 	if (player.anim_clock == STATE_SINBAD_JAB_DURATION) {
 		this->start_standing_player(player_number);
+	}
+}
+
+void GameState::start_jumping_player(uint8_t player_number) {
+	dbg("start_jumping_player " << (uint16_t)player_number);
+	Player& player = this->getPlayer(player_number);
+
+	player.state = PLAYER_STATE_JUMPING;
+	player.state_field1 = 0;
+	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_jumping").address);
+}
+
+uint8_t const STATE_SINBAD_JUMP_PREPARATION_END = 4;
+void GameState::jumping_player(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	// Wait for the preparation to end to begin to jump
+	if (player.anim_clock < STATE_SINBAD_JUMP_PREPARATION_END) {
+		return;
+	}
+	if (player.anim_clock == STATE_SINBAD_JUMP_PREPARATION_END) {
+		// Put initial jumping velocity
+		player.velocity_v = bin_int(0xfac0);
+		return;
+	}
+
+	// Check if the top of the jump is reached
+	if (msb(player.velocity_v) >= 0b10000000) {
+		// The top is not reached, stay in jumping state but apply gravity and directional influence
+		this->falling_player(player_number); // Hack - We just use falling_player which do exactly what we want
+
+		// Check if it is time to stop a short-hop
+		if (msb(player.velocity_v) >= 0xfd) {
+			// If the jump button is no more pressed mid jump, convert the jump to a short-hop
+			if (player.state_field1 != 0) {
+				return;
+			}
+			++player.state_field1;
+
+			if ((player.btns.getRaw() & CONTROLLER_INPUT_JUMP) != 0) {
+				return;
+			}
+
+			player.velocity_v = bin_int(0xfefe);
+		}
+	}else {
+		// The top is reached, return to falling
+		this->start_falling_player(player_number);
+	}
+}
+
+void GameState::jumping_player_input(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	// The jump is cancellable by grounded movements during preparation
+	// and by aerial movements after that
+	if (player.num_aerial_jumps != 0 || player.anim_clock > STATE_SINBAD_JUMP_PREPARATION_END) {
+		// not_grounded:
+		this->check_aerial_inputs(player_number);
+	}else {
+		// grounded:
+		this->controller_callbacks(
+			player_number,
+			{
+				CONTROLLER_INPUT_ATTACK_UP, CONTROLLER_INPUT_SPECIAL_UP,
+			},
+			{
+				[&](){this->start_up_tilt_player(player_number);},
+				[&](){this->start_spe_up_player(player_number);},
+
+				[&](){},
+			}
+		);
 	}
 }
 
@@ -448,9 +527,9 @@ void GameState::running_player_input(uint8_t player_number) {
 					this->start_running_player(player_number);
 				}
 			},
-			[&](){dbg("TODO running_player_input");},
-			[&](){dbg("TODO running_player_input");},
-			[&](){dbg("TODO running_player_input");},
+			[&](){this->start_jumping_player(player_number);},
+			[&](){this->start_jumping_player(player_number);},
+			[&](){this->start_jumping_player(player_number);},
 
 			[&](){dbg("TODO running_player_input");},
 			[&](){dbg("TODO running_player_input");},
@@ -509,9 +588,15 @@ void GameState::standing_player_input(uint8_t player_number) {
 		{
 			[&](){this->standing_player_input_left(player_number);},
 			[&](){this->standing_player_input_right(player_number);},
-			[&](){dbg("TODO standing_player_input");},
-			[&](){dbg("TODO standing_player_input");},
-			[&](){dbg("TODO standing_player_input");},
+			[&](){this->start_jumping_player(player_number);},
+			[&](){
+				this->getPlayer(player_number).direction = DIRECTION_RIGHT;
+				this->start_jumping_player(player_number);
+			},
+			[&](){
+				this->getPlayer(player_number).direction = DIRECTION_LEFT;
+				this->start_jumping_player(player_number);
+			},
 
 			[&](){this->start_jabbing_player(player_number);},
 			[&](){dbg("TODO standing_player_input");},
@@ -545,6 +630,13 @@ void GameState::spawn_player(uint8_t player_number) {
 	if(this->getPlayer(player_number).anim_clock == STATE_SINBAD_SPAWN_DURATION) {
 		this->start_standing_player(player_number);
 	}
+}
+
+void GameState::start_spe_up_player(uint8_t player_number) {
+	dbg("start_spe_up_player " << (uint16_t)player_number);
+
+	//TODO
+	dbg("TODO start_spe_up_player");
 }
 
 const uint8_t TECH_MAX_FRAMES_BEFORE_COLLISION = 5;
@@ -638,6 +730,13 @@ void GameState::thrown_player_on_ground(uint8_t player_number) {
 	}
 }
 
+void GameState::start_up_tilt_player(uint8_t player_number) {
+	dbg("start_up_tilt_player " << (uint16_t)player_number);
+
+	//TODO
+	dbg("TODO start_up_tilt_player");
+}
+
 /********************************
 *
 * GameState implementation
@@ -649,39 +748,39 @@ GameState::GameState(Stage stage)
 {
 	// Setup data
 	mPlayerTickRoutines = {
-		&GameState::standing_player, &GameState::running_player, &GameState::falling_player,  &place_holder, &GameState::jabbing_player,
-		&GameState::thrown_player,   &GameState::respawn_player, &place_holder,               &place_holder, &place_holder,
-		&place_holder,               &GameState::landing_player, &GameState::crashing_player, &place_holder, &place_holder,
-		&place_holder,               &place_holder,              &place_holder,               &place_holder, &place_holder,
-		&place_holder,               &place_holder,              &place_holder,               &place_holder, &GameState::spawn_player,
+		&GameState::standing_player, &GameState::running_player, &GameState::falling_player,  &GameState::jumping_player, &GameState::jabbing_player,
+		&GameState::thrown_player,   &GameState::respawn_player, &place_holder,               &place_holder,              &place_holder,
+		&place_holder,               &GameState::landing_player, &GameState::crashing_player, &place_holder,              &place_holder,
+		&place_holder,               &place_holder,              &place_holder,               &place_holder,              &place_holder,
+		&place_holder,               &place_holder,              &place_holder,               &place_holder,              &GameState::spawn_player,
 	};
 	mPlayerOffgroundRoutines = {
-		&GameState::start_falling_player, &GameState::start_falling_player,  &GameState::dummy_routine,         &place_holder, &GameState::start_falling_player,
-		&GameState::dummy_routine,        &GameState::dummy_routine,         &place_holder,                     &place_holder, &place_holder,
-		&place_holder,                    &GameState::start_helpless_player, &GameState::start_helpless_player, &place_holder, &place_holder,
-		&place_holder,                    &place_holder,                     &place_holder,                     &place_holder, &place_holder,
-		&place_holder,                    &place_holder,                     &place_holder,                     &place_holder, &GameState::dummy_routine,
+		&GameState::start_falling_player, &GameState::start_falling_player,  &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::start_falling_player,
+		&GameState::dummy_routine,        &GameState::dummy_routine,         &place_holder,                     &place_holder,             &place_holder,
+		&place_holder,                    &GameState::start_helpless_player, &GameState::start_helpless_player, &place_holder,             &place_holder,
+		&place_holder,                    &place_holder,                     &place_holder,                     &place_holder,             &place_holder,
+		&place_holder,                    &place_holder,                     &place_holder,                     &place_holder,             &GameState::dummy_routine,
 	};
 	mPlayerOngroundRoutines = {
-		&GameState::dummy_routine,           &GameState::dummy_routine, &GameState::start_landing_player, &place_holder, &GameState::dummy_routine,
-		&GameState::thrown_player_on_ground, &GameState::dummy_routine, &place_holder,                    &place_holder, &place_holder,
-		&place_holder,                       &GameState::dummy_routine, &GameState::dummy_routine,        &place_holder, &place_holder,
-		&place_holder,                       &place_holder,             &place_holder,                    &place_holder, &place_holder,
-		&place_holder,                       &place_holder,             &place_holder,                    &place_holder, &GameState::dummy_routine,
+		&GameState::dummy_routine,           &GameState::dummy_routine, &GameState::start_landing_player, &GameState::dummy_routine, &GameState::dummy_routine,
+		&GameState::thrown_player_on_ground, &GameState::dummy_routine, &place_holder,                    &place_holder,             &place_holder,
+		&place_holder,                       &GameState::dummy_routine, &GameState::dummy_routine,        &place_holder,             &place_holder,
+		&place_holder,                       &place_holder,             &place_holder,                    &place_holder,             &place_holder,
+		&place_holder,                       &place_holder,             &place_holder,                    &place_holder,             &GameState::dummy_routine,
 	};
 	mPlayerInputRoutines = {
-		&GameState::standing_player_input, &GameState::running_player_input, &GameState::check_aerial_inputs, &place_holder, &GameState::keep_input_dirty,
-		&GameState::thrown_player_input,   &GameState::respawn_player_input, &place_holder,                   &place_holder, &place_holder,
-		&place_holder,                     &GameState::keep_input_dirty,     &GameState::keep_input_dirty,    &place_holder, &place_holder,
-		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder, &place_holder,
-		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder, &GameState::keep_input_dirty,
+		&GameState::standing_player_input, &GameState::running_player_input, &GameState::check_aerial_inputs, &GameState::jumping_player_input, &GameState::keep_input_dirty,
+		&GameState::thrown_player_input,   &GameState::respawn_player_input, &place_holder,                   &place_holder,                    &place_holder,
+		&place_holder,                     &GameState::keep_input_dirty,     &GameState::keep_input_dirty,    &place_holder,                    &place_holder,
+		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder,                    &place_holder,
+		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder,                    &GameState::keep_input_dirty,
 	};
 	mPlayerOnhurtRoutines = {
-		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player, &place_holder, &GameState::hurt_player,
-		&GameState::hurt_player, &GameState::dummy_routine, &place_holder,           &place_holder, &place_holder,
-		&place_holder,           &GameState::hurt_player,   &GameState::hurt_player, &place_holder, &place_holder,
-		&place_holder,           &place_holder,             &place_holder,           &place_holder, &place_holder,
-		&place_holder,           &place_holder,             &place_holder,           &place_holder, &GameState::dummy_routine,
+		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player,
+		&GameState::hurt_player, &GameState::dummy_routine, &place_holder,           &place_holder,           &place_holder,
+		&place_holder,           &GameState::hurt_player,   &GameState::hurt_player, &place_holder,           &place_holder,
+		&place_holder,           &place_holder,             &place_holder,           &place_holder,           &place_holder,
+		&place_holder,           &place_holder,             &place_holder,           &place_holder,           &GameState::dummy_routine,
 	};
 	mAnimations = {
 #include "GameState.animations.inc.cpp"
@@ -1030,7 +1129,7 @@ void GameState::hurt_player(uint8_t player_number) {
 
 	// Apply hitstun to the opponent
 	// hitstun duration = high byte of 2 * (abs(velocity_v) + abs(velocity_h))
-	stroke_player.hitstun = msb(2 * (std::abs(stroke_player.velocity_v) + std::abs(stroke_player.velocity_h)));
+	stroke_player.hitstun = msb(static_cast<uint16_t>(2 * (std::abs(stroke_player.velocity_v) + std::abs(stroke_player.velocity_h))));
 
 	// Start screenshake of duration = hitstun / 2
 	mScreenShakeCounter = stroke_player.hitstun / 2;
