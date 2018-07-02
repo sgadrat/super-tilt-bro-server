@@ -821,6 +821,12 @@ GameState::GameState(Stage stage)
 bool GameState::tick() {
 	dbg("===== tick =====");
 
+	// Emulate fetch_controllers from main loop
+	mPlayerA.last_frame_btns = mPlayerA.btns;
+	mPlayerB.last_frame_btns = mPlayerB.btns;
+	mPlayerA.btns = mControllerA;
+	mPlayerB.btns = mControllerB;
+
 	// Shake screen and do nothing until shaking is over
 	if (mScreenShakeCounter > 0) {
 		--mScreenShakeCounter;
@@ -879,19 +885,15 @@ bool GameState::tick() {
 
 	this->update_sprites();
 
-	// Input change handling
-	mPlayerA.last_frame_btns = mPlayerA.btns;
-	mPlayerB.last_frame_btns = mPlayerB.btns;
-
 	return true;
 }
 
 void GameState::setControllerAState(ControllerState state) {
-	mPlayerA.btns = state;
+	mControllerA = state;
 }
 
 void GameState::setControllerBState(ControllerState state) {
-	mPlayerB.btns = state;
+	mControllerB = state;
 }
 
 GameState::Player& GameState::getPlayer(uint8_t player_number) {

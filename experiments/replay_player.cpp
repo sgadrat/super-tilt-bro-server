@@ -73,6 +73,21 @@ GameState initial_gamestate() {
 	return GameState(stage);
 }
 
+std::ostream& operator<<(std::ostream& os, GameState::ControllerState const& controller) {
+	os <<
+		"{a:" << controller.a_pressed <<
+		" b:" << controller.b_pressed <<
+		" select:" << controller.select_pressed <<
+		" start:" << controller.start_pressed <<
+		" up:" << controller.up_pressed <<
+		" down:" << controller.down_pressed <<
+		" left:" << controller.left_pressed <<
+		" right:" << controller.right_pressed <<
+		'}'
+	;
+	return os;
+}
+
 int main() {
 	// Parse history
 	std::map<uint32_t, GameState::ControllerState> controller_a_history{
@@ -124,13 +139,13 @@ int main() {
 		std::map<uint32_t, GameState::ControllerState>::const_iterator controller_history_entry(controller_a_history.find(current_frame));
 		if (controller_history_entry != controller_a_history.end()) {
 			gamestate.setControllerAState(controller_history_entry->second);
-			std::cerr << " controller_a <- " << (uint16_t)controller_history_entry->second.getRaw() << std::endl;
+			std::cerr << " controller_a <- " << controller_history_entry->second << std::endl;
 		}
 
 		controller_history_entry = controller_b_history.find(current_frame);
 		if (controller_history_entry != controller_b_history.end()) {
 			gamestate.setControllerBState(controller_history_entry->second);
-			std::cerr << " controller_b <- " << (uint16_t)controller_history_entry->second.getRaw() << std::endl;
+			std::cerr << " controller_b <- " << controller_history_entry->second << std::endl;
 		}
 
 		// Tick Simulation

@@ -214,6 +214,8 @@ private:
 
 private:
 	Stage mStage;
+	ControllerState mControllerA;
+	ControllerState mControllerB;
 	Player mPlayerA;
 	Player mPlayerB;
 	uint8_t mScreenShakeCounter;
