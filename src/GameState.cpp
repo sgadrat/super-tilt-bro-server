@@ -203,9 +203,9 @@ void GameState::check_aerial_inputs(uint8_t player_number) {
 		{
 			[&](){dbg("TODO aerial_input");},
 			[&](){dbg("TODO aerial_input");},
-			[&](){dbg("TODO aerial_input");},
-			[&](){dbg("TODO aerial_input");},
-			[&](){dbg("TODO aerial_input");},
+			[&](){this->start_aerial_jumping(player_number);},
+			[&](){this->start_aerial_jumping(player_number);},
+			[&](){this->start_aerial_jumping(player_number);},
 
 			[&](){dbg("TODO aerial_input");},
 			[&](){dbg("TODO aerial_input");},
@@ -245,6 +245,26 @@ void GameState::controller_callbacks(uint8_t player_number, std::vector<uint8_t>
 		}
 	}
 	callbacks[i]();
+}
+
+void GameState::start_aerial_jumping(uint8_t player_number) {
+	dbg("start_aerial_jumping " << (uint16_t)player_number);
+	Player& player = this->getPlayer(player_number);
+	uint8_t const MAX_NUM_AERIAL_JUMPS = 1;
+
+	// Deny to start jump state if the player used all it's jumps
+	if (player.num_aerial_jumps == MAX_NUM_AERIAL_JUMPS) {
+		return;
+	}
+	++player.num_aerial_jumps;
+
+	// Trick - aerial_jumping set the state to jumping. It is the same state with
+	// the starting conditions as the only differences
+	player.state = PLAYER_STATE_JUMPING;
+	player.velocity_v = 0;
+
+	// Set the appropriate animation
+	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_aerial_jumping").address);
 }
 
 void GameState::start_crashing_player(uint8_t player_number) {

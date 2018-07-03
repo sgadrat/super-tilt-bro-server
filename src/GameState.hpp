@@ -166,6 +166,8 @@ private:
 	void controller_callbacks(uint8_t player_number, std::vector<uint8_t> gamepad_state, std::vector<std::function<void()>> callbacks);
 	void set_player_animation(uint8_t player_number, uint16_t animation_address);
 
+	void start_aerial_jumping(uint8_t player_number);
+
 	void start_crashing_player(uint8_t player_number);
 	void crashing_player(uint8_t player_number);
 
