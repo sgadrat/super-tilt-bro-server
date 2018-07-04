@@ -162,7 +162,7 @@ private:
 
 	void aerial_directional_influence(uint8_t player_number);
 	void apply_gravity(uint8_t player_number);
-	void check_aerial_inputs(uint8_t player_nummber);
+	void check_aerial_inputs(uint8_t player_number);
 	void controller_callbacks(uint8_t player_number, std::vector<uint8_t> gamepad_state, std::vector<std::function<void()>> callbacks);
 	void set_player_animation(uint8_t player_number, uint16_t animation_address);
 
@@ -197,6 +197,9 @@ private:
 	void start_running_player(uint8_t player_number);
 	void running_player(uint8_t player_number);
 	void running_player_input(uint8_t player_number);
+
+	void start_side_tilt_player(uint8_t player_number);
+	void side_tilt_player(uint8_t player_number);
 
 	void start_spawn_player(uint8_t player_number);
 	void spawn_player(uint8_t player_number);
