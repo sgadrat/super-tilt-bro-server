@@ -1,4 +1,4 @@
-{"anim_sinbad_idle", 49428, {
+{"anim_sinbad_idle", 49421, {
 	{
 		60, false,
 		{{0, 8, 0, 16}},
@@ -10,7 +10,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_run", 49483, {
+{"anim_sinbad_run", 49476, {
 	{
 		5, false,
 		{{0, 16, 0, 16}},
@@ -27,7 +27,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_jab", 49595, {
+{"anim_sinbad_jab", 49588, {
 	{
 		1, true,
 		{{0, 8, 0, 16}},
@@ -69,7 +69,7 @@
 		{false, {244, 4, 9, 17}, -4, -4, -512, -512, 1}
 	},
 }},
-{"anim_sinbad_side_tilt", 49932, {
+{"anim_sinbad_side_tilt", 49925, {
 	{
 		7, true,
 		{{0, 12, 0, 16}},
@@ -86,7 +86,7 @@
 		{false, {244, 0, 6, 12}, -2, -8, -768, -768, 5}
 	},
 }},
-{"anim_sinbad_special", 50074, {
+{"anim_sinbad_special", 50067, {
 	{
 		3, true,
 		{{248, 8, 2, 13}},
@@ -128,7 +128,7 @@
 		{true, {240, 248, 245, 1}, -2, -5, -768, -768, 10}
 	},
 }},
-{"anim_sinbad_side_special_charge", 50491, {
+{"anim_sinbad_side_special_charge", 50484, {
 	{
 		7, false,
 		{{252, 8, 0, 16}},
@@ -220,21 +220,21 @@
 		{0}
 	},
 }},
-{"anim_sinbad_side_special_jump", 51068, {
+{"anim_sinbad_side_special_jump", 51061, {
 	{
 		61, true,
 		{{0, 16, 0, 16}},
 		{true, {248, 4, 6, 12}, 0, 0, 512, 256, 4}
 	},
 }},
-{"anim_sinbad_helpless", 51121, {
+{"anim_sinbad_helpless", 51114, {
 	{
 		60, false,
 		{{0, 8, 0, 16}},
 		{0}
 	},
 }},
-{"anim_sinbad_landing", 51139, {
+{"anim_sinbad_landing", 51132, {
 	{
 		1, false,
 		{{0, 8, 1, 16}},
@@ -251,7 +251,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_crashing", 51221, {
+{"anim_sinbad_crashing", 51214, {
 	{
 		3, false,
 		{{248, 7, 10, 15}},
@@ -283,7 +283,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_thrown", 51389, {
+{"anim_sinbad_thrown", 51382, {
 	{
 		4, false,
 		{{248, 8, 0, 16}},
@@ -295,7 +295,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_jumping", 51444, {
+{"anim_sinbad_jumping", 51437, {
 	{
 		3, false,
 		{{0, 8, 2, 16}},
@@ -312,14 +312,14 @@
 		{0}
 	},
 }},
-{"anim_sinbad_falling", 51526, {
+{"anim_sinbad_falling", 51519, {
 	{
 		100, false,
 		{{0, 8, 0, 16}},
 		{0}
 	},
 }},
-{"anim_sinbad_aerial_jumping", 51554, {
+{"anim_sinbad_aerial_jumping", 51547, {
 	{
 		3, false,
 		{{0, 8, 2, 16}},
@@ -336,7 +336,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_down_tilt", 51646, {
+{"anim_sinbad_down_tilt", 51639, {
 	{
 		2, false,
 		{{0, 7, 2, 15}},
@@ -368,7 +368,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_aerial_side", 51879, {
+{"anim_sinbad_aerial_side", 51872, {
 	{
 		3, false,
 		{{0, 11, 0, 15}},
@@ -390,7 +390,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_aerial_down", 52018, {
+{"anim_sinbad_aerial_down", 52011, {
 	{
 		3, false,
 		{{252, 7, 0, 15}},
@@ -427,7 +427,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_aerial_up", 52303, {
+{"anim_sinbad_aerial_up", 52296, {
 	{
 		4, false,
 		{{253, 8, 0, 15}},
@@ -449,7 +449,7 @@
 		{true, {0, 5, 244, 255}, -8, -5, -1024, -512, 2}
 	},
 }},
-{"anim_sinbad_aerial_neutral", 52532, {
+{"anim_sinbad_aerial_neutral", 52525, {
 	{
 		3, true,
 		{{0, 7, 0, 15}},
@@ -476,7 +476,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_aerial_spe", 52728, {
+{"anim_sinbad_aerial_spe", 52721, {
 	{
 		4, true,
 		{{0, 7, 1, 15}},
@@ -498,21 +498,21 @@
 		{false, {1, 10, 15, 23}, -5, -5, -512, -512, 8}
 	},
 }},
-{"anim_sinbad_spe_up_prepare", 52917, {
+{"anim_sinbad_spe_up_prepare", 52910, {
 	{
 		200, false,
 		{{0, 7, 2, 15}},
 		{0}
 	},
 }},
-{"anim_sinbad_spe_up_jump", 52955, {
+{"anim_sinbad_spe_up_jump", 52948, {
 	{
 		200, true,
 		{{0, 7, 0, 15}},
 		{true, {244, 255, 2, 7}, -2, -5, -768, -768, 10}
 	},
 }},
-{"anim_sinbad_spe_down", 52998, {
+{"anim_sinbad_spe_down", 52991, {
 	{
 		2, false,
 		{{0, 7, 2, 15}},
@@ -544,7 +544,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_up_tilt", 53231, {
+{"anim_sinbad_up_tilt", 53224, {
 	{
 		16, true,
 		{{0, 7, 0, 15}},
@@ -556,7 +556,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_shielding_full", 53361, {
+{"anim_sinbad_shielding_full", 53354, {
 	{
 		4, false,
 		{{252, 11, 0, 15}},
@@ -568,7 +568,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_shielding_partial", 53436, {
+{"anim_sinbad_shielding_partial", 53429, {
 	{
 		4, false,
 		{{252, 11, 0, 15}},
@@ -580,7 +580,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_shielding_limit", 53511, {
+{"anim_sinbad_shielding_limit", 53504, {
 	{
 		4, false,
 		{{252, 11, 0, 15}},
@@ -592,7 +592,7 @@
 		{0}
 	},
 }},
-{"anim_sinbad_respawn", 53586, {
+{"anim_sinbad_respawn", 53579, {
 	{
 		2, false,
 		{{0, 7, 0, 15}},
@@ -604,14 +604,14 @@
 		{0}
 	},
 }},
-{"anim_invisible", 53661, {
+{"anim_invisible", 53654, {
 	{
 		250, false,
 		{{0, 1, 0, 1}},
 		{0}
 	},
 }},
-{"anim_sinbad_spawn", 53669, {
+{"anim_sinbad_spawn", 53662, {
 	{
 		20, false,
 		{{0, 7, 0, 15}},
