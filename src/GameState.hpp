@@ -178,6 +178,7 @@ private:
 	void helpless_player(uint8_t player_number);
 
 	void start_innexistant_player(uint8_t player_number);
+	void innexistant_player(uint8_t player_number);
 
 	void start_jabbing_player(uint8_t player_number);
 	void jabbing_player(uint8_t player_number);

@@ -317,8 +317,22 @@ void GameState::helpless_player(uint8_t player_number) {
 
 void GameState::start_innexistant_player(uint8_t player_number) {
 	dbg("start_innexistant_player " << (uint16_t)player_number);
-	//TODO
-	dbg("TODO start_innexistant_player");
+	Player& player = this->getPlayer(player_number);
+
+	// Set state
+	player.state = PLAYER_STATE_INNEXISTANT;
+
+	// Set to a fixed place
+	player.x = 0;
+	player.y = 0;
+	player.velocity_h = 0;
+	player.velocity_v = 0;
+
+	// Set the appropriate animation
+	this->set_player_animation(player_number, this->findAnimation("anim_invisible").address);
+}
+
+void GameState::innexistant_player(uint8_t /*player_number*/) {
 }
 
 void GameState::start_jabbing_player(uint8_t player_number) {
@@ -773,39 +787,39 @@ GameState::GameState(Stage stage)
 {
 	// Setup data
 	mPlayerTickRoutines = {
-		&GameState::standing_player, &GameState::running_player, &GameState::falling_player,  &GameState::jumping_player, &GameState::jabbing_player,
-		&GameState::thrown_player,   &GameState::respawn_player, &place_holder,               &place_holder,              &place_holder,
-		&GameState::helpless_player, &GameState::landing_player, &GameState::crashing_player, &place_holder,              &place_holder,
-		&place_holder,               &place_holder,              &place_holder,               &place_holder,              &place_holder,
-		&place_holder,               &place_holder,              &place_holder,               &place_holder,              &GameState::spawn_player,
+		&GameState::standing_player, &GameState::running_player, &GameState::falling_player,  &GameState::jumping_player,     &GameState::jabbing_player,
+		&GameState::thrown_player,   &GameState::respawn_player, &place_holder,               &place_holder,                  &place_holder,
+		&GameState::helpless_player, &GameState::landing_player, &GameState::crashing_player, &place_holder,                  &place_holder,
+		&place_holder,               &place_holder,              &place_holder,               &place_holder,                  &place_holder,
+		&place_holder,               &place_holder,              &place_holder,               &GameState::innexistant_player, &GameState::spawn_player,
 	};
 	mPlayerOffgroundRoutines = {
 		&GameState::start_falling_player, &GameState::start_falling_player,  &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::start_falling_player,
 		&GameState::dummy_routine,        &GameState::dummy_routine,         &place_holder,                     &place_holder,             &place_holder,
 		&GameState::dummy_routine,        &GameState::start_helpless_player, &GameState::start_helpless_player, &place_holder,             &place_holder,
 		&place_holder,                    &place_holder,                     &place_holder,                     &place_holder,             &place_holder,
-		&place_holder,                    &place_holder,                     &place_holder,                     &place_holder,             &GameState::dummy_routine,
+		&place_holder,                    &place_holder,                     &place_holder,                     &GameState::dummy_routine, &GameState::dummy_routine,
 	};
 	mPlayerOngroundRoutines = {
 		&GameState::dummy_routine,           &GameState::dummy_routine, &GameState::start_landing_player, &GameState::dummy_routine, &GameState::dummy_routine,
 		&GameState::thrown_player_on_ground, &GameState::dummy_routine, &place_holder,                    &place_holder,             &place_holder,
 		&GameState::start_landing_player,    &GameState::dummy_routine, &GameState::dummy_routine,        &place_holder,             &place_holder,
 		&place_holder,                       &place_holder,             &place_holder,                    &place_holder,             &place_holder,
-		&place_holder,                       &place_holder,             &place_holder,                    &place_holder,             &GameState::dummy_routine,
+		&place_holder,                       &place_holder,             &place_holder,                    &GameState::dummy_routine, &GameState::dummy_routine,
 	};
 	mPlayerInputRoutines = {
 		&GameState::standing_player_input, &GameState::running_player_input, &GameState::check_aerial_inputs, &GameState::jumping_player_input, &GameState::keep_input_dirty,
 		&GameState::thrown_player_input,   &GameState::respawn_player_input, &place_holder,                   &place_holder,                    &place_holder,
 		&GameState::keep_input_dirty,      &GameState::keep_input_dirty,     &GameState::keep_input_dirty,    &place_holder,                    &place_holder,
 		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder,                    &place_holder,
-		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder,                    &GameState::keep_input_dirty,
+		&place_holder,                     &place_holder,                    &place_holder,                   &GameState::dummy_routine,        &GameState::keep_input_dirty,
 	};
 	mPlayerOnhurtRoutines = {
-		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player,
-		&GameState::hurt_player, &GameState::dummy_routine, &place_holder,           &place_holder,           &place_holder,
-		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player, &place_holder,           &place_holder,
-		&place_holder,           &place_holder,             &place_holder,           &place_holder,           &place_holder,
-		&place_holder,           &place_holder,             &place_holder,           &place_holder,           &GameState::dummy_routine,
+		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player,
+		&GameState::hurt_player, &GameState::dummy_routine, &place_holder,           &place_holder,             &place_holder,
+		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player, &place_holder,             &place_holder,
+		&place_holder,           &place_holder,             &place_holder,           &place_holder,             &place_holder,
+		&place_holder,           &place_holder,             &place_holder,           &GameState::dummy_routine, &GameState::dummy_routine,
 	};
 	mAnimations = {
 #include "GameState.animations.inc.cpp"
