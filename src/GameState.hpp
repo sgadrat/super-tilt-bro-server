@@ -202,6 +202,7 @@ private:
 	void spawn_player(uint8_t player_number);
 
 	void start_spe_up_player(uint8_t player_number);
+	void spe_up_player(uint8_t player_number);
 
 	void start_standing_player(uint8_t player_number);
 	void standing_player(uint8_t player_number);

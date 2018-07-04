@@ -214,7 +214,7 @@ void GameState::check_aerial_inputs(uint8_t player_number) {
 			[&](){dbg("TODO aerial_input");},
 
 			[&](){dbg("TODO aerial_input");},
-			[&](){dbg("TODO aerial_input");},
+			[&](){this->start_spe_up_player(player_number);},
 			[&](){dbg("TODO aerial_input");},
 			[&](){
 				// Fast fall, gravity * 1.5
@@ -576,7 +576,7 @@ void GameState::running_player_input(uint8_t player_number) {
 			[&](){dbg("TODO running_player_input");},
 			[&](){dbg("TODO running_player_input");},
 
-			[&](){dbg("TODO running_player_input");},
+			[&](){this->start_spe_up_player(player_number);},
 			[&](){dbg("TODO running_player_input");},
 
 			[&](){this->start_standing_player(player_number);},
@@ -645,7 +645,7 @@ void GameState::standing_player_input(uint8_t player_number) {
 
 			[&](){dbg("TODO standing_player_input");},
 			[&](){dbg("TODO standing_player_input");},
-			[&](){dbg("TODO standing_player_input");},
+			[&](){this->start_spe_up_player(player_number);},
 			[&](){dbg("TODO standing_player_input");},
 			[&](){dbg("TODO standing_player_input");},
 
@@ -665,7 +665,7 @@ void GameState::start_spawn_player(uint8_t player_number) {
 };
 
 void GameState::spawn_player(uint8_t player_number) {
-	const uint8_t STATE_SINBAD_SPAWN_DURATION = 50;
+	uint8_t const STATE_SINBAD_SPAWN_DURATION = 50;
 	if(this->getPlayer(player_number).anim_clock == STATE_SINBAD_SPAWN_DURATION) {
 		this->start_standing_player(player_number);
 	}
@@ -673,13 +673,72 @@ void GameState::spawn_player(uint8_t player_number) {
 
 void GameState::start_spe_up_player(uint8_t player_number) {
 	dbg("start_spe_up_player " << (uint16_t)player_number);
+	Player& player = this->getPlayer(player_number);
 
-	//TODO
-	dbg("TODO start_spe_up_player");
+	// Set state
+	player.state = PLAYER_STATE_SPE_UP;
+
+	// Set initial velocity
+	player.velocity_h = 0;
+	player.velocity_v = 0;
+
+	// Set substate to "charging"
+	player.state_field1 = 0;
+
+	// Set the appropriate animation
+	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_spe_up_prepare").address);
 }
 
-const uint8_t TECH_MAX_FRAMES_BEFORE_COLLISION = 5;
-const uint8_t TECH_NB_FORBIDDEN_FRAMES = 60;
+void GameState::spe_up_player(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+	uint8_t const STATE_SINBAD_SPE_UP_PREPARATION_DURATION = 3;
+
+	// Move if the substate is set to moving
+	if (player.state_field1 != 0) {
+		goto moving;
+	}
+
+	// Check if there is reason to begin to move
+	if (player.anim_clock >= STATE_SINBAD_SPE_UP_PREPARATION_DURATION) {
+		goto start_moving;
+	}
+
+	// not_moving
+	return;
+
+	start_moving: {
+		// Set substate to "moving"
+		player.state_field1 = 1;
+
+		// Set jumping velocity
+		player.velocity_v = bin_int(0xfa00);
+
+		// Set the movement animation
+		this->set_player_animation(player_number, this->findAnimation("anim_sinbad_spe_up_jump").address);
+
+		// Fallthrough moving
+	}
+
+	moving: {
+		// Return to falling when the top is reached
+		if (msb(player.velocity_v) == 0) {
+			goto top_reached;
+		}
+
+		// The top is not reached, stay in special upward state but apply gravity and directional influence
+		this->aerial_directional_influence(player_number);
+		this->apply_gravity(player_number);
+		return;
+	}
+
+	top_reached: {
+		this->start_helpless_player(player_number);
+		return;
+	}
+}
+
+uint8_t const TECH_MAX_FRAMES_BEFORE_COLLISION = 5;
+uint8_t const TECH_NB_FORBIDDEN_FRAMES = 60;
 void GameState::start_thrown_player(uint8_t player_number) {
 	dbg("start_thrown_player " << (uint16_t)player_number);
 	Player& player = this->getPlayer(player_number);
@@ -790,35 +849,35 @@ GameState::GameState(Stage stage)
 		&GameState::standing_player, &GameState::running_player, &GameState::falling_player,  &GameState::jumping_player,     &GameState::jabbing_player,
 		&GameState::thrown_player,   &GameState::respawn_player, &place_holder,               &place_holder,                  &place_holder,
 		&GameState::helpless_player, &GameState::landing_player, &GameState::crashing_player, &place_holder,                  &place_holder,
-		&place_holder,               &place_holder,              &place_holder,               &place_holder,                  &place_holder,
+		&place_holder,               &place_holder,              &place_holder,               &place_holder,                  &GameState::spe_up_player,
 		&place_holder,               &place_holder,              &place_holder,               &GameState::innexistant_player, &GameState::spawn_player,
 	};
 	mPlayerOffgroundRoutines = {
 		&GameState::start_falling_player, &GameState::start_falling_player,  &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::start_falling_player,
 		&GameState::dummy_routine,        &GameState::dummy_routine,         &place_holder,                     &place_holder,             &place_holder,
 		&GameState::dummy_routine,        &GameState::start_helpless_player, &GameState::start_helpless_player, &place_holder,             &place_holder,
-		&place_holder,                    &place_holder,                     &place_holder,                     &place_holder,             &place_holder,
+		&place_holder,                    &place_holder,                     &place_holder,                     &place_holder,             &GameState::dummy_routine,
 		&place_holder,                    &place_holder,                     &place_holder,                     &GameState::dummy_routine, &GameState::dummy_routine,
 	};
 	mPlayerOngroundRoutines = {
 		&GameState::dummy_routine,           &GameState::dummy_routine, &GameState::start_landing_player, &GameState::dummy_routine, &GameState::dummy_routine,
 		&GameState::thrown_player_on_ground, &GameState::dummy_routine, &place_holder,                    &place_holder,             &place_holder,
 		&GameState::start_landing_player,    &GameState::dummy_routine, &GameState::dummy_routine,        &place_holder,             &place_holder,
-		&place_holder,                       &place_holder,             &place_holder,                    &place_holder,             &place_holder,
+		&place_holder,                       &place_holder,             &place_holder,                    &place_holder,             &GameState::dummy_routine,
 		&place_holder,                       &place_holder,             &place_holder,                    &GameState::dummy_routine, &GameState::dummy_routine,
 	};
 	mPlayerInputRoutines = {
 		&GameState::standing_player_input, &GameState::running_player_input, &GameState::check_aerial_inputs, &GameState::jumping_player_input, &GameState::keep_input_dirty,
 		&GameState::thrown_player_input,   &GameState::respawn_player_input, &place_holder,                   &place_holder,                    &place_holder,
 		&GameState::keep_input_dirty,      &GameState::keep_input_dirty,     &GameState::keep_input_dirty,    &place_holder,                    &place_holder,
-		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder,                    &place_holder,
+		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder,                    &GameState::dummy_routine,
 		&place_holder,                     &place_holder,                    &place_holder,                   &GameState::dummy_routine,        &GameState::keep_input_dirty,
 	};
 	mPlayerOnhurtRoutines = {
 		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player,
 		&GameState::hurt_player, &GameState::dummy_routine, &place_holder,           &place_holder,             &place_holder,
 		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player, &place_holder,             &place_holder,
-		&place_holder,           &place_holder,             &place_holder,           &place_holder,             &place_holder,
+		&place_holder,           &place_holder,             &place_holder,           &place_holder,             &GameState::hurt_player,
 		&place_holder,           &place_holder,             &place_holder,           &GameState::dummy_routine, &GameState::dummy_routine,
 	};
 	mAnimations = {
