@@ -175,6 +175,7 @@ private:
 	void falling_player(uint8_t player_number);
 
 	void start_helpless_player(uint8_t player_number);
+	void helpless_player(uint8_t player_number);
 
 	void start_innexistant_player(uint8_t player_number);
 
