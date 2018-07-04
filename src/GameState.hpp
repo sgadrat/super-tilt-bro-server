@@ -207,6 +207,10 @@ private:
 	void start_spe_up_player(uint8_t player_number);
 	void spe_up_player(uint8_t player_number);
 
+	void start_special_player(uint8_t player_number);
+	void special_player(uint8_t player_number);
+	void special_player_input(uint8_t player_number);
+
 	void start_standing_player(uint8_t player_number);
 	void standing_player(uint8_t player_number);
 	void standing_player_input_left(uint8_t player_number);
