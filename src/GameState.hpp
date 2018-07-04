@@ -216,6 +216,7 @@ private:
 	void thrown_player_on_ground(uint8_t player_number);
 
 	void start_up_tilt_player(uint8_t player_number);
+	void up_tilt_player(uint8_t player_number);
 
 private:
 	Stage mStage;
