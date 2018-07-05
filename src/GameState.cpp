@@ -201,8 +201,8 @@ void GameState::check_aerial_inputs(uint8_t player_number) {
 			CONTROLLER_INPUT_SPECIAL,       CONTROLLER_INPUT_SPECIAL_UP,   CONTROLLER_INPUT_SPECIAL_DOWN, CONTROLLER_INPUT_TECH,
 		},
 		{
-			[&](){dbg("TODO aerial_input");},
-			[&](){dbg("TODO aerial_input");},
+			[&](){this->start_side_special_player(player_number);},
+			[&](){this->start_side_special_player(player_number);},
 			[&](){this->start_aerial_jumping(player_number);},
 			[&](){this->start_aerial_jumping(player_number);},
 			[&](){this->start_aerial_jumping(player_number);},
@@ -579,8 +579,8 @@ void GameState::running_player_input(uint8_t player_number) {
 				this->start_side_tilt_player(player_number);
 			},
 			[&](){this->start_special_player(player_number);},
-			[&](){dbg("TODO running_player_input");},
-			[&](){dbg("TODO running_player_input");},
+			[&](){this->start_side_special_player(player_number);},
+			[&](){this->start_side_special_player(player_number);},
 
 			[&](){this->start_spe_up_player(player_number);},
 			[&](){dbg("TODO running_player_input");},
@@ -588,6 +588,79 @@ void GameState::running_player_input(uint8_t player_number) {
 			[&](){this->start_standing_player(player_number);},
 		}
 	);
+}
+
+void GameState::start_side_special_player(uint8_t player_number) {
+	dbg("start_side_tilt_player " << (uint16_t)player_number);
+	Player& player = this->getPlayer(player_number);
+
+	// Set state
+	player.state = PLAYER_STATE_SIDE_SPECIAL;
+
+	// Set initial velocity
+	player.velocity_h = 0;
+	player.velocity_v = 0;
+
+	// Set substate to "charging"
+	player.state_field1 = 0;
+
+	// Set the appropriate animation
+	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_side_special_charge").address);
+}
+
+void GameState::side_special_player(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+	uint8_t const STATE_SINBAD_SIDE_SPECIAL_PREPARATION_DURATION = 120;
+
+	// Move if the substate is set to moving
+	if (player.state_field1 != 0) {
+		goto moving;
+	}
+
+	// Check if there is reason to begin to move
+	if (player.anim_clock >= STATE_SINBAD_SIDE_SPECIAL_PREPARATION_DURATION) {
+		goto start_moving;
+	}
+	if (player.btns.getRaw() == CONTROLLER_INPUT_SPECIAL_RIGHT) {
+		goto not_moving;
+	}
+	if (player.btns.getRaw() != CONTROLLER_INPUT_SPECIAL_LEFT) {
+		goto start_moving;
+	}
+
+	not_moving: {
+		return;
+	}
+
+	start_moving: {
+		// Set substate to "moving"
+		player.state_field1 = 1;
+
+		// Store fly duration (fly_duration = 5 + charge_duration / 8)
+		player.state_field2 = 5 + (player.anim_clock >> 3);
+
+		// Set the movement animation
+		this->set_player_animation(player_number, this->findAnimation("anim_sinbad_side_special_jump").address);
+
+		// Falltrhough to moving
+	}
+
+	moving: {
+		// Set vertical velocity (fixed)
+		player.velocity_v = bin_int(0xff80);
+
+		// Set horizontal velocity (depending on direction)
+		if (player.direction == DIRECTION_LEFT) {
+			player.velocity_h = bin_int(0xfc00);
+		}else {
+			player.velocity_h = 0x0400;
+		}
+
+		// After move's time is out, go to helpless state
+		if (player.anim_clock == player.state_field2) {
+			this->start_helpless_player(player_number);
+		}
+	}
 }
 
 void GameState::start_side_tilt_player(uint8_t player_number) {
@@ -683,9 +756,15 @@ void GameState::standing_player_input(uint8_t player_number) {
 				this->start_side_tilt_player(player_number);
 			},
 			[&](){this->start_special_player(player_number);},
-			[&](){dbg("TODO standing_player_input");},
+			[&](){
+				this->getPlayer(player_number).direction = DIRECTION_RIGHT;
+				this->start_side_special_player(player_number);
+			},
 
-			[&](){dbg("TODO standing_player_input");},
+			[&](){
+				this->getPlayer(player_number).direction = DIRECTION_LEFT;
+				this->start_side_special_player(player_number);
+			},
 			[&](){dbg("TODO standing_player_input");},
 			[&](){this->start_spe_up_player(player_number);},
 			[&](){dbg("TODO standing_player_input");},
@@ -928,35 +1007,35 @@ GameState::GameState(Stage stage)
 	// Setup data
 	mPlayerTickRoutines = {
 		&GameState::standing_player, &GameState::running_player, &GameState::falling_player,   &GameState::jumping_player,     &GameState::jabbing_player,
-		&GameState::thrown_player,   &GameState::respawn_player, &GameState::side_tilt_player, &GameState::special_player,     &place_holder,
+		&GameState::thrown_player,   &GameState::respawn_player, &GameState::side_tilt_player, &GameState::special_player,     &GameState::side_special_player,
 		&GameState::helpless_player, &GameState::landing_player, &GameState::crashing_player,  &place_holder,                  &place_holder,
 		&place_holder,               &place_holder,              &place_holder,                &place_holder,                  &GameState::spe_up_player,
 		&place_holder,               &GameState::up_tilt_player, &place_holder,                &GameState::innexistant_player, &GameState::spawn_player,
 	};
 	mPlayerOffgroundRoutines = {
 		&GameState::start_falling_player, &GameState::start_falling_player,  &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::start_falling_player,
-		&GameState::dummy_routine,        &GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::dummy_routine, &place_holder,
+		&GameState::dummy_routine,        &GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::dummy_routine,
 		&GameState::dummy_routine,        &GameState::start_helpless_player, &GameState::start_helpless_player, &place_holder,             &place_holder,
 		&place_holder,                    &place_holder,                     &place_holder,                     &place_holder,             &GameState::dummy_routine,
 		&place_holder,                    &GameState::dummy_routine,         &place_holder,                     &GameState::dummy_routine, &GameState::dummy_routine,
 	};
 	mPlayerOngroundRoutines = {
 		&GameState::dummy_routine,           &GameState::dummy_routine, &GameState::start_landing_player, &GameState::dummy_routine, &GameState::dummy_routine,
-		&GameState::thrown_player_on_ground, &GameState::dummy_routine, &GameState::dummy_routine,        &GameState::dummy_routine, &place_holder,
+		&GameState::thrown_player_on_ground, &GameState::dummy_routine, &GameState::dummy_routine,        &GameState::dummy_routine, &GameState::dummy_routine,
 		&GameState::start_landing_player,    &GameState::dummy_routine, &GameState::dummy_routine,        &place_holder,             &place_holder,
 		&place_holder,                       &place_holder,             &place_holder,                    &place_holder,             &GameState::dummy_routine,
 		&place_holder,                       &GameState::dummy_routine, &place_holder,                    &GameState::dummy_routine, &GameState::dummy_routine,
 	};
 	mPlayerInputRoutines = {
 		&GameState::standing_player_input, &GameState::running_player_input, &GameState::check_aerial_inputs, &GameState::jumping_player_input, &GameState::keep_input_dirty,
-		&GameState::thrown_player_input,   &GameState::respawn_player_input, &GameState::keep_input_dirty,    &GameState::special_player_input, &place_holder,
+		&GameState::thrown_player_input,   &GameState::respawn_player_input, &GameState::keep_input_dirty,    &GameState::special_player_input, &GameState::dummy_routine,
 		&GameState::keep_input_dirty,      &GameState::keep_input_dirty,     &GameState::keep_input_dirty,    &place_holder,                    &place_holder,
 		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder,                    &GameState::dummy_routine,
 		&place_holder,                     &GameState::keep_input_dirty,     &place_holder,                   &GameState::dummy_routine,        &GameState::keep_input_dirty,
 	};
 	mPlayerOnhurtRoutines = {
 		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player,
-		&GameState::hurt_player, &GameState::dummy_routine, &GameState::hurt_player, &GameState::hurt_player,   &place_holder,
+		&GameState::hurt_player, &GameState::dummy_routine, &GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player,
 		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player, &place_holder,             &place_holder,
 		&place_holder,           &place_holder,             &place_holder,           &place_holder,             &GameState::hurt_player,
 		&place_holder,           &GameState::hurt_player,   &place_holder,           &GameState::dummy_routine, &GameState::dummy_routine,

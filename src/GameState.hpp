@@ -198,6 +198,9 @@ private:
 	void running_player(uint8_t player_number);
 	void running_player_input(uint8_t player_number);
 
+	void start_side_special_player(uint8_t player_number);
+	void side_special_player(uint8_t player_number);
+
 	void start_side_tilt_player(uint8_t player_number);
 	void side_tilt_player(uint8_t player_number);
 
