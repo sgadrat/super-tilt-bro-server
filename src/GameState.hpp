@@ -171,6 +171,9 @@ private:
 	void start_crashing_player(uint8_t player_number);
 	void crashing_player(uint8_t player_number);
 
+	void start_down_tilt_player(uint8_t player_number);
+	void down_tilt_player(uint8_t player_number);
+
 	void start_falling_player(uint8_t player_number);
 	void falling_player(uint8_t player_number);
 
