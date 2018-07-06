@@ -171,6 +171,9 @@ private:
 	void start_aerial_down_player(uint8_t player_number);
 	void aerial_down_player(uint8_t player_number);
 
+	void start_aerial_neutral_player(uint8_t player_number);
+	void aerial_neutral_player(uint8_t player_number);
+
 	void start_aerial_side_player(uint8_t player_number);
 	void aerial_side_player(uint8_t player_number);
 
