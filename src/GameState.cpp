@@ -209,7 +209,7 @@ void GameState::check_aerial_inputs(uint8_t player_number) {
 
 			[&](){this->start_aerial_side_player(player_number);},
 			[&](){this->start_aerial_side_player(player_number);},
-			[&](){dbg("TODO aerial_input");},
+			[&](){this->start_aerial_down_player(player_number);},
 			[&](){dbg("TODO aerial_input");},
 			[&](){dbg("TODO aerial_input");},
 
@@ -265,6 +265,25 @@ void GameState::start_aerial_jumping_player(uint8_t player_number) {
 
 	// Set the appropriate animation
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_aerial_jumping").address);
+}
+
+void GameState::start_aerial_down_player(uint8_t player_number) {
+	dbg("start_aerial_down_player " << (uint16_t)player_number);
+	Player& player = this->getPlayer(player_number);
+
+	player.state= PLAYER_STATE_AERIAL_DOWN;
+	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_aerial_down").address);
+}
+
+void GameState::aerial_down_player(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+	uint8_t const STATE_SINBAD_AERIAL_DOWN_DURATION = 21;
+
+	this->apply_gravity(player_number);
+
+	if (player.anim_clock == STATE_SINBAD_AERIAL_DOWN_DURATION) {
+		this->start_falling_player(player_number);
+	}
 }
 
 void GameState::start_aerial_side_player(uint8_t player_number) {
@@ -1046,31 +1065,31 @@ GameState::GameState(Stage stage)
 {
 	// Setup data
 	mPlayerTickRoutines = {
-		&GameState::standing_player, &GameState::running_player, &GameState::falling_player,   &GameState::jumping_player,     &GameState::jabbing_player,
-		&GameState::thrown_player,   &GameState::respawn_player, &GameState::side_tilt_player, &GameState::special_player,     &GameState::side_special_player,
-		&GameState::helpless_player, &GameState::landing_player, &GameState::crashing_player,  &GameState::down_tilt_player,   &GameState::aerial_side_player,
-		&place_holder,               &place_holder,              &place_holder,                &place_holder,                  &GameState::spe_up_player,
-		&place_holder,               &GameState::up_tilt_player, &place_holder,                &GameState::innexistant_player, &GameState::spawn_player,
+		&GameState::standing_player,    &GameState::running_player, &GameState::falling_player,   &GameState::jumping_player,     &GameState::jabbing_player,
+		&GameState::thrown_player,      &GameState::respawn_player, &GameState::side_tilt_player, &GameState::special_player,     &GameState::side_special_player,
+		&GameState::helpless_player,    &GameState::landing_player, &GameState::crashing_player,  &GameState::down_tilt_player,   &GameState::aerial_side_player,
+		&GameState::aerial_down_player, &place_holder,              &place_holder,                &place_holder,                  &GameState::spe_up_player,
+		&place_holder,                  &GameState::up_tilt_player, &place_holder,                &GameState::innexistant_player, &GameState::spawn_player,
 	};
 	mPlayerOffgroundRoutines = {
 		&GameState::start_falling_player, &GameState::start_falling_player,  &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::start_falling_player,
 		&GameState::dummy_routine,        &GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::dummy_routine,
 		&GameState::dummy_routine,        &GameState::start_helpless_player, &GameState::start_helpless_player, &GameState::dummy_routine, &GameState::dummy_routine,
-		&place_holder,                    &place_holder,                     &place_holder,                     &place_holder,             &GameState::dummy_routine,
+		&GameState::dummy_routine,        &place_holder,                     &place_holder,                     &place_holder,             &GameState::dummy_routine,
 		&place_holder,                    &GameState::dummy_routine,         &place_holder,                     &GameState::dummy_routine, &GameState::dummy_routine,
 	};
 	mPlayerOngroundRoutines = {
 		&GameState::dummy_routine,           &GameState::dummy_routine, &GameState::start_landing_player, &GameState::dummy_routine, &GameState::dummy_routine,
 		&GameState::thrown_player_on_ground, &GameState::dummy_routine, &GameState::dummy_routine,        &GameState::dummy_routine, &GameState::dummy_routine,
 		&GameState::start_landing_player,    &GameState::dummy_routine, &GameState::dummy_routine,        &GameState::dummy_routine, &GameState::start_landing_player,
-		&place_holder,                       &place_holder,             &place_holder,                    &place_holder,             &GameState::dummy_routine,
+		&GameState::start_landing_player,    &place_holder,             &place_holder,                    &place_holder,             &GameState::dummy_routine,
 		&place_holder,                       &GameState::dummy_routine, &place_holder,                    &GameState::dummy_routine, &GameState::dummy_routine,
 	};
 	mPlayerInputRoutines = {
 		&GameState::standing_player_input, &GameState::running_player_input, &GameState::check_aerial_inputs, &GameState::jumping_player_input, &GameState::keep_input_dirty,
 		&GameState::thrown_player_input,   &GameState::respawn_player_input, &GameState::keep_input_dirty,    &GameState::special_player_input, &GameState::dummy_routine,
 		&GameState::keep_input_dirty,      &GameState::keep_input_dirty,     &GameState::keep_input_dirty,    &GameState::keep_input_dirty,     &GameState::keep_input_dirty,
-		&place_holder,                     &place_holder,                    &place_holder,                   &place_holder,                    &GameState::dummy_routine,
+		&GameState::keep_input_dirty,      &place_holder,                    &place_holder,                   &place_holder,                    &GameState::dummy_routine,
 		&place_holder,                     &GameState::keep_input_dirty,     &place_holder,                   &GameState::dummy_routine,        &GameState::keep_input_dirty,
 	};
 	mPlayerOnhurtRoutines = {
