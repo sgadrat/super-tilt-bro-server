@@ -174,6 +174,9 @@ private:
 	void start_aerial_side_player(uint8_t player_number);
 	void aerial_side_player(uint8_t player_number);
 
+	void start_aerial_up_player(uint8_t player_number);
+	void aerial_up_player(uint8_t player_number);
+
 	void start_crashing_player(uint8_t player_number);
 	void crashing_player(uint8_t player_number);
 
