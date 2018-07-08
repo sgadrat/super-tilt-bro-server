@@ -41,11 +41,6 @@ static int16_t bin_int(uint16_t v) {
 	return static_cast<int16_t>(v);
 }
 
-static void place_holder(GameState*, uint8_t) {
-	//TODO all reference to this function are temporary place holders and must be replaced by some real implementation
-	dbg("TODO place_holder function");
-}
-
 /********************************
 *
 * Constants
