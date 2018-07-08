@@ -216,6 +216,11 @@ private:
 	void running_player(uint8_t player_number);
 	void running_player_input(uint8_t player_number);
 
+	void start_shielding_player(uint8_t player_number);
+	void shielding_player(uint8_t player_number);
+	void shielding_player_input(uint8_t player_number);
+	void shielding_player_hurt(uint8_t player_number);
+
 	void start_side_special_player(uint8_t player_number);
 	void side_special_player(uint8_t player_number);
 
