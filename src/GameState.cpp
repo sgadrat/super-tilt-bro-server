@@ -1492,15 +1492,18 @@ void GameState::check_player_hit(uint8_t player_number) {
 		return;
 	}
 
-	// Check collisions between hitbox and hitbox
-	if (this->boxes_overlap(current_player.hitbox.position, opponent_player.hitbox.position)) {
-		// Set opponent in thrown mode without momentum
-		opponent_player.hitstun = HITSTUN_PARRY_NB_FRAMES;
-		opponent_player.velocity_v = 0;
-		opponent_player.velocity_h = 0;
-		this->start_thrown_player(opponent_number);
-		mScreenShakeCounter = SCREENSHAKE_PARRY_NB_FRAMES;
-		return;
+	// If opponent's hitbox is enabled, check hitbox on hitbox collisions
+	if (opponent_player.hitbox.enabled) {
+		// Check collisions between hitbox and hitbox
+		if (this->boxes_overlap(current_player.hitbox.position, opponent_player.hitbox.position)) {
+			// Set opponent in thrown mode without momentum
+			opponent_player.hitstun = HITSTUN_PARRY_NB_FRAMES;
+			opponent_player.velocity_v = 0;
+			opponent_player.velocity_h = 0;
+			this->start_thrown_player(opponent_number);
+			mScreenShakeCounter = SCREENSHAKE_PARRY_NB_FRAMES;
+			return;
+		}
 	}
 
 	// Check collisions between hitbox and hurtbox
