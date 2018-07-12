@@ -9,7 +9,7 @@
 #include <thread>
 #include <vector>
 
-// g++ -o replay_player replay_player.cpp ../src/GameState.cpp -I .. -I ../src
+// g++ -o replay_player -O0 -g replay_player.cpp ../src/GameState.cpp -I .. -I ../src
 
 class GameStateInfo {
 public:
@@ -88,6 +88,35 @@ std::ostream& operator<<(std::ostream& os, GameState::ControllerState const& con
 	return os;
 }
 
+std::string state_str(std::string const& state_num) {
+	if (state_num == "0") return std::string("STANDING") + " (00)";
+	if (state_num == "1") return std::string("RUNNING") + " (01)";
+	if (state_num == "2") return std::string("FALLING") + " (02)";
+	if (state_num == "3") return std::string("JUMPING") + " (03)";
+	if (state_num == "4") return std::string("JABBING") + " (04)";
+	if (state_num == "5") return std::string("THROWN") + " (05)";
+	if (state_num == "6") return std::string("RESPAWN") + " (06)";
+	if (state_num == "7") return std::string("SIDE_TILT") + " (07)";
+	if (state_num == "8") return std::string("SPECIAL") + " (08)";
+	if (state_num == "9") return std::string("SIDE_SPECIAL") + " (09)";
+	if (state_num == "10") return std::string("HELPLESS") + " (0a)";
+	if (state_num == "11") return std::string("LANDING") + " (0b)";
+	if (state_num == "12") return std::string("CRASHING") + " (0c)";
+	if (state_num == "13") return std::string("DOWN_TILT") + " (0d)";
+	if (state_num == "14") return std::string("AERIAL_SIDE") + " (0e)";
+	if (state_num == "15") return std::string("AERIAL_DOWN") + " (0f)";
+	if (state_num == "16") return std::string("AERIAL_UP") + " (10)";
+	if (state_num == "17") return std::string("AERIAL_NEUTRAL") + " (11)";
+	if (state_num == "18") return std::string("AERIAL_SPE_NEUTRAL") + " (12)";
+	if (state_num == "19") return std::string("SPE_UP") + " (13)";
+	if (state_num == "20") return std::string("SPE_DOWN") + " (14)";
+	if (state_num == "21") return std::string("UP_TILT") + " (15)";
+	if (state_num == "22") return std::string("SHIELDING") + " (16)";
+	if (state_num == "23") return std::string("INNEXISTANT") + " (17)";
+	if (state_num == "24") return std::string("SPAWN") + " (18)";
+	return "<unknown state> (" + state_num + ")";
+}
+
 int main() {
 	// Parse history
 	std::map<uint32_t, GameState::ControllerState> controller_a_history{
@@ -124,7 +153,7 @@ int main() {
 		gamestate.serial(gamestate_info);
 
 		// Display state information
-		std::cerr << "player_a.state .....: " << gamestate_info.mValues["player_a.state"] << std::endl;
+		std::cerr << "player_a.state .....: " << state_str(gamestate_info.mValues["player_a.state"]) << std::endl;
 		std::cerr << "player_a.x .........: " << gamestate_info.mValues["player_a.x.msb"] << std::endl;
 		std::cerr << "player_a.direction .: " << (gamestate_info.mValues["player_a.direction"] == "0" ? "LEFT" : "RIGHT") << std::endl;
 		if (gamestate_info.mValues["player_a.hitbox.enabled"] != "0") {
