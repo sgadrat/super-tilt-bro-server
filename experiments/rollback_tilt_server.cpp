@@ -39,7 +39,18 @@ GameState::ControllerState controller_state_from_message(stnp::message::Controll
 	return controller_state;
 }
 
-int main() {
+int main(int argc, char** argv) {
+	// Parse command line
+	uint32_t lag_prediction = 1;
+	if (argc == 2) {
+		std::istringstream iss(argv[1]);
+		iss >> lag_prediction;
+		if (iss.fail()) {
+			std::cerr << "usage: " << argv[0] << " [anti-lag-prediction]" << std::endl;
+			return 1;
+		}
+	}
+
 	// Prepare component threads
 	network::SocketPool socket_pool;
 	ThreadSafeFifo<network::IncommingUdpMessage> in_messages(5);
@@ -147,7 +158,7 @@ int main() {
 						controller_b_history.rbegin()->first
 					);
 
-					while (gamestate_time < last_input_time + 1) {
+					while (gamestate_time < last_input_time + 1 + lag_prediction) {
 						// Apply inputs
 						//  TODO check if it is more accurate to apply inputs before or after the simulation's tick
 						std::map<uint32_t, GameState::ControllerState>::const_iterator controller_history_entry(controller_a_history.find(gamestate_time));
