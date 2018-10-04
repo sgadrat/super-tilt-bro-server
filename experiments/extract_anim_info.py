@@ -24,8 +24,8 @@ def asmsint16(s):
 RE_ANIM_LINE = re.compile('(?P<name>[a-z0-9_]+)=[a-z0-9_]+=(?P<addr>[0-9]+)')
 
 animations_blacklist = [
-	'anim_sinbad_victory', # Unused ingame and conatins no hurtbox
-	'anim_sinbad_defeat', # Unused ingame and conatins no hurtbox
+	'anim_sinbad_victory', # Unused ingame and contains no hurtbox
+	'anim_sinbad_defeat', # Unused ingame and contains no hurtbox
 ]
 animations_whitelist = [
 ]
