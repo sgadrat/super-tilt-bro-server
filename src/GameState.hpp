@@ -200,6 +200,7 @@ private:
 
 	void start_jabbing_player(uint8_t player_number);
 	void jabbing_player(uint8_t player_number);
+	void jabbing_player_input(uint8_t player_number);
 
 	void start_jumping_player(uint8_t player_number);
 	void jumping_player(uint8_t player_number);
@@ -220,6 +221,9 @@ private:
 	void shielding_player(uint8_t player_number);
 	void shielding_player_input(uint8_t player_number);
 	void shielding_player_hurt(uint8_t player_number);
+
+	void start_shieldlag_player(uint8_t player_number);
+	void shieldlag_player(uint8_t player_number);
 
 	void start_side_special_player(uint8_t player_number);
 	void side_special_player(uint8_t player_number);

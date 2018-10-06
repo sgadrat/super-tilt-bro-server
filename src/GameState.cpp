@@ -75,6 +75,7 @@ const uint8_t PLAYER_STATE_UP_TILT = 0x15;
 const uint8_t PLAYER_STATE_SHIELDING = 0x16;
 const uint8_t PLAYER_STATE_INNEXISTANT = 0x17;
 const uint8_t PLAYER_STATE_SPAWN = 0x18;
+const uint8_t PLAYER_STATE_SHIELDLAG = 0x19;
 
 const uint8_t DIRECTION_LEFT = 0x00;
 const uint8_t DIRECTION_RIGHT = 0x01;
@@ -133,6 +134,7 @@ void GameState::set_player_animation(uint8_t player_number, uint16_t animation_a
 
 void GameState::aerial_directional_influence(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
+	uint8_t const AIR_FRICTION_STRENGTH = 7;
 
 	if (player.btns.left_pressed) {
 		if (bin_int(0xff00) < player.velocity_h) {
@@ -142,6 +144,8 @@ void GameState::aerial_directional_influence(uint8_t player_number) {
 		if (player.velocity_h < bin_int(0x0100)) {
 			merge_to_player_velocity(player_number, bin_int(0x0100), player.velocity_v, 0x80);
 		}
+	}else {
+		merge_to_player_velocity(player_number, bin_int(0x0000), player.velocity_v, AIR_FRICTION_STRENGTH);
 	}
 }
 
@@ -266,13 +270,22 @@ void GameState::start_aerial_down_player(uint8_t player_number) {
 	dbg("start_aerial_down_player " << (uint16_t)player_number);
 	Player& player = this->getPlayer(player_number);
 
+	// Set State
 	player.state = PLAYER_STATE_AERIAL_DOWN;
+
+	// Cancel fastfall
+	if (player.gravity != DEFAULT_GRAVITY) {
+		player.gravity = DEFAULT_GRAVITY;
+		player.velocity_v = (static_cast<int16_t>(DEFAULT_GRAVITY) << 8);
+	}
+
+	// Set the appropriate animation
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_aerial_down").address);
 }
 
 void GameState::aerial_down_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
-	uint8_t const STATE_SINBAD_AERIAL_DOWN_DURATION = 21;
+	uint8_t const STATE_SINBAD_AERIAL_DOWN_DURATION = 14;
 
 	this->apply_gravity(player_number);
 
@@ -459,10 +472,23 @@ void GameState::start_jabbing_player(uint8_t player_number) {
 
 void GameState::jabbing_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
-	uint8_t const STATE_SINBAD_JAB_DURATION = 8;
+	uint8_t const STATE_SINBAD_JAB_DURATION = 14;
 
+	// Do not move, velocity tends toward vector (0,0)
+	this->merge_to_player_velocity(player_number, 0, 0, 0xff);
+
+	// At the end of the move, return to standing state
 	if (player.anim_clock == STATE_SINBAD_JAB_DURATION) {
 		this->start_standing_player(player_number);
+	}
+}
+
+void GameState::jabbing_player_input(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	// Allow to cut the animation for another jab
+	if (player.btns.getRaw() == CONTROLLER_INPUT_JAB) {
+		this->start_jabbing_player(player_number);
 	}
 }
 
@@ -727,11 +753,21 @@ void GameState::shielding_player(uint8_t player_number) {
 void GameState::shielding_player_input(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 
-	// Do the same as standing player, except all buttons are released (start standing in this case)
-	if (player.btns.getRaw() != 0) {
+	// Do the same as standing player except when
+	//  all buttons are released - start standing
+	//  down is pressed - avoid to reset the shield state (and hit counter)
+	if (player.btns.getRaw() == CONTROLLER_INPUT_TECH) {
+		if (player.btns.getRaw() != 0) {
+			this->standing_player_input(player_number);
+		}else {
+			this->start_shieldlag_player(player_number);
+		}
+	}
+
+	if (player.btns.getRaw() == 0) {
+		this->start_shieldlag_player(player_number);
+	}else if (player.btns.getRaw() != CONTROLLER_INPUT_TECH) {
 		this->standing_player_input(player_number);
-	}else {
-		this->start_standing_player(player_number);
 	}
 }
 
@@ -771,6 +807,30 @@ void GameState::shielding_player_hurt(uint8_t player_number) {
 
 	// Disable the hitbox to avoid multi-hits
 	striker_player.hitbox.enabled = false;
+}
+
+void GameState::start_shieldlag_player(uint8_t player_number) {
+	dbg("start_shieldlag_player " << (uint16_t)player_number);
+	Player& player = this->getPlayer(player_number);
+
+	// Set the player's state
+	player.state = PLAYER_STATE_SHIELDLAG;
+
+	// Set the appropriate animation
+	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_shielding_remove").address);
+}
+
+void GameState::shieldlag_player(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+	uint8_t const STATE_SINBAD_SHIELDLAG_DURATION = 8;
+
+	// Do not move, velocity tends toward vector (0,0)
+	this->merge_to_player_velocity(player_number, 0, 0, 0x80);
+
+	// After move's time is out, go to standing state
+	if (player.anim_clock == STATE_SINBAD_SHIELDLAG_DURATION) {
+		this->start_standing_player(player_number);
+	}
 }
 
 void GameState::start_side_special_player(uint8_t player_number) {
@@ -1094,7 +1154,7 @@ void GameState::special_player_input(uint8_t player_number) {
 	}
 }
 
-uint8_t const TECH_MAX_FRAMES_BEFORE_COLLISION = 5;
+uint8_t const TECH_MAX_FRAMES_BEFORE_COLLISION = 10;
 uint8_t const TECH_NB_FORBIDDEN_FRAMES = 60;
 void GameState::start_thrown_player(uint8_t player_number) {
 	dbg("start_thrown_player " << (uint16_t)player_number);
@@ -1222,13 +1282,15 @@ GameState::GameState(Stage stage)
 		&GameState::helpless_player,    &GameState::landing_player,   &GameState::crashing_player,       &GameState::down_tilt_player,   &GameState::aerial_side_player,
 		&GameState::aerial_down_player, &GameState::aerial_up_player, &GameState::aerial_neutral_player, &GameState::aerial_spe_player,  &GameState::spe_up_player,
 		&GameState::spe_down_player,    &GameState::up_tilt_player,   &GameState::shielding_player,      &GameState::innexistant_player, &GameState::spawn_player,
+		&GameState::shieldlag_player,
 	};
 	mPlayerOffgroundRoutines = {
-		&GameState::start_falling_player, &GameState::start_falling_player,  &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::start_falling_player,
-		&GameState::dummy_routine,        &GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::dummy_routine,
-		&GameState::dummy_routine,        &GameState::start_helpless_player, &GameState::start_helpless_player, &GameState::dummy_routine, &GameState::dummy_routine,
-		&GameState::dummy_routine,        &GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::dummy_routine,
-		&GameState::dummy_routine,        &GameState::dummy_routine,         &GameState::start_helpless_player, &GameState::dummy_routine, &GameState::dummy_routine,
+		&GameState::start_falling_player,  &GameState::start_falling_player,  &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::start_falling_player,
+		&GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::dummy_routine,
+		&GameState::dummy_routine,         &GameState::start_helpless_player, &GameState::start_helpless_player, &GameState::dummy_routine, &GameState::dummy_routine,
+		&GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::dummy_routine,
+		&GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::start_helpless_player, &GameState::dummy_routine, &GameState::dummy_routine,
+		&GameState::start_helpless_player,
 	};
 	mPlayerOngroundRoutines = {
 		&GameState::dummy_routine,           &GameState::dummy_routine,         &GameState::start_landing_player, &GameState::dummy_routine,        &GameState::dummy_routine,
@@ -1236,6 +1298,7 @@ GameState::GameState(Stage stage)
 		&GameState::start_landing_player,    &GameState::dummy_routine,         &GameState::dummy_routine,        &GameState::dummy_routine,        &GameState::start_landing_player,
 		&GameState::start_landing_player,    &GameState::start_landing_player,  &GameState::start_landing_player, &GameState::start_landing_player, &GameState::dummy_routine,
 		&GameState::dummy_routine,           &GameState::dummy_routine,         &GameState::dummy_routine,        &GameState::dummy_routine,        &GameState::dummy_routine,
+		&GameState::dummy_routine,
 	};
 	mPlayerInputRoutines = {
 		&GameState::standing_player_input, &GameState::running_player_input, &GameState::check_aerial_inputs,    &GameState::jumping_player_input, &GameState::keep_input_dirty,
@@ -1243,6 +1306,7 @@ GameState::GameState(Stage stage)
 		&GameState::keep_input_dirty,      &GameState::keep_input_dirty,     &GameState::keep_input_dirty,       &GameState::keep_input_dirty,     &GameState::keep_input_dirty,
 		&GameState::keep_input_dirty,      &GameState::keep_input_dirty,     &GameState::keep_input_dirty,       &GameState::dummy_routine,        &GameState::dummy_routine,
 		&GameState::keep_input_dirty,      &GameState::keep_input_dirty,     &GameState::shielding_player_input, &GameState::dummy_routine,        &GameState::keep_input_dirty,
+		&GameState::keep_input_dirty,
 	};
 	mPlayerOnhurtRoutines = {
 		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player,           &GameState::hurt_player,   &GameState::hurt_player,
@@ -1250,6 +1314,7 @@ GameState::GameState(Stage stage)
 		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player,           &GameState::hurt_player,   &GameState::hurt_player,
 		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player,           &GameState::hurt_player,   &GameState::hurt_player,
 		&GameState::hurt_player, &GameState::hurt_player,   &GameState::shielding_player_hurt, &GameState::dummy_routine, &GameState::dummy_routine,
+		&GameState::hurt_player,
 	};
 	mAnimations = {
 #include "GameState.animations.inc.cpp"
