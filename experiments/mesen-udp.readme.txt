@@ -2,6 +2,10 @@ mesen-0.9.5_patch_nrom_udp.patch
 
  Apply it to mesen on tag 0.9.5 from github. The NROM mapper becomes capable of sending and receiving udp packets.
 
+mesen-0.9.5_patch_nrom_udp_windows.patch
+
+ Mesen patch for windows. Main difference is that it will be able to find the configuration file.
+
 test_game
 
  Sample game using udp packets. Run it with patched Mesen, and run netcat as udp server on port 1234: nc -lu 127.0.0.1 1234

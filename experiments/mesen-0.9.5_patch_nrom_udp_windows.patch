@@ -1,16 +1,18 @@
 diff --git a/Core/NROM.h b/Core/NROM.h
-index dff0624e..c3d655eb 100644
+index dff0624e..ddc672ea 100644
 --- a/Core/NROM.h
 +++ b/Core/NROM.h
-@@ -1,18 +1,140 @@
+@@ -1,18 +1,144 @@
  #pragma once
  #include "stdafx.h"
  #include "BaseMapper.h"
++#define _WIN32_WINNT 0x0601
 +#include <boost/asio.hpp>
 +#include <vector>
 +#include <map>
 +#include <string>
 +#include <fstream>
++#include <cstdlib>
 +
 +static std::map<std::string, std::string> GetConfig() {
 +	// Fill default fields
@@ -20,7 +22,8 @@ index dff0624e..c3d655eb 100644
 +	};
 +
 +	// Parse config file
-+	std::ifstream ifs("/tmp/nes_net.cfg");
++	std::cout << "config file: '" << (std::getenv("USERPROFILE") + std::string("\\nes_net.cfg")) << "'" << std::endl;
++	std::ifstream ifs(std::getenv("USERPROFILE") + std::string("\\nes_net.cfg"));
 +	while (ifs.good()) {
 +		std::string key, value;
 +		ifs >> key >> value;
@@ -71,6 +74,7 @@ index dff0624e..c3d655eb 100644
 +
 +			boost::asio::ip::udp::resolver resolver(mIoContext);
 +			mServerEndpoint = *resolver.resolve(config["server_address"], config["server_port"]).begin();
++			//mSocket.open(boost::asio::ip::udp::v4());
 +			mSocket.connect(mServerEndpoint);
 +
 +			mReadBufferFresh = false;
