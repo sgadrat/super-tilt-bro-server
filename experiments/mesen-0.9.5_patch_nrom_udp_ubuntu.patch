@@ -1,0 +1,199 @@
+diff --git a/Core/NROM.h b/Core/NROM.h
+index dff0624e..0d0fa951 100644
+--- a/Core/NROM.h
++++ b/Core/NROM.h
+@@ -1,18 +1,140 @@
+ #pragma once
+ #include "stdafx.h"
+ #include "BaseMapper.h"
++#include <boost/asio.hpp>
++#include <vector>
++#include <map>
++#include <string>
++#include <fstream>
++
++static std::map<std::string, std::string> GetConfig() {
++	// Fill default fields
++	std::map<std::string, std::string> config = {
++		{"server_address", "127.0.0.1"},
++		{"server_port", "1234"},
++	};
++
++	// Parse config file
++	std::ifstream ifs("/tmp/nes_net.cfg");
++	while (ifs.good()) {
++		std::string key, value;
++		ifs >> key >> value;
++		if (ifs.good()) {
++			config[key] = value;
++			std::cout << "  '" << key << "' => '" << value << "'" << std::endl;
++		}
++	}
++
++	// debug
++	std::cout << "Parsed config:" << std::endl;
++	for (std::pair<std::string, std::string> const& record : config) {
++		std::cout << "  " << record.first << " = " << record.second << std::endl;
++	}
++
++	return config;
++}
+ 
+ class NROM : public BaseMapper
+ {
++	public:
++		NROM()
++		: BaseMapper()
++		, mSocket(mIoContext)
++		{}
++
+ 	protected:
+ 		virtual uint16_t GetPRGPageSize() override { return 0x4000; }
+-		virtual uint16_t GetCHRPageSize() override {	return 0x2000; }
++		virtual uint16_t GetCHRPageSize() override { return 0x2000; }
++		virtual bool AllowRegisterRead() override { return true; }
+ 
+ 		virtual void InitMapper() override
+ 		{
++			std::cout << "init NROM" << std::endl;
+ 			SelectPRGPage(0, 0);
+ 			SelectPRGPage(1, 1);
+ 
+ 			SelectCHRPage(0, 0);
++
++			std::map<std::string, std::string> config = GetConfig();
++
++			RemoveRegisterRange(0x8000, 0xFFFF, MemoryOperation::Read);
++			AddRegisterRange(0x5000, 0x5FFF, MemoryOperation::Any);
++
++			mReg = 0;
++			mWriteBuffer.resize(256);
++
++			boost::asio::ip::udp::resolver resolver(mIoContext);
++			mServerEndpoint = *resolver.resolve(boost::asio::ip::udp::resolver::query(config["server_address"], config["server_port"]));
++			mSocket.connect(mServerEndpoint);
++
++			mReadBufferFresh = false;
++			mTmpReadBuffer.resize(255);
++			mSocket.async_receive(boost::asio::buffer(mTmpReadBuffer), [&] (const boost::system::error_code& e, std::size_t bytes_transferred) -> void {
++				std::cout << "received " << bytes_transferred << " bytes: " << e << std::endl;
++				this->ReceivedPacket(bytes_transferred);
++			});
++		}
++
++		virtual uint8_t ReadRegister(uint16_t addr) override
++		{
++			if (addr >= 0x5100) {
++				mIoContext.poll();
++				uint8_t res = mReadBufferFresh ? mReadBuffer.size() : 0;
++				mReadBufferFresh = false;
++				return res;
++			}
++			if (addr < 0x5000) {
++				return 0;
++			}
++			uint16_t offset = addr - 0x5000;
++			if (offset >= mReadBuffer.size()) {
++				return 0;
++			}
++			return mReadBuffer[offset];
+ 		}
++
++		virtual void WriteRegister(uint16_t addr, uint8_t value) override
++		{
++			if (addr >= 0x5101) {
++				SendPacket(static_cast<uint16_t>(value) + 1);
++				return;
++			}
++			if (addr < 0x5000) {
++				return;
++			}
++			mWriteBuffer[addr - 0x5000] = value;
++		}
++
++	private:
++		void SendPacket(uint16_t payload_size)
++		{
++			mSocket.send(boost::asio::buffer(mWriteBuffer, payload_size));
++		}
++
++		void ReceivedPacket(std::size_t bytes_transferred)
++		{
++			std::cout << "received packet" << std::endl;
++			mTmpReadBuffer.resize(bytes_transferred);
++			mReadBuffer = mTmpReadBuffer;
++			mReadBufferFresh = true;
++
++			mTmpReadBuffer.resize(255);
++			mSocket.async_receive(boost::asio::buffer(mTmpReadBuffer), [&] (const boost::system::error_code& e, std::size_t bytes_transferred) -> void {
++				std::cout << "received " << bytes_transferred << " bytes: " << e << std::endl;
++				this->ReceivedPacket(bytes_transferred);
++			});
++		}
++
++	private:
++		uint8_t mReg;
++		std::vector<uint8_t> mReadBuffer;
++		std::vector<uint8_t> mTmpReadBuffer;
++		bool mReadBufferFresh;
++
++		std::vector<uint8_t> mWriteBuffer;
++
++
++		boost::asio::io_service mIoContext;
++		boost::asio::ip::udp::endpoint mServerEndpoint;
++		boost::asio::ip::udp::socket mSocket;
+ };
+diff --git a/GUI.NET/Config/ConfigManager.cs b/GUI.NET/Config/ConfigManager.cs
+index bd680f4a..da187472 100644
+--- a/GUI.NET/Config/ConfigManager.cs
++++ b/GUI.NET/Config/ConfigManager.cs
+@@ -64,6 +64,7 @@ namespace Mesen.GUI.Config
+ 			} else if(File.Exists(documentsConfig)) {
+ 				HomeFolder = documentsFolder;
+ 			}
++			HomeFolder = "/tmp/mesen";
+ 		}
+ 
+ 		public static string GetConfigFile()
+diff --git a/build.sh b/build.sh
+index ac1ed102..2d2df704 100755
+--- a/build.sh
++++ b/build.sh
+@@ -5,17 +5,17 @@
+ 
+ if [ "$1" = libretro ]; then
+ 	MESENPLATFORM=x64 make clean
+-	LTO=true MESENPLATFORM=x64 make libretro -j 16
++	LTO=true MESENPLATFORM=x64 make libretro -j 1
+ 
+ 	MESENPLATFORM=x86 make clean
+-	LTO=true MESENPLATFORM=x86 make libretro -j 16
++	LTO=true MESENPLATFORM=x86 make libretro -j 1
+ else
+ 	MESENPLATFORM=x64 make clean
+-	LTO=true MESENPLATFORM=x64 make core -j 16
++	LTO=true MESENPLATFORM=x64 make core -j 1
+ 
+-	MESENPLATFORM=x86 make clean
+-	LTO=true MESENPLATFORM=x86 make core -j 16
++	#MESENPLATFORM=x86 make clean
++	#LTO=true MESENPLATFORM=x86 make core -j 16
+ 
+ 	cp ./InteropDLL/obj.x64/libMesenCore.x64.dll ./bin
+-	cp ./InteropDLL/obj.x86/libMesenCore.x86.dll ./bin
++	#cp ./InteropDLL/obj.x86/libMesenCore.x86.dll ./bin
+ fi
+diff --git a/makefile b/makefile
+index 0ae3dae1..a30ea841 100644
+--- a/makefile
++++ b/makefile
+@@ -106,7 +106,7 @@ Linux/$(OBJFOLDER)/%.o: Linux/libevdev/%.c
+ 
+ InteropDLL/$(OBJFOLDER)/$(SHAREDLIB): $(SEVENZIPOBJ) $(LUAOBJ) $(UTILOBJ) $(COREOBJ) $(LIBEVDEVOBJ) $(LINUXOBJ) InteropDLL/ConsoleWrapper.cpp InteropDLL/DebugWrapper.cpp
+ 	mkdir -p InteropDLL/$(OBJFOLDER)
+-	$(CPPC) $(GCCOPTIONS) -Wl,-z,defs -shared -o $(SHAREDLIB) InteropDLL/*.cpp $(SEVENZIPOBJ) $(LUAOBJ) $(LINUXOBJ) $(LIBEVDEVOBJ) $(UTILOBJ) $(COREOBJ) -pthread -lSDL2 -lstdc++fs
++	$(CPPC) $(GCCOPTIONS) -Wl,-z,defs -shared -o $(SHAREDLIB) InteropDLL/*.cpp $(SEVENZIPOBJ) $(LUAOBJ) $(LINUXOBJ) $(LIBEVDEVOBJ) $(UTILOBJ) $(COREOBJ) -pthread -lSDL2 -lstdc++fs -L/usr/lib/x86_64-linux-gnu -lboost_system
+ 	mv $(SHAREDLIB) InteropDLL/$(OBJFOLDER)
+ 
+ 
