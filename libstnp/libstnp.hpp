@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 #include <cassert>
+#include <endian.h>
+#include <cstring>
 #include <vector>
 #include <stdexcept>
 
@@ -51,6 +53,11 @@ public:
 		mBuffer.push_back((v >> 8) & 0xff);
 		mBuffer.push_back((v >> 16) & 0xff);
 		mBuffer.push_back((v >> 24) & 0xff);
+	}
+
+	void int16(int16_t& v) {
+		uint16_t u = static_cast<uint16_t>(v);
+		this->uint16(u);
 	}
 
 	void flags8(std::vector<bool*> const& v) {
@@ -116,6 +123,12 @@ public:
 		v += static_cast<uint32_t>(mBuffer[mPosition++]) << 8;
 		v += static_cast<uint32_t>(mBuffer[mPosition++]) << 16;
 		v += static_cast<uint32_t>(mBuffer[mPosition++]) << 24;
+	}
+
+	void int16(int16_t& v) {
+		::memcpy(&v, mBuffer.data() + mPosition, 2);
+		mPosition += 2;
+		v = le16toh(v); //TODO not sure it is correct, we should place the value in an union to ensure transparent conversion to unsigned
 	}
 
 	void flags8(std::vector<bool*> const& v) {

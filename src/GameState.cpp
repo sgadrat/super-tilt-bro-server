@@ -12,25 +12,25 @@
 *
 ********************************/
 
-#define dbg(m) do {\
-	std::ostringstream oss;\
-	oss << m << std::endl;\
-	std::cerr << oss.str();\
-}while(0)
+class DbgGuard {
+public:
+	DbgGuard(std::string message)
+	: mMessage(message)
+	{
+		std::cerr << mMessage << " {" << std::endl;
+	}
 
-static uint8_t msb(uint16_t v) {
-	return v >> 8;
-}
+	~DbgGuard() {
+		std::cerr << "}" << std::endl;
+	}
 
-static uint8_t msb(int16_t v) {
-	return msb(
-		v >= 0 ? static_cast<uint16_t>(v) : static_cast<uint16_t>(0x10000 + v)
-	);
-}
+	std::string mMessage;
+};
 
-static uint8_t lsb(uint16_t v) {
-	return v & 0xff;
-}
+#define dbg(m) \
+	std::ostringstream dbg_oss;\
+	dbg_oss << m;\
+	DbgGuard dbg_g(dbg_oss.str())
 
 /*
  * usage:
@@ -39,6 +39,15 @@ static uint8_t lsb(uint16_t v) {
  */
 static int16_t bin_int(uint16_t v) {
 	return static_cast<int16_t>(v);
+}
+
+static int32_t screen_pixel_to_screen_pixel_subpixel(int16_t screen_pixel, uint8_t subpixel) {
+	return compose_int32(
+		subpixel,
+		lsb(screen_pixel),
+		msb(screen_pixel),
+		screen_pixel < 0 ? 0xff : 0x00
+	);
 }
 
 /********************************
@@ -50,31 +59,31 @@ static int16_t bin_int(uint16_t v) {
 const uint8_t DEFAULT_GRAVITY = 3;
 const uint8_t INITIAL_STOCKS = 3;
 
-const uint8_t PLAYER_STATE_STANDING = 0x00;
-const uint8_t PLAYER_STATE_RUNNING = 0x01;
-const uint8_t PLAYER_STATE_FALLING = 0x02;
-const uint8_t PLAYER_STATE_JUMPING = 0x03;
-const uint8_t PLAYER_STATE_JABBING = 0x04;
-const uint8_t PLAYER_STATE_THROWN = 0x05;
-const uint8_t PLAYER_STATE_RESPAWN = 0x06;
-const uint8_t PLAYER_STATE_SIDE_TILT = 0x07;
-const uint8_t PLAYER_STATE_SPECIAL = 0x08;
-const uint8_t PLAYER_STATE_SIDE_SPECIAL = 0x09;
-const uint8_t PLAYER_STATE_HELPLESS = 0x0a;
-const uint8_t PLAYER_STATE_LANDING = 0x0b;
-const uint8_t PLAYER_STATE_CRASHING = 0x0c;
-const uint8_t PLAYER_STATE_DOWN_TILT = 0x0d;
-const uint8_t PLAYER_STATE_AERIAL_SIDE = 0x0e;
-const uint8_t PLAYER_STATE_AERIAL_DOWN = 0x0f;
-const uint8_t PLAYER_STATE_AERIAL_UP = 0x10;
-const uint8_t PLAYER_STATE_AERIAL_NEUTRAL = 0x11;
-const uint8_t PLAYER_STATE_AERIAL_SPE_NEUTRAL = 0x12;
-const uint8_t PLAYER_STATE_SPE_UP = 0x13;
-const uint8_t PLAYER_STATE_SPE_DOWN = 0x14;
-const uint8_t PLAYER_STATE_UP_TILT = 0x15;
-const uint8_t PLAYER_STATE_SHIELDING = 0x16;
-const uint8_t PLAYER_STATE_INNEXISTANT = 0x17;
-const uint8_t PLAYER_STATE_SPAWN = 0x18;
+const uint8_t PLAYER_STATE_THROWN = 0x00;
+const uint8_t PLAYER_STATE_RESPAWN = 0x01;
+const uint8_t PLAYER_STATE_INNEXISTANT = 0x02;
+const uint8_t PLAYER_STATE_SPAWN = 0x03;
+const uint8_t PLAYER_STATE_STANDING = 0x04;
+const uint8_t PLAYER_STATE_RUNNING = 0x05;
+const uint8_t PLAYER_STATE_FALLING = 0x06;
+const uint8_t PLAYER_STATE_JUMPING = 0x07;
+const uint8_t PLAYER_STATE_JABBING = 0x08;
+const uint8_t PLAYER_STATE_SIDE_TILT = 0x09;
+const uint8_t PLAYER_STATE_SPECIAL = 0x0a;
+const uint8_t PLAYER_STATE_SIDE_SPECIAL = 0x0b;
+const uint8_t PLAYER_STATE_HELPLESS = 0x0c;
+const uint8_t PLAYER_STATE_LANDING = 0x0d;
+const uint8_t PLAYER_STATE_CRASHING = 0x0e;
+const uint8_t PLAYER_STATE_DOWN_TILT = 0x0f;
+const uint8_t PLAYER_STATE_AERIAL_SIDE = 0x10;
+const uint8_t PLAYER_STATE_AERIAL_DOWN = 0x11;
+const uint8_t PLAYER_STATE_AERIAL_UP = 0x12;
+const uint8_t PLAYER_STATE_AERIAL_NEUTRAL = 0x13;
+const uint8_t PLAYER_STATE_AERIAL_SPE_NEUTRAL = 0x14;
+const uint8_t PLAYER_STATE_SPE_UP = 0x15;
+const uint8_t PLAYER_STATE_SPE_DOWN = 0x16;
+const uint8_t PLAYER_STATE_UP_TILT = 0x17;
+const uint8_t PLAYER_STATE_SHIELDING = 0x18;
 const uint8_t PLAYER_STATE_SHIELDLAG = 0x19;
 
 const uint8_t DIRECTION_LEFT = 0x00;
@@ -113,6 +122,11 @@ const uint8_t CONTROLLER_INPUT_DOWN_TILT = CONTROLLER_BTN_DOWN | CONTROLLER_BTN_
 
 const uint8_t SLOWDOWN_TIME = 100;
 
+const int16_t STAGE_BLAST_LEFT = -128;
+const int16_t STAGE_BLAST_RIGHT = 384;
+const int16_t STAGE_BLAST_TOP = -32;
+const int16_t STAGE_BLAST_BOTTOM = 255;
+
 /********************************
 *
 * Player states routines
@@ -122,14 +136,8 @@ const uint8_t SLOWDOWN_TIME = 100;
 void GameState::set_player_animation(uint8_t player_number, uint16_t animation_address) {
 	Player& player = this->getPlayer(player_number);
 
-	// Set the player's animation
-	player.animation = animation_address;
-
-	// Reset animation's clock
-	player.anim_clock = 0;
-
-	// Set animation's direction
-	player.animation_direction = player.direction;
+	this->animation_state_change_animation(player.animation, animation_address);
+	player.animation.direction = player.direction;
 }
 
 void GameState::aerial_directional_influence(uint8_t player_number) {
@@ -260,6 +268,7 @@ void GameState::start_aerial_jumping_player(uint8_t player_number) {
 	// Trick - aerial_jumping set the state to jumping. It is the same state with
 	// the starting conditions as the only differences
 	player.state = PLAYER_STATE_JUMPING;
+	player.state_clock = 0;
 	player.velocity_v = 0;
 
 	// Set the appropriate animation
@@ -272,6 +281,9 @@ void GameState::start_aerial_down_player(uint8_t player_number) {
 
 	// Set State
 	player.state = PLAYER_STATE_AERIAL_DOWN;
+
+	// Reset clock
+	player.state_clock = 0;
 
 	// Cancel fastfall
 	if (player.gravity != DEFAULT_GRAVITY) {
@@ -289,7 +301,8 @@ void GameState::aerial_down_player(uint8_t player_number) {
 
 	this->apply_gravity(player_number);
 
-	if (player.anim_clock == STATE_SINBAD_AERIAL_DOWN_DURATION) {
+	++player.state_clock;
+	if (player.state_clock == STATE_SINBAD_AERIAL_DOWN_DURATION) {
 		this->start_falling_player(player_number);
 	}
 }
@@ -299,6 +312,7 @@ void GameState::start_aerial_neutral_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 
 	player.state = PLAYER_STATE_AERIAL_NEUTRAL;
+	player.state_clock = 0;
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_aerial_neutral").address);
 }
 
@@ -308,7 +322,8 @@ void GameState::aerial_neutral_player(uint8_t player_number) {
 
 	this->apply_gravity(player_number);
 
-	if (player.anim_clock == STATE_SINBAD_AERIAL_NEUTRAL_DURATION) {
+	++player.state_clock;
+	if (player.state_clock == STATE_SINBAD_AERIAL_NEUTRAL_DURATION) {
 		this->start_falling_player(player_number);
 	}
 }
@@ -318,6 +333,7 @@ void GameState::start_aerial_side_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 
 	player.state = PLAYER_STATE_AERIAL_SIDE;
+	player.state_clock = 0;
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_aerial_side").address);
 }
 
@@ -327,7 +343,8 @@ void GameState::aerial_side_player(uint8_t player_number) {
 
 	this->apply_gravity(player_number);
 
-	if (player.anim_clock == STATE_SINBAD_AERIAL_SIDE_DURATION) {
+	++player.state_clock;
+	if (player.state_clock == STATE_SINBAD_AERIAL_SIDE_DURATION) {
 		this->start_falling_player(player_number);
 	}
 }
@@ -359,6 +376,7 @@ void GameState::start_aerial_up_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 
 	player.state = PLAYER_STATE_AERIAL_UP;
+	player.state_clock = 0;
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_aerial_up").address);
 }
 
@@ -368,7 +386,8 @@ void GameState::aerial_up_player(uint8_t player_number) {
 
 	this->apply_gravity(player_number);
 
-	if (player.anim_clock == STATE_SINBAD_AERIAL_UP_DURATION) {
+	++player.state_clock;
+	if (player.state_clock == STATE_SINBAD_AERIAL_UP_DURATION) {
 		this->start_falling_player(player_number);
 	}
 }
@@ -378,6 +397,7 @@ void GameState::start_crashing_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 
 	player.state = PLAYER_STATE_CRASHING;
+	player.state_clock = 0;
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_crashing").address);
 }
 
@@ -385,11 +405,14 @@ void GameState::crashing_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 	uint8_t const STATE_SINBAD_CRASHING_DURATION = 30;
 
+	// Tick clock
+	++player.state_clock;
+
 	// Do not move, velocity tends toward vector (0,0)
 	this->merge_to_player_velocity(player_number, 0, 0, 0x80);
 
 	// After move's time is out, go to standing state
-	if (player.anim_clock == STATE_SINBAD_CRASHING_DURATION) {
+	if (player.state_clock == STATE_SINBAD_CRASHING_DURATION) {
 		this->start_standing_player(player_number);
 	}
 }
@@ -399,6 +422,7 @@ void GameState::start_down_tilt_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 
 	player.state = PLAYER_STATE_DOWN_TILT;
+	player.state_clock = 0;
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_down_tilt").address);
 }
 
@@ -406,11 +430,14 @@ void GameState::down_tilt_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 	uint8_t const STATE_SINBAD_DOWNTILT_DURATION = 21;
 
+	// Tick clock
+	++player.state_clock;
+
 	// Do not move, velocity tends toward vector (0,0)
 	this->merge_to_player_velocity(player_number, 0, 0, 0x80);
 
 	// After move's time is out, go to standing state
-	if (player.anim_clock == STATE_SINBAD_DOWNTILT_DURATION) {
+	if (player.state_clock == STATE_SINBAD_DOWNTILT_DURATION) {
 		this->start_standing_player(player_number);
 	}
 }
@@ -467,6 +494,7 @@ void GameState::start_jabbing_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 
 	player.state = PLAYER_STATE_JABBING;
+	player.state_clock = 0;
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_jab").address);
 }
 
@@ -474,11 +502,14 @@ void GameState::jabbing_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 	uint8_t const STATE_SINBAD_JAB_DURATION = 14;
 
+	// Tick clock
+	++player.state_clock;
+
 	// Do not move, velocity tends toward vector (0,0)
 	this->merge_to_player_velocity(player_number, 0, 0, 0xff);
 
 	// At the end of the move, return to standing state
-	if (player.anim_clock == STATE_SINBAD_JAB_DURATION) {
+	if (player.state_clock == STATE_SINBAD_JAB_DURATION) {
 		this->start_standing_player(player_number);
 	}
 }
@@ -498,6 +529,7 @@ void GameState::start_jumping_player(uint8_t player_number) {
 
 	player.state = PLAYER_STATE_JUMPING;
 	player.state_field1 = 0;
+	player.state_clock = 0;
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_jumping").address);
 }
 
@@ -505,11 +537,14 @@ uint8_t const STATE_SINBAD_JUMP_PREPARATION_END = 4;
 void GameState::jumping_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 
+	// Tick clock
+	++player.state_clock;
+
 	// Wait for the preparation to end to begin to jump
-	if (player.anim_clock < STATE_SINBAD_JUMP_PREPARATION_END) {
+	if (player.state_clock < STATE_SINBAD_JUMP_PREPARATION_END) {
 		return;
 	}
-	if (player.anim_clock == STATE_SINBAD_JUMP_PREPARATION_END) {
+	if (player.state_clock == STATE_SINBAD_JUMP_PREPARATION_END) {
 		// Put initial jumping velocity
 		player.velocity_v = bin_int(0xfac0);
 		return;
@@ -545,7 +580,7 @@ void GameState::jumping_player_input(uint8_t player_number) {
 
 	// The jump is cancellable by grounded movements during preparation
 	// and by aerial movements after that
-	if (player.num_aerial_jumps != 0 || player.anim_clock > STATE_SINBAD_JUMP_PREPARATION_END) {
+	if (player.num_aerial_jumps != 0 || player.state_clock > STATE_SINBAD_JUMP_PREPARATION_END) {
 		// not_grounded:
 		this->check_aerial_inputs(player_number);
 	}else {
@@ -572,6 +607,9 @@ void GameState::start_landing_player(uint8_t player_number) {
 	// Set state
 	player.state = PLAYER_STATE_LANDING;
 
+	// Reset clock
+	player.state_clock = 0;
+
 	// Cap initial velocity
 	if (std::abs(player.velocity_h) >= 0x0300) {
 		if (player.velocity_h >= 0) {
@@ -589,11 +627,14 @@ void GameState::landing_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 	const uint8_t STATE_SINBAD_LANDING_DURATION = 6;
 
+	// Tick clock
+	++player.state_clock;
+
 	// Do not move, velocity tends toward vector (0,0)
 	this->merge_to_player_velocity(player_number, 0, 0, 0x40);
 
 	// After move's time is out, go to standing state
-	if (player.anim_clock == STATE_SINBAD_LANDING_DURATION) {
+	if (player.state_clock == STATE_SINBAD_LANDING_DURATION) {
 		this->start_standing_player(player_number);
 	}
 }
@@ -816,6 +857,9 @@ void GameState::start_shieldlag_player(uint8_t player_number) {
 	// Set the player's state
 	player.state = PLAYER_STATE_SHIELDLAG;
 
+	// Reset clock
+	player.state_clock = 0;
+
 	// Set the appropriate animation
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_shielding_remove").address);
 }
@@ -828,13 +872,14 @@ void GameState::shieldlag_player(uint8_t player_number) {
 	this->merge_to_player_velocity(player_number, 0, 0, 0x80);
 
 	// After move's time is out, go to standing state
-	if (player.anim_clock == STATE_SINBAD_SHIELDLAG_DURATION) {
+	++player.state_clock;
+	if (player.state_clock == STATE_SINBAD_SHIELDLAG_DURATION) {
 		this->start_standing_player(player_number);
 	}
 }
 
 void GameState::start_side_special_player(uint8_t player_number) {
-	dbg("start_side_tilt_player " << (uint16_t)player_number);
+	dbg("start_side_special_player " << (uint16_t)player_number);
 	Player& player = this->getPlayer(player_number);
 
 	// Set state
@@ -843,6 +888,9 @@ void GameState::start_side_special_player(uint8_t player_number) {
 	// Set initial velocity
 	player.velocity_h = 0;
 	player.velocity_v = 0;
+
+	// Reset clock
+	player.state_clock = 0;
 
 	// Set substate to "charging"
 	player.state_field1 = 0;
@@ -855,13 +903,16 @@ void GameState::side_special_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 	uint8_t const STATE_SINBAD_SIDE_SPECIAL_PREPARATION_DURATION = 120;
 
+	// Tick clock
+	++player.state_clock;
+
 	// Move if the substate is set to moving
 	if (player.state_field1 != 0) {
 		goto moving;
 	}
 
 	// Check if there is reason to begin to move
-	if (player.anim_clock >= STATE_SINBAD_SIDE_SPECIAL_PREPARATION_DURATION) {
+	if (player.state_clock >= STATE_SINBAD_SIDE_SPECIAL_PREPARATION_DURATION) {
 		goto start_moving;
 	}
 	if (player.btns.getRaw() == CONTROLLER_INPUT_SPECIAL_RIGHT) {
@@ -880,10 +931,13 @@ void GameState::side_special_player(uint8_t player_number) {
 		player.state_field1 = 1;
 
 		// Store fly duration (fly_duration = 5 + charge_duration / 8)
-		player.state_field2 = 5 + (player.anim_clock >> 3);
+		player.state_field2 = 5 + (player.state_clock >> 3);
 
 		// Set the movement animation
 		this->set_player_animation(player_number, this->findAnimation("anim_sinbad_side_special_jump").address);
+
+		// Reset clock
+		player.state_clock = 0;
 
 		// Falltrhough to moving
 	}
@@ -900,7 +954,7 @@ void GameState::side_special_player(uint8_t player_number) {
 		}
 
 		// After move's time is out, go to helpless state
-		if (player.anim_clock == player.state_field2) {
+		if (player.state_clock == player.state_field2) {
 			this->start_helpless_player(player_number);
 		}
 	}
@@ -916,6 +970,9 @@ void GameState::start_side_tilt_player(uint8_t player_number) {
 	// Set the player's state
 	player.state = PLAYER_STATE_SIDE_TILT;
 
+	// Initialize the clock
+	player.state_clock = 0;
+
 	// Set initial velocity
 	player.velocity_v = bin_int(0xfd80);
 	if (player.direction != DIRECTION_LEFT) {
@@ -929,7 +986,9 @@ void GameState::side_tilt_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 	uint8_t const STATE_SINBAD_SIDE_TILT_DURATION = 21;
 
-	if (player.anim_clock == STATE_SINBAD_SIDE_TILT_DURATION) {
+	++player.state_clock;
+
+	if (player.state_clock == STATE_SINBAD_SIDE_TILT_DURATION) {
 		this->start_standing_player(player_number);
 	}else {
 		this->merge_to_player_velocity(player_number, 0, 0x0100, 0x80);
@@ -1025,12 +1084,16 @@ void GameState::start_spawn_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 
 	player.state = PLAYER_STATE_SPAWN;
+	player.state_clock = 0;
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_spawn").address);
 };
 
 void GameState::spawn_player(uint8_t player_number) {
 	uint8_t const STATE_SINBAD_SPAWN_DURATION = 50;
-	if(this->getPlayer(player_number).anim_clock == STATE_SINBAD_SPAWN_DURATION) {
+	Player& player = this->getPlayer(player_number);
+
+	++player.state_clock;
+	if(player.state_clock == STATE_SINBAD_SPAWN_DURATION) {
 		this->start_standing_player(player_number);
 	}
 }
@@ -1041,6 +1104,9 @@ void GameState::start_spe_down_player(uint8_t player_number) {
 
 	// Set state
 	player.state = PLAYER_STATE_SPE_DOWN;
+
+	// Reset clock
+	player.state_clock = 0;
 
 	// Set the appropriate animation
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_spe_down").address);
@@ -1053,7 +1119,8 @@ void GameState::spe_down_player(uint8_t player_number) {
 	this->apply_gravity(player_number);
 
 	// Wait for move's timeout
-	if (player.anim_clock == STATE_SINBAD_SPE_DOWN_DURATION) {
+	++player.state_clock;
+	if (player.state_clock == STATE_SINBAD_SPE_DOWN_DURATION) {
 		// Return to falling or standing
 		if (! this->check_on_ground(player_number)) {
 			this->start_falling_player(player_number);
@@ -1074,6 +1141,9 @@ void GameState::start_spe_up_player(uint8_t player_number) {
 	player.velocity_h = 0;
 	player.velocity_v = 0;
 
+	// Reset clock
+	player.state_clock = 0;
+
 	// Set substate to "charging"
 	player.state_field1 = 0;
 
@@ -1085,13 +1155,16 @@ void GameState::spe_up_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 	uint8_t const STATE_SINBAD_SPE_UP_PREPARATION_DURATION = 3;
 
+	// Tick clock
+	++player.state_clock;
+
 	// Move if the substate is set to moving
 	if (player.state_field1 != 0) {
 		goto moving;
 	}
 
 	// Check if there is reason to begin to move
-	if (player.anim_clock >= STATE_SINBAD_SPE_UP_PREPARATION_DURATION) {
+	if (player.state_clock >= STATE_SINBAD_SPE_UP_PREPARATION_DURATION) {
 		goto start_moving;
 	}
 
@@ -1140,7 +1213,7 @@ void GameState::start_special_player(uint8_t player_number) {
 	player.state = PLAYER_STATE_SPECIAL;
 
 	// Place the player above ground
-	player.y -= 0x1000;
+	player.y -= 0x1000; //TODO check if it is computed correctly in ASM since player.y have one more byte than before
 }
 
 void GameState::special_player(uint8_t /*player_number*/) {
@@ -1169,9 +1242,9 @@ void GameState::start_thrown_player(uint8_t player_number) {
 	// Set animation
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_thrown").address);
 	if (player.velocity_h >= 0) {
-		player.animation_direction = DIRECTION_RIGHT;
+		player.animation.direction = DIRECTION_RIGHT;
 	}else {
-		player.animation_direction = DIRECTION_LEFT;
+		player.animation.direction = DIRECTION_LEFT;
 	}
 }
 
@@ -1250,6 +1323,7 @@ void GameState::start_up_tilt_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 
 	player.state = PLAYER_STATE_UP_TILT;
+	player.state_clock = 0;
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_up_tilt").address);
 }
 
@@ -1261,7 +1335,8 @@ void GameState::up_tilt_player(uint8_t player_number) {
 	this->merge_to_player_velocity(player_number, 0, 0, 0x80);
 
 	// After move's time is out, go to standing state
-	if (player.anim_clock == STATE_SINBAD_UPTILT_DURATION) {
+	++player.state_clock;
+	if (player.state_clock == STATE_SINBAD_UPTILT_DURATION) {
 		this->start_standing_player(player_number);
 	}
 }
@@ -1277,43 +1352,43 @@ GameState::GameState(Stage stage)
 {
 	// Setup data
 	mPlayerTickRoutines = {
-		&GameState::standing_player,    &GameState::running_player,   &GameState::falling_player,        &GameState::jumping_player,     &GameState::jabbing_player,
-		&GameState::thrown_player,      &GameState::respawn_player,   &GameState::side_tilt_player,      &GameState::special_player,     &GameState::side_special_player,
-		&GameState::helpless_player,    &GameState::landing_player,   &GameState::crashing_player,       &GameState::down_tilt_player,   &GameState::aerial_side_player,
-		&GameState::aerial_down_player, &GameState::aerial_up_player, &GameState::aerial_neutral_player, &GameState::aerial_spe_player,  &GameState::spe_up_player,
-		&GameState::spe_down_player,    &GameState::up_tilt_player,   &GameState::shielding_player,      &GameState::innexistant_player, &GameState::spawn_player,
+		&GameState::thrown_player, &GameState::respawn_player, &GameState::innexistant_player, &GameState::spawn_player, &GameState::standing_player,
+		&GameState::running_player, &GameState::falling_player, &GameState::jumping_player, &GameState::jabbing_player, &GameState::side_tilt_player,
+		&GameState::special_player, &GameState::side_special_player, &GameState::helpless_player, &GameState::landing_player, &GameState::crashing_player,
+		&GameState::down_tilt_player, &GameState::aerial_side_player, &GameState::aerial_down_player, &GameState::aerial_up_player, &GameState::aerial_neutral_player,
+		&GameState::aerial_spe_player, &GameState::spe_up_player, &GameState::spe_down_player, &GameState::up_tilt_player, &GameState::shielding_player,
 		&GameState::shieldlag_player,
 	};
 	mPlayerOffgroundRoutines = {
-		&GameState::start_falling_player,  &GameState::start_falling_player,  &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::start_falling_player,
-		&GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::dummy_routine,
-		&GameState::dummy_routine,         &GameState::start_helpless_player, &GameState::start_helpless_player, &GameState::dummy_routine, &GameState::dummy_routine,
-		&GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::dummy_routine, &GameState::dummy_routine,
-		&GameState::dummy_routine,         &GameState::dummy_routine,         &GameState::start_helpless_player, &GameState::dummy_routine, &GameState::dummy_routine,
+		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::start_falling_player,
+		&GameState::start_falling_player, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::start_falling_player, &GameState::dummy_routine,
+		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::start_helpless_player, &GameState::start_helpless_player,
+		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine,
+		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::start_helpless_player,
 		&GameState::start_helpless_player,
 	};
 	mPlayerOngroundRoutines = {
-		&GameState::dummy_routine,           &GameState::dummy_routine,         &GameState::start_landing_player, &GameState::dummy_routine,        &GameState::dummy_routine,
-		&GameState::thrown_player_on_ground, &GameState::dummy_routine,         &GameState::dummy_routine,        &GameState::dummy_routine,        &GameState::dummy_routine,
-		&GameState::start_landing_player,    &GameState::dummy_routine,         &GameState::dummy_routine,        &GameState::dummy_routine,        &GameState::start_landing_player,
-		&GameState::start_landing_player,    &GameState::start_landing_player,  &GameState::start_landing_player, &GameState::start_landing_player, &GameState::dummy_routine,
-		&GameState::dummy_routine,           &GameState::dummy_routine,         &GameState::dummy_routine,        &GameState::dummy_routine,        &GameState::dummy_routine,
+		&GameState::thrown_player_on_ground, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine,
+		&GameState::dummy_routine, &GameState::start_landing_player, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine,
+		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::start_landing_player, &GameState::dummy_routine, &GameState::dummy_routine,
+		&GameState::dummy_routine, &GameState::start_landing_player, &GameState::start_landing_player, &GameState::start_landing_player, &GameState::start_landing_player,
+		&GameState::start_landing_player, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine,
 		&GameState::dummy_routine,
 	};
 	mPlayerInputRoutines = {
-		&GameState::standing_player_input, &GameState::running_player_input, &GameState::check_aerial_inputs,    &GameState::jumping_player_input, &GameState::keep_input_dirty,
-		&GameState::thrown_player_input,   &GameState::respawn_player_input, &GameState::keep_input_dirty,       &GameState::special_player_input, &GameState::dummy_routine,
-		&GameState::keep_input_dirty,      &GameState::keep_input_dirty,     &GameState::keep_input_dirty,       &GameState::keep_input_dirty,     &GameState::keep_input_dirty,
-		&GameState::keep_input_dirty,      &GameState::keep_input_dirty,     &GameState::keep_input_dirty,       &GameState::dummy_routine,        &GameState::dummy_routine,
-		&GameState::keep_input_dirty,      &GameState::keep_input_dirty,     &GameState::shielding_player_input, &GameState::dummy_routine,        &GameState::keep_input_dirty,
+		&GameState::thrown_player_input, &GameState::respawn_player_input, &GameState::dummy_routine, &GameState::keep_input_dirty, &GameState::standing_player_input,
+		&GameState::running_player_input, &GameState::check_aerial_inputs, &GameState::jumping_player_input, &GameState::jabbing_player_input, &GameState::keep_input_dirty,
+		&GameState::special_player_input, &GameState::dummy_routine, &GameState::keep_input_dirty, &GameState::keep_input_dirty, &GameState::keep_input_dirty,
+		&GameState::keep_input_dirty, &GameState::keep_input_dirty, &GameState::keep_input_dirty, &GameState::keep_input_dirty, &GameState::keep_input_dirty,
+		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::keep_input_dirty, &GameState::keep_input_dirty, &GameState::shielding_player_input,
 		&GameState::keep_input_dirty,
 	};
 	mPlayerOnhurtRoutines = {
-		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player,           &GameState::hurt_player,   &GameState::hurt_player,
-		&GameState::hurt_player, &GameState::dummy_routine, &GameState::hurt_player,           &GameState::hurt_player,   &GameState::hurt_player,
-		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player,           &GameState::hurt_player,   &GameState::hurt_player,
-		&GameState::hurt_player, &GameState::hurt_player,   &GameState::hurt_player,           &GameState::hurt_player,   &GameState::hurt_player,
-		&GameState::hurt_player, &GameState::hurt_player,   &GameState::shielding_player_hurt, &GameState::dummy_routine, &GameState::dummy_routine,
+		&GameState::hurt_player, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::hurt_player,
+		&GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player,
+		&GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player,
+		&GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player,
+		&GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player, &GameState::hurt_player, &GameState::shielding_player_hurt,
 		&GameState::hurt_player,
 	};
 	mAnimations = {
@@ -1344,6 +1419,13 @@ GameState::GameState(Stage stage)
 	mPlayerB.gravity = DEFAULT_GRAVITY;
 	mPlayerA.stocks = INITIAL_STOCKS;
 	mPlayerB.stocks = INITIAL_STOCKS;
+
+	this->animation_init_state(mPlayerA.animation, 0); // voluntarily let garbage in data vector, it will be overriden by initializing player's state
+	mPlayerA.animation.first_sprite_num = 0x00;
+	mPlayerA.animation.last_sprite_num = 0x0f;
+	this->animation_init_state(mPlayerB.animation, 0);
+	mPlayerB.animation.first_sprite_num = 0x10;
+	mPlayerB.animation.last_sprite_num = 0x1f;
 
 	this->start_spawn_player(0);
 	this->start_spawn_player(1);
@@ -1423,10 +1505,12 @@ bool GameState::tick() {
 }
 
 void GameState::setControllerAState(ControllerState state) {
+	dbg("setControllerAState("<< state.getStr() <<")");
 	mControllerA = state;
 }
 
 void GameState::setControllerBState(ControllerState state) {
+	dbg("setControllerBState("<< state.getStr() <<")");
 	mControllerB = state;
 }
 
@@ -1461,90 +1545,17 @@ GameState::Animation& GameState::findAnimation(std::string const& name) {
 }
 
 void GameState::update_sprites() {
-	/* Light version of the real subroutine, placing sprites is useless, just compute anim_clock and move hitboxes */
-	for (uint8_t player_number = 0; player_number < 2; ++player_number) {
-		Player& player = getPlayer(player_number);
+	// Player A
+	mPlayerA.animation.x = compose_int16(byte1(mPlayerA.x), byte2(mPlayerA.x));
+	mPlayerA.animation.y = compose_int16(byte1(mPlayerA.y), byte2(mPlayerA.y));
+	this->animation_draw(0, mPlayerA.animation, 0, 0);
+	this->animation_tick(mPlayerA.animation);
 
-		// Search for the frame on time with clock
-		uint8_t frame_first_tick = 0;
-		bool found = false;
-		for (Animation::Frame const& frame : findAnimation(player.animation).frames) {
-			uint8_t frame_end_tick = frame_first_tick + frame.duration;
-			if (frame_end_tick > player.anim_clock) {
-				this->draw_anim_frame(frame, Point<uint8_t>{ .x = msb(player.x), .y = msb(player.y) }, player.animation_direction, frame_first_tick, player_number);
-				++player.anim_clock;
-				found = true;
-				break;
-			}else {
-				frame_first_tick = frame_end_tick;
-			}
-		}
-		if (! found) {
-			player.anim_clock = 0;
-		}
-	}
-}
-
-void GameState::draw_anim_frame(GameState::Animation::Frame const& frame, Point<uint8_t> position, uint8_t direction, uint8_t first_tick, uint8_t player_number) {
-	Player& player = getPlayer(player_number);
-
-	// Compute is_first_tick
-	bool is_first_tick = first_tick == player.anim_clock;
-
-	// Move hurtbox (inlined "anim_frame_move_hurtbox")
-
-	// Extract relative position
-	player.hurtbox = frame.hurtbox;
-
-	// If the animation is flipped, flip the box
-	if (direction != DIRECTION_LEFT) {
-		uint8_t width = player.hurtbox.position.right - player.hurtbox.position.left;
-		player.hurtbox.position.right = (player.hurtbox.position.left ^ 0b11111111) + 8; // right = -left + 7
-		player.hurtbox.position.left = player.hurtbox.position.right - width;
-	}
-
-	// Apply offset to the box
-	player.hurtbox.position.left += position.x;
-	player.hurtbox.position.right += position.x;
-	player.hurtbox.position.top += position.y;
-	player.hurtbox.position.bottom += position.y;
-
-	// Move hurtbox (end of inlined "anim_frame_move_hurtbox")
-
-	// Move hitbox (inlined "anim_frame_move_hitbox")
-
-	if (frame.has_hitbox) {
-		// Copy hitbox with special handling for reenabling
-		bool enabled = player.hitbox.enabled;
-		if (is_first_tick) {
-			enabled = enabled || frame.hitbox.enabled;
-		}
-		player.hitbox = frame.hitbox;
-		player.hitbox.enabled = enabled;
-
-		// If the player is right facing, flip the box
-		if (direction != DIRECTION_LEFT) {
-			// Flip box position
-			uint8_t width = player.hitbox.position.right - player.hitbox.position.left;
-			player.hitbox.position.right = (player.hitbox.position.left ^ 0b11111111) + 8; // right = -left + 7
-			player.hitbox.position.left = player.hitbox.position.right - width;
-
-			// Flip box knockback
-			player.hitbox.base_knock_up_h *= -1;
-			player.hitbox.force_h *= -1;
-		}
-
-		// Apply offset to the box
-		player.hitbox.position.left += position.x;
-		player.hitbox.position.right += position.x;
-		player.hitbox.position.top += position.y;
-		player.hitbox.position.bottom += position.y;
-	}else {
-		// Deactivate the hitbox if it was not placed by this frame
-		player.hitbox.enabled = false;
-	}
-
-	// Move hitbox (end of inlined "anim_frame_move_hitbox")
+	// Player B
+	mPlayerB.animation.x = compose_int16(byte1(mPlayerB.x), byte2(mPlayerB.x));
+	mPlayerB.animation.y = compose_int16(byte1(mPlayerB.y), byte2(mPlayerB.y));
+	this->animation_draw(1, mPlayerB.animation, 0, 0);
+	this->animation_tick(mPlayerB.animation);
 }
 
 void GameState::check_player_hit(uint8_t player_number) {
@@ -1581,15 +1592,15 @@ void GameState::move_player(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 
 	// Save old position
-	Point<uint8_t> old_position = {
-		.x = static_cast<uint8_t>(player.x >> 8),
-		.y = static_cast<uint8_t>(player.y >> 8),
+	Point<int16_t> old_position = {
+		.x = compose_int16(byte1(player.x), byte2(player.x)),
+		.y = compose_int16(byte1(player.y), byte2(player.y)),
 	};
 
 	// Apply velocity to position
-	Point<uint16_t> final_position = {
-		.x = static_cast<uint16_t>(player.x + player.velocity_h),
-		.y = static_cast<uint16_t>(player.y + player.velocity_v),
+	Point<int32_t> final_position = {
+		.x = player.x + player.velocity_h,
+		.y = player.y + player.velocity_v,
 	};
 
 	// Check collisions with stage plaforms
@@ -1599,26 +1610,40 @@ void GameState::move_player(uint8_t player_number) {
 		}else {
 			final_position = this->check_collision(old_position, final_position, platform.position);
 		}
-		player.x = final_position.x;
-		player.y = final_position.y;
 	}
+
+	// HACK perform the check twice to mitigate the following issue ... (long explanation in ASM code)
+	for (Stage::Platform const& platform : mStage.platforms) {
+		if (platform.is_smooth) {
+			final_position = this->check_top_collision(old_position, final_position, platform.position.left, platform.position.right, platform.position.top);
+		}else {
+			final_position = this->check_collision(old_position, final_position, platform.position);
+		}
+	}
+
+	// Store final velocity in player's position
+	player.x = final_position.x;
+	player.y = final_position.y;
 }
 
 void GameState::check_player_position(uint8_t player_number, Point<uint8_t> const& old_position) {
 	Player& player = this->getPlayer(player_number);
-	Point<uint8_t> current_position = {
-		.x = static_cast<uint8_t>(player.x >> 8),
-		.y = static_cast<uint8_t>(player.y >> 8),
-	};
 
 	// Check death
-	if (player.velocity_h < 0 && old_position.x < current_position.x) {
+	Point<int16_t> current_pixel = {
+		.x = compose_int16(byte1(player.x), byte2(player.x)),
+		.y = compose_int16(byte1(player.y), byte2(player.y)),
+	};
+	if (current_pixel.x < STAGE_BLAST_LEFT) {
 		goto set_death_state;
-	}else if (player.velocity_h >= 0 && old_position.x > current_position.x) {
+	}
+	if (STAGE_BLAST_RIGHT < current_pixel.x) {
 		goto set_death_state;
-	}else if (player.velocity_v < 0 && old_position.y < current_position.y) {
+	}
+	if (current_pixel.y < STAGE_BLAST_TOP) {
 		goto set_death_state;
-	}else if (player.velocity_v >= 0 && old_position.y > current_position.y) {
+	}
+	if (STAGE_BLAST_BOTTOM < current_pixel.y) {
 		goto set_death_state;
 	}
 
@@ -1687,6 +1712,7 @@ void GameState::hurt_player(uint8_t player_number) {
 }
 
 void GameState::keep_input_dirty(uint8_t player_number) {
+	dbg("keep_input_dirty " << (uint16_t)player_number);
 	Player& player = this->getPlayer(player_number);
 
 	player.btns = player.last_frame_btns;
@@ -1718,6 +1744,7 @@ bool GameState::boxes_overlap(Rectangle const& rect1, Rectangle const& rect2) co
 }
 
 bool GameState::check_on_ground(uint8_t player_number) {
+	//TODO adapt to v2: platforms are stored in a modifiable space. Characters can create it. Also, there is two types of platforms (simple and oos).
 	for (Stage::Platform const& platform : mStage.platforms) {
 		if (this->check_on_platform(player_number, platform.position)) {
 			return true;
@@ -1727,77 +1754,131 @@ bool GameState::check_on_ground(uint8_t player_number) {
 }
 
 bool GameState::check_on_platform(uint8_t player_number, Rectangle const& platform_position) {
+	//Note: this implementation is common to check_on_platform and check_on_platform_multi_screen as we store all platforms with int16 components
 	Player& player = this->getPlayer(player_number);
 
+	// Get player position in screen+pixel precision
+	int16_t player_x = compose_int16(byte1(player.x), byte2(player.x));
+	int16_t player_y = compose_int16(byte1(player.y), byte2(player.y));
+
 	// if (X < platform_left - 1) then offground
-	if (msb(player.x) < platform_position.left - 1) {
+	if (player_x < platform_position.left - 1) {
 		return false;
 	}
 
 	// if (platform_right + 1 < X) then offground
-	if (platform_position.right + 1 < msb(player.x)) {
+	if (platform_position.right + 1 < player_x) {
 		return false;
 	}
 
 	// if (Y != platform_top - 1) then offground
-	if (msb(player.y) != platform_position.top - 1) {
+	if (player_y != platform_position.top - 1) {
 		return false;
 	}
 
 	// To be onground, the character has to be on the bottom subpixel of the (Y ground pixel - 1)
-	return lsb(player.y) == 0xff;
+	return byte0(player.y) == 0xff;
 }
 
-Point<uint16_t> GameState::check_top_collision(Point<uint8_t> const& old_position, Point<uint16_t> const& final_position, uint8_t platform_position_left, uint8_t platform_position_right, uint8_t platform_position_top) const {
+Point<int32_t> GameState::check_top_collision(Point<int16_t> const& old_position, Point<int32_t> const& final_position, int16_t platform_position_left, int16_t platform_position_right, int16_t platform_position_top) const {
+	Point<int16_t> final_position_pixel = {
+		.x = compose_int16(byte1(final_position.x), byte2(final_position.x)),
+		.y = compose_int16(byte1(final_position.y), byte2(final_position.y)),
+	};
+
 	// Skip horizontal edges collision checks if the player is aside of the obstacle
-	if (msb(final_position.x) < platform_position_left) {
+	if (final_position_pixel.x < platform_position_left) {
 		return final_position;
 	}
-	if (platform_position_right < msb(final_position.x)) {
+	if (platform_position_right < final_position_pixel.x) {
 		return final_position;
 	}
 
 	if (old_position.y >= platform_position_top) {
 		return final_position;
 	}
-	if (msb(final_position.y) < platform_position_top) {
+	if (final_position_pixel.y < platform_position_top) {
 		return final_position;
 	}
-	uint16_t y = (((uint16_t)platform_position_top - 1) << 8) + 0xff;
-	Point<uint16_t> res = {
+
+	Point<int32_t> res = {
 		.x = final_position.x,
-		.y = y
+		.y = screen_pixel_to_screen_pixel_subpixel(platform_position_top-1, 0xff),
 	};
 	return res;
 }
 
-Point<uint16_t> GameState::check_collision(Point<uint8_t> const& old_position, Point<uint16_t> const& final_position, Rectangle const& block_position) const {
-	Point<uint16_t> result = final_position;
+Point<int32_t> GameState::check_collision(Point<int16_t> const& old_position, Point<int32_t> const& final_position, Rectangle const& block_position) const {
+	Point<int16_t> final_position_pixel = {
+		.x = compose_int16(byte1(final_position.x), byte2(final_position.x)),
+		.y = compose_int16(byte1(final_position.y), byte2(final_position.y)),
+	};
+	Point<int32_t> result = final_position;
+
+	// Skip vertical edges collision checks if the player is over or under the obstacle
+	if (final_position_pixel.y < block_position.top) {
+		goto horizontal_edges;
+	}
+	if (block_position.bottom < final_position_pixel.y) {
+		goto horizontal_edges;
+	}
 
 	// Check collision with left edge
-	if (msb(result.y) >= block_position.top && block_position.bottom >= msb(result.y)) {
-		if (old_position.x < block_position.left && msb(result.x) >= block_position.left) {
-			result.x = (((uint16_t)block_position.left - 1) << 8) + 0xff;
+	left_edge:
+		if (block_position.left < old_position.x) {
+			goto right_edge;
+		}
+		if (final_position_pixel.x < block_position.left) {
+			goto right_edge;
 		}
 
-		// Check collision with right edge
-		if (block_position.right < old_position.x && block_position.right >= msb(result.x)) {
-			result.x = ((uint16_t)block_position.right + 1) << 8;
+			result.x = screen_pixel_to_screen_pixel_subpixel(block_position.left-1, 0xff);
+			final_position_pixel.x = block_position.left-1;
+
+	// Check collision with right edge
+	right_edge:
+		if (old_position.x < block_position.right) {
+			goto horizontal_edges;
 		}
+		if (block_position.right < final_position_pixel.x) {
+			goto horizontal_edges;
+		}
+
+			result.x = screen_pixel_to_screen_pixel_subpixel(block_position.right+1, 0x00);
+			final_position_pixel.x = block_position.right+1;
+
+	horizontal_edges:
+	// Skip horizontal edges collision checks if the player is aside of the obstacle
+	if (final_position_pixel.x < block_position.left) {
+		goto end;
+	}
+	if (block_position.right < final_position_pixel.x) {
+		goto end;
 	}
 
 	// Check collision with top edge
-	if (msb(result.x) >= block_position.left && block_position.right >= msb(result.x)) {
-		if (old_position.y < block_position.top && msb(result.y) >= block_position.top) {
-			result.y = (((uint16_t)block_position.top - 1) << 8) + 0xff;
+	top_edge:
+		if (block_position.top < old_position.y) {
+			goto bot_edge;
+		}
+		if (final_position_pixel.y < block_position.top) {
+			goto bot_edge;
 		}
 
-		// Check collision with bottom edge
-		if (block_position.bottom < old_position.y && block_position.bottom >= msb(result.y)) {
-			result.y =((uint16_t)block_position.bottom + 1) << 8;
-		}
-	}
+			result.y = screen_pixel_to_screen_pixel_subpixel(block_position.top-1, 0xff);
 
+	// Check collision with bottom edge
+	bot_edge:
+		if (old_position.y < block_position.bottom) {
+			goto end;
+		}
+		if (block_position.bottom < final_position_pixel.y) {
+			goto end;
+		}
+
+			result.y = screen_pixel_to_screen_pixel_subpixel(block_position.bottom+1, 0x00);
+
+	end:
 	return result;
 }
 
@@ -1822,4 +1903,150 @@ void GameState::merge_to_player_velocity(uint8_t player_number, int16_t horizont
 			}
 		}
 	}
+}
+
+void GameState::animation_init_state(AnimationState& state, uint16_t data_vector) const {
+	// Zero most fields
+	state.x = 0;
+	state.y = 0;
+	state.direction = 0;
+	state.clock = 0;
+	state.first_sprite_num = 0;
+	state.last_sprite_num = 0;
+
+	// Initialize frame vector and data vector to the first frame
+	state.data_vector = data_vector;
+	state.frame_vector = data_vector;
+}
+
+void GameState::animation_state_change_animation(AnimationState& state, uint16_t data_vector) const {
+	// Reset clock
+	state.clock = 0;
+
+	// Set frame vector and data vector to new animation's first frame
+	state.data_vector = data_vector;
+	state.frame_vector = data_vector;
+}
+
+void GameState::animation_draw(uint8_t player_number, AnimationState const& state, int16_t camera_x, int16_t camera_y) {
+	// Compute animation position relative to camera
+	Point<int16_t> animation_position;
+	animation_position.x = state.x - camera_x;
+	animation_position.y = state.y - camera_y;
+
+	// Pass parameters to draw_anim_frame
+	Animation const& animation = this->findAnimation(state.data_vector);
+	size_t const current_frame_index = animation.find_frame(state.frame_vector);
+	Animation::Frame const& current_frame = animation.frames.at(current_frame_index);
+	this->draw_anim_frame(player_number, current_frame, state, animation_position, state.direction);
+}
+
+void GameState::animation_tick(AnimationState& state) {
+	// Increment counter
+	++state.clock;
+
+	// If counter is above (or equal) frame duration, update current frame vector
+	Animation const& animation = this->findAnimation(state.data_vector);
+	size_t const current_frame_index = animation.find_frame(state.frame_vector);
+	Animation::Frame const& current_frame = animation.frames.at(current_frame_index);
+	if (state.clock >= current_frame.duration) {
+		// Search the next frame
+		size_t next_frame_index = (current_frame_index + 1) % animation.frames.size();
+		uint16_t next_frame_addr = state.frame_vector + current_frame.size;
+		if (next_frame_index == 0) {
+			next_frame_addr = state.data_vector;
+		}
+
+		// Store computed frame vector in animation state
+		state.frame_vector = next_frame_addr;
+
+		// Reset tick counter
+		state.clock = 0;
+	}
+}
+
+void GameState::draw_anim_frame(uint8_t player_number, GameState::Animation::Frame const& frame, AnimationState const& anim_state, Point<int16_t> position, uint8_t direction) {
+	/* Light version of stb_draw_anim_frame, placing sprites is useless, just move hitboxes without indirect call mechanic */
+
+	Player& player = getPlayer(player_number);
+
+	// Hitbox
+	bool hitbox_flag = false;
+
+	if (frame.has_hitbox) {
+		// Anotate that we encountered an hitbox
+		hitbox_flag = true;
+
+		// Enabled
+		if (anim_state.clock == 0) {
+			player.hitbox.enabled = player.hitbox.enabled || frame.hitbox.enabled;
+		}
+		// Copy other hitbox fields
+		player.hitbox.damages = frame.hitbox.damages;
+		player.hitbox.base_knock_up_h = frame.hitbox.base_knock_up_h;
+		player.hitbox.base_knock_up_v = frame.hitbox.base_knock_up_v;
+		player.hitbox.force_h = frame.hitbox.force_h;
+		player.hitbox.force_v = frame.hitbox.force_v;
+		player.hitbox.position = frame.hitbox.position;
+
+		// If the player is right facing, flip the box
+		if (direction) {
+			// Flip box position
+			int16_t width = player.hitbox.position.right - player.hitbox.position.left;
+			player.hitbox.position.right = (-player.hitbox.position.left) + 7;
+			player.hitbox.position.left = player.hitbox.position.right - width;
+
+			// Flip box knockback
+			player.hitbox.base_knock_up_h *= -1;
+			player.hitbox.force_h *= -1;
+		}
+
+		// Apply offset to the box
+		player.hitbox.position.left += position.x;
+		player.hitbox.position.right += position.x;
+		player.hitbox.position.top += position.y;
+		player.hitbox.position.bottom += position.y;
+	}
+
+	if (!hitbox_flag) {
+		player.hitbox.enabled = false;
+	}
+
+	// Hurtbox
+	/* Extract relative position */
+	player.hurtbox.position.left = frame.hurtbox.position.left;
+	player.hurtbox.position.right = frame.hurtbox.position.right;
+	player.hurtbox.position.top = frame.hurtbox.position.top;
+	player.hurtbox.position.bottom = frame.hurtbox.position.bottom;
+
+	/* If the animation is flipped, flip the box */
+	if (direction) {
+		// Flip box position
+		int16_t width = player.hurtbox.position.right - player.hurtbox.position.left;
+		player.hurtbox.position.right = (-player.hurtbox.position.left) + 7;
+		player.hurtbox.position.left = player.hurtbox.position.right - width;
+	}
+
+	/* Apply offset to the box */
+	player.hurtbox.position.left += position.x;
+	player.hurtbox.position.right += position.x;
+	player.hurtbox.position.top += position.y;
+	player.hurtbox.position.bottom += position.y;
+}
+
+size_t GameState::Animation::find_frame(uint16_t addr) const {
+	uint16_t current_addr = this->address;
+	size_t current_index = 0;
+
+	while (current_addr != addr) {
+		// Trigerring this asset means that the frame was not found.
+		// It should not happen as the engine always knows in which animation to search for a frame.
+		// If the situation change, adapt this function implementation and duplicate the assert after
+		// each call that shall not trigger it.
+		assert(current_index < this->frames.size());
+
+		current_addr += this->frames.at(current_index).size;
+		++current_index;
+	}
+	return current_index;
 }

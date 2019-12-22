@@ -2,10 +2,11 @@
 
 #include <functional>
 #include <stdint.h>
+#include <sstream>
 #include <vector>
 
 struct Rectangle {
-	uint8_t left, right, top, bottom;
+	int16_t left, right, top, bottom;
 };
 
 template <typename T>
@@ -67,6 +68,12 @@ public:
 				(this->right_pressed ? 1 : 0)
 			;
 		}
+
+		std::string getStr() const {
+			std::ostringstream oss;
+			oss << "a="<<a_pressed<<",b="<<b_pressed<<",select="<<select_pressed<<",start="<<start_pressed<<",up="<<up_pressed<<",down="<<down_pressed<<",left="<<left_pressed<<",right="<<right_pressed;
+			return oss.str();
+		}
 	};
 
 	GameState(Stage stage);
@@ -97,40 +104,56 @@ private:
 		uint8_t damages;
 	};
 
+	struct AnimationState {
+		int16_t x;
+		int16_t y;
+		uint16_t data_vector;
+		uint8_t direction;
+		uint8_t clock;
+		uint8_t first_sprite_num;
+		uint8_t last_sprite_num;
+		uint16_t frame_vector;
+
+		template <typename SerializationHandler>
+		void serial(SerializationHandler& s);
+	};
+
 	struct Player {
 		uint8_t state;
 		uint8_t hitstun;
-		uint16_t x;
-		uint16_t y;
+		int32_t x;
+		int32_t y;
 		uint8_t direction;
 		int16_t velocity_v;
 		int16_t velocity_h;
 		uint8_t state_field1;
 		uint8_t state_field2;
-		uint16_t animation;
-		uint8_t anim_clock;
+		uint8_t state_clock;
 		Hurtbox hurtbox;
 		Hitbox hitbox;
 		uint8_t damages;
-		uint8_t animation_direction;
 		uint8_t num_aerial_jumps;
 		uint8_t stocks;
 		uint8_t gravity;
 		ControllerState btns;
 		ControllerState last_frame_btns;
+		AnimationState animation;
 	};
 
 	struct Animation {
 		struct Frame {
+			uint8_t size;
 			uint8_t duration;
 			bool has_hitbox;
-			Hurtbox hurtbox;
+			Hurtbox hurtbox; //TODO in frame, hurtbox and hitbox positions are signed
 			Hitbox hitbox;
 		};
 
 		std::string name;
 		uint16_t address;
 		std::vector<Frame> frames;
+
+		size_t find_frame(uint16_t addr) const;
 	};
 
 private:
@@ -146,7 +169,6 @@ private:
 	bool check_on_platform(uint8_t player_number, Rectangle const& platform_position);
 	void check_player_hit(uint8_t player_number);
 	void check_player_position(uint8_t player_number, Point<uint8_t> const& old_position);
-	void draw_anim_frame(Animation::Frame const& frame, Point<uint8_t> position, uint8_t direction, uint8_t first_tick, uint8_t player_number);
 	void dummy_routine(uint8_t player_number);
 	void hurt_player(uint8_t player_number);
 	void keep_input_dirty(uint8_t player_number);
@@ -154,9 +176,15 @@ private:
 	void update_sprites();
 
 	bool boxes_overlap(Rectangle const& rect1, Rectangle const& rect2) const;
-	Point<uint16_t> check_top_collision(Point<uint8_t> const& old_position, Point<uint16_t> const& final_position, uint8_t platform_position_left, uint8_t platform_position_right, uint8_t platform_position_top) const;
-	Point<uint16_t> check_collision(Point<uint8_t> const& old_position, Point<uint16_t> const& final_position, Rectangle const& block_position) const;
+	Point<int32_t> check_top_collision(Point<int16_t> const& old_position, Point<int32_t> const& final_position, int16_t platform_position_left, int16_t platform_position_right, int16_t platform_position_top) const;
+	Point<int32_t> check_collision(Point<int16_t> const& old_position, Point<int32_t> const& final_position, Rectangle const& block_position) const;
 	void merge_to_player_velocity(uint8_t player_number, int16_t horizontal, int16_t vertical, uint8_t step);
+
+	void animation_init_state(AnimationState& state, uint16_t data_vector) const;
+	void animation_state_change_animation(AnimationState& state, uint16_t data_vector) const;
+	void animation_draw(uint8_t player_number, AnimationState const& state, int16_t camera_x, int16_t camera_y);
+	void animation_tick(AnimationState& state);
+	void draw_anim_frame(uint8_t player_number, Animation::Frame const& frame, AnimationState const& anim_state, Point<int16_t> position, uint8_t direction);
 
 	// Player state routines
 
@@ -276,21 +304,152 @@ private:
 };
 
 template <typename SerializationHandler>
+void GameState::AnimationState::serial(SerializationHandler& s) {
+	//TODO investigate: we may spare some of x, y, direction, sprite_num if the client recomputes it each frame
+	s.int16(x);
+	s.int16(y);
+	s.uint16(data_vector);
+	s.uint8(direction);
+	s.uint8(clock);
+	s.uint8(first_sprite_num);
+	s.uint8(last_sprite_num);
+	s.uint16(frame_vector);
+}
+
+union TwoBytes {
+	uint16_t unsigned_int;
+	int16_t signed_int;
+};
+
+union FourBytes {
+	uint32_t unsigned_int;
+	int32_t signed_int;
+};
+
+inline uint8_t lsb(int16_t v) {
+	TwoBytes u;
+	u.signed_int = v;
+	return u.unsigned_int & 0x00ff;
+}
+
+inline uint8_t msb(int16_t v) {
+	TwoBytes u;
+	u.signed_int = v;
+	return (u.unsigned_int & 0xff00) >> 8;
+}
+
+inline uint8_t byte0(int32_t v) {
+	FourBytes u;
+	u.signed_int = v;
+	return u.unsigned_int & 0x000000ff;
+}
+
+inline uint8_t byte1(int32_t v) {
+	FourBytes u;
+	u.signed_int = v;
+	return (u.unsigned_int & 0x0000ff00) >> 8;
+}
+
+inline uint8_t byte2(int32_t v) {
+	FourBytes u;
+	u.signed_int = v;
+	return (u.unsigned_int & 0x00ff0000) >> 16;
+}
+
+inline uint8_t byte3(int32_t v) {
+	FourBytes u;
+	u.signed_int = v;
+	return (u.unsigned_int & 0xff000000) >> 24;
+}
+
+inline int16_t compose_int16(uint8_t lsb, uint8_t msb) {
+	TwoBytes u;
+	u.unsigned_int = (static_cast<uint16_t>(msb) << 8) + lsb;
+	return u.signed_int;
+}
+
+inline int32_t compose_int32(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3) {
+	FourBytes u;
+	u.unsigned_int =
+		(static_cast<uint32_t>(byte3) << 24) +
+		(static_cast<uint32_t>(byte2) << 16) +
+		(static_cast<uint32_t>(byte1) << 8) +
+		byte0
+	;
+	return u.signed_int;
+}
+
+template <typename SerializationHandler>
 void GameState::serial(SerializationHandler& s) {
+	/*
+	 * Decompose multibytes values that are stored exploded
+	 */
+
+	uint8_t player_a_x_low = byte0(mPlayerA.x);
+	uint8_t player_a_x = byte1(mPlayerA.x);
+	uint8_t player_a_x_screen = byte2(mPlayerA.x);
+
+	uint8_t player_a_y_low = byte0(mPlayerA.y);
+	uint8_t player_a_y = byte1(mPlayerA.y);
+	uint8_t player_a_y_screen = byte2(mPlayerA.y);
+
+	uint8_t player_b_x_low = byte0(mPlayerB.x);
+	uint8_t player_b_x = byte1(mPlayerB.x);
+	uint8_t player_b_x_screen = byte2(mPlayerB.x);
+
+	uint8_t player_b_y_low = byte0(mPlayerB.y);
+	uint8_t player_b_y = byte1(mPlayerB.y);
+	uint8_t player_b_y_screen = byte2(mPlayerB.y);
+
+	uint8_t player_a_hurtbox_left_lsb = lsb(mPlayerA.hurtbox.position.left);
+	uint8_t player_b_hurtbox_left_lsb = lsb(mPlayerB.hurtbox.position.left);
+	uint8_t player_a_hurtbox_right_lsb = lsb(mPlayerA.hurtbox.position.right);
+	uint8_t player_b_hurtbox_right_lsb = lsb(mPlayerB.hurtbox.position.right);
+	uint8_t player_a_hurtbox_top_lsb = lsb(mPlayerA.hurtbox.position.top);
+	uint8_t player_b_hurtbox_top_lsb = lsb(mPlayerB.hurtbox.position.top);
+	uint8_t player_a_hurtbox_bottom_lsb = lsb(mPlayerA.hurtbox.position.bottom);
+	uint8_t player_b_hurtbox_bottom_lsb = lsb(mPlayerB.hurtbox.position.bottom);
+	uint8_t player_a_hitbox_left_lsb = lsb(mPlayerA.hitbox.position.left);
+	uint8_t player_b_hitbox_left_lsb = lsb(mPlayerB.hitbox.position.left);
+	uint8_t player_a_hitbox_right_lsb = lsb(mPlayerA.hitbox.position.right);
+	uint8_t player_b_hitbox_right_lsb = lsb(mPlayerB.hitbox.position.right);
+	uint8_t player_a_hitbox_top_lsb = lsb(mPlayerA.hitbox.position.top);
+	uint8_t player_b_hitbox_top_lsb = lsb(mPlayerB.hitbox.position.top);
+	uint8_t player_a_hitbox_bottom_lsb = lsb(mPlayerA.hitbox.position.bottom);
+	uint8_t player_b_hitbox_bottom_lsb = lsb(mPlayerB.hitbox.position.bottom);
+	uint8_t player_a_hurtbox_left_msb = msb(mPlayerA.hurtbox.position.left);
+	uint8_t player_b_hurtbox_left_msb = msb(mPlayerB.hurtbox.position.left);
+	uint8_t player_a_hurtbox_right_msb = msb(mPlayerA.hurtbox.position.right);
+	uint8_t player_b_hurtbox_right_msb = msb(mPlayerB.hurtbox.position.right);
+	uint8_t player_a_hurtbox_top_msb = msb(mPlayerA.hurtbox.position.top);
+	uint8_t player_b_hurtbox_top_msb = msb(mPlayerB.hurtbox.position.top);
+	uint8_t player_a_hurtbox_bottom_msb = msb(mPlayerA.hurtbox.position.bottom);
+	uint8_t player_b_hurtbox_bottom_msb = msb(mPlayerB.hurtbox.position.bottom);
+	uint8_t player_a_hitbox_left_msb = msb(mPlayerA.hitbox.position.left);
+	uint8_t player_b_hitbox_left_msb = msb(mPlayerB.hitbox.position.left);
+	uint8_t player_a_hitbox_right_msb = msb(mPlayerA.hitbox.position.right);
+	uint8_t player_b_hitbox_right_msb = msb(mPlayerB.hitbox.position.right);
+	uint8_t player_a_hitbox_top_msb = msb(mPlayerA.hitbox.position.top);
+	uint8_t player_b_hitbox_top_msb = msb(mPlayerB.hitbox.position.top);
+	uint8_t player_a_hitbox_bottom_msb = msb(mPlayerA.hitbox.position.bottom);
+	uint8_t player_b_hitbox_bottom_msb = msb(mPlayerB.hitbox.position.bottom);
+
+	/*
+	 * Zeropage's state
+	 */
+
+	// $00
 	s.uint8(mPlayerA.state);
 	s.uint8(mPlayerB.state);
 	uint8_t filler = 0;
 	s.uint8(filler);
 	s.uint8(mPlayerA.hitstun);
 	s.uint8(mPlayerB.hitstun);
-	uint8_t v = mPlayerA.x >> 8;
-	s.uint8(v);
-	v = mPlayerB.x >> 8;
-	s.uint8(v);
-	v = mPlayerA.y >> 8;
-	s.uint8(v);
-	v = mPlayerB.y >> 8;
-	s.uint8(v);
+	uint8_t v;
+	s.uint8(player_a_x);
+	s.uint8(player_b_x);
+	s.uint8(player_a_y);
+	s.uint8(player_b_y);
 	s.uint8(mPlayerA.direction);
 	s.uint8(mPlayerB.direction);
 	v = mPlayerA.velocity_v >> 8;
@@ -302,29 +461,33 @@ void GameState::serial(SerializationHandler& s) {
 	v = mPlayerB.velocity_h >> 8;
 	s.uint8(v);
 	s.uint8(mPlayerA.state_field1);
+	// $10
 	s.uint8(mPlayerB.state_field1);
 	s.uint8(mPlayerA.state_field2);
 	s.uint8(mPlayerB.state_field2);
-	s.uint16(mPlayerA.animation);
-	s.uint16(mPlayerB.animation);
-	s.uint8(mPlayerA.anim_clock);
-	s.uint8(mPlayerB.anim_clock);
-	s.uint8(mPlayerA.hurtbox.position.left);
-	s.uint8(mPlayerB.hurtbox.position.left);
-	s.uint8(mPlayerA.hurtbox.position.right);
-	s.uint8(mPlayerB.hurtbox.position.right);
-	s.uint8(mPlayerA.hurtbox.position.top);
-	s.uint8(mPlayerB.hurtbox.position.top);
-	s.uint8(mPlayerA.hurtbox.position.bottom);
-	s.uint8(mPlayerB.hurtbox.position.bottom);
-	s.uint8(mPlayerA.hitbox.position.left);
-	s.uint8(mPlayerB.hitbox.position.left);
-	s.uint8(mPlayerA.hitbox.position.right);
-	s.uint8(mPlayerB.hitbox.position.right);
-	s.uint8(mPlayerA.hitbox.position.top);
-	s.uint8(mPlayerB.hitbox.position.top);
-	s.uint8(mPlayerA.hitbox.position.bottom);
-	s.uint8(mPlayerB.hitbox.position.bottom);
+	s.uint8(player_a_x_screen);
+	s.uint8(player_b_x_screen);
+	s.uint8(player_a_y_screen);
+	s.uint8(player_b_y_screen);
+	s.uint8(mPlayerA.state_clock);
+	s.uint8(mPlayerB.state_clock);
+	s.uint8(player_a_hurtbox_left_lsb);
+	s.uint8(player_b_hurtbox_left_lsb);
+	s.uint8(player_a_hurtbox_right_lsb);
+	s.uint8(player_b_hurtbox_right_lsb);
+	s.uint8(player_a_hurtbox_top_lsb);
+	s.uint8(player_b_hurtbox_top_lsb);
+	s.uint8(player_a_hurtbox_bottom_lsb);
+	// $20
+	s.uint8(player_b_hurtbox_bottom_lsb);
+	s.uint8(player_a_hitbox_left_lsb);
+	s.uint8(player_b_hitbox_left_lsb);
+	s.uint8(player_a_hitbox_right_lsb);
+	s.uint8(player_b_hitbox_right_lsb);
+	s.uint8(player_a_hitbox_top_lsb);
+	s.uint8(player_b_hitbox_top_lsb);
+	s.uint8(player_a_hitbox_bottom_lsb);
+	s.uint8(player_b_hitbox_bottom_lsb);
 	v = mPlayerA.hitbox.enabled ? 1 : 0;
 	s.uint8(v);
 	v = mPlayerB.hitbox.enabled ? 1 : 0;
@@ -338,17 +501,14 @@ void GameState::serial(SerializationHandler& s) {
 	v = mPlayerB.hitbox.force_h >> 8;
 	s.uint8(v);
 	s.uint8(mPlayerA.hitbox.damages);
+	// $30
 	s.uint8(mPlayerB.hitbox.damages);
 	s.uint8(mPlayerA.damages);
 	s.uint8(mPlayerB.damages);
-	v = mPlayerA.x & 0xff;
-	s.uint8(v);
-	v = mPlayerB.x & 0xff;
-	s.uint8(v);
-	v = mPlayerA.y & 0xff;
-	s.uint8(v);
-	v = mPlayerB.y & 0xff;
-	s.uint8(v);
+	s.uint8(player_a_x_low);
+	s.uint8(player_b_x_low);
+	s.uint8(player_a_y_low);
+	s.uint8(player_b_y_low);
 	v = mPlayerA.velocity_v & 0xff;
 	s.uint8(v);
 	v = mPlayerB.velocity_v & 0xff;
@@ -367,6 +527,7 @@ void GameState::serial(SerializationHandler& s) {
 	s.uint8(v);
 	v = mPlayerA.hitbox.base_knock_up_v >> 8;
 	s.uint8(v);
+	// $40
 	v = mPlayerB.hitbox.base_knock_up_v >> 8;
 	s.uint8(v);
 	v = mPlayerA.hitbox.base_knock_up_h >> 8;
@@ -381,14 +542,40 @@ void GameState::serial(SerializationHandler& s) {
 	s.uint8(v);
 	v = mPlayerB.hitbox.base_knock_up_h & 0xff;
 	s.uint8(v);
-	s.uint8(mPlayerA.animation_direction);
-	s.uint8(mPlayerB.animation_direction);
+	s.uint8(filler);
+	s.uint8(filler);
 	s.uint8(mPlayerA.num_aerial_jumps);
 	s.uint8(mPlayerB.num_aerial_jumps);
 	s.uint8(mPlayerA.stocks);
 	s.uint8(mPlayerB.stocks);
 	s.uint8(mPlayerA.gravity);
 	s.uint8(mPlayerB.gravity);
+
+	/*
+	 * Hitboxes MSBs - $57 to $66
+	 */
+	s.uint8(player_a_hurtbox_left_msb);
+	s.uint8(player_b_hurtbox_left_msb);
+	s.uint8(player_a_hurtbox_right_msb);
+	s.uint8(player_b_hurtbox_right_msb);
+	s.uint8(player_a_hurtbox_top_msb);
+	s.uint8(player_b_hurtbox_top_msb);
+	s.uint8(player_a_hurtbox_bottom_msb);
+	s.uint8(player_b_hurtbox_bottom_msb);
+	s.uint8(player_a_hitbox_left_msb);
+	s.uint8(player_b_hitbox_left_msb);
+	s.uint8(player_a_hitbox_right_msb);
+	s.uint8(player_b_hitbox_right_msb);
+	s.uint8(player_a_hitbox_top_msb);
+	s.uint8(player_b_hitbox_top_msb);
+	s.uint8(player_a_hitbox_bottom_msb);
+	s.uint8(player_b_hitbox_bottom_msb);
+
+	//TODO screenshake, particles and slow down - $70 to $7f (check feasibility/pertinance of $90 to $af)
+
+	/*
+	 * Controllers state
+	 */
 	s.flags8({
 		&mPlayerA.btns.a_pressed,
 		&mPlayerA.btns.b_pressed,
@@ -409,4 +596,12 @@ void GameState::serial(SerializationHandler& s) {
 		&mPlayerB.btns.left_pressed,
 		&mPlayerB.btns.right_pressed,
 	});
+
+	/*
+	 * Animations state
+	 */
+	mPlayerA.animation.serial(s);
+	mPlayerB.animation.serial(s);
+
+	//TODO recompose exploded values in member variables (only useful for deserializing GameState)
 }

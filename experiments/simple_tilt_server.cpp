@@ -12,9 +12,9 @@ int main() {
 	// Prepare component threads
 	network::SocketPool socket_pool;
 	ThreadSafeFifo<network::IncommingUdpMessage> in_messages(5);
-	network::UdpInput udp_receiver(1234, &socket_pool, &in_messages);
+	network::UdpInput udp_receiver(3000, &socket_pool, &in_messages);
 	ThreadSafeFifo<network::OutgoingUdpMessage> out_messages(5);
-	network::UdpOutput udp_sender(1234, &socket_pool, &out_messages);
+	network::UdpOutput udp_sender(3000, &socket_pool, &out_messages);
 
 	// Start component threads
 	std::thread udp_receiver_thread(&network::UdpInput::run, &udp_receiver);
@@ -29,7 +29,7 @@ int main() {
 	stage.respawn = Stage::Spawn{ .x = 0x7000, .y = 0x6000 },
 	stage.platforms = std::vector<Stage::Platform>{
 		Stage::Platform{
-			.position = { .left = 0x21, .right = 0xd7, .top = 0x81, .bottom = 0xff },
+			.position = { .left = 0x29, .right = 0xcf, .top = 0x81, .bottom = 0xff },
 			.is_smooth = false,
 		},
 	};
