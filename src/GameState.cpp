@@ -58,6 +58,7 @@ static int32_t screen_pixel_to_screen_pixel_subpixel(int16_t screen_pixel, uint8
 
 const uint8_t DEFAULT_GRAVITY = 3;
 const uint8_t INITIAL_STOCKS = 3;
+const uint8_t PLAYER_DOWN_TAP_MAX_DURATION = 7;
 
 const uint8_t PLAYER_STATE_THROWN = 0x00;
 const uint8_t PLAYER_STATE_RESPAWN = 0x01;
@@ -778,6 +779,9 @@ void GameState::start_shielding_player(uint8_t player_number) {
 	// Set state
 	player.state = PLAYER_STATE_SHIELDING;
 
+	// Reset clock
+	player.state_clock = 0;
+
 	// Set the appropriate animation
 	this->set_player_animation(player_number, this->findAnimation("anim_sinbad_shielding_full").address);
 
@@ -789,24 +793,28 @@ void GameState::start_shielding_player(uint8_t player_number) {
 }
 
 void GameState::shielding_player(uint8_t player_number) {
+	Player& player = this->getPlayer(player_number);
+
+	// Tick clock
+	if (player.state_clock < PLAYER_DOWN_TAP_MAX_DURATION) {
+		++player.state_clock;
+	}
 }
 
 void GameState::shielding_player_input(uint8_t player_number) {
 	Player& player = this->getPlayer(player_number);
 
 	// Do the same as standing player except when
-	//  all buttons are released - start standing
+	//  all buttons are released - start shieldlag (or falling if on smooth platform and it was a short-tap)
 	//  down is pressed - avoid to reset the shield state (and hit counter)
-	if (player.btns.getRaw() == CONTROLLER_INPUT_TECH) {
-		if (player.btns.getRaw() != 0) {
-			this->standing_player_input(player_number);
+	if (player.btns.getRaw() == 0) {
+		std::pair<bool, Stage::Platform*> on_ground = this->check_on_ground(player_number);
+		if (player.state_clock <= PLAYER_DOWN_TAP_MAX_DURATION  && on_ground.first && on_ground.second->is_smooth) {
+			player.y -= 0x000300;
+			this->start_falling_player(player_number);
 		}else {
 			this->start_shieldlag_player(player_number);
 		}
-	}
-
-	if (player.btns.getRaw() == 0) {
-		this->start_shieldlag_player(player_number);
 	}else if (player.btns.getRaw() != CONTROLLER_INPUT_TECH) {
 		this->standing_player_input(player_number);
 	}
@@ -1122,7 +1130,7 @@ void GameState::spe_down_player(uint8_t player_number) {
 	++player.state_clock;
 	if (player.state_clock == STATE_SINBAD_SPE_DOWN_DURATION) {
 		// Return to falling or standing
-		if (! this->check_on_ground(player_number)) {
+		if (! this->check_on_ground(player_number).first) {
 			this->start_falling_player(player_number);
 		}else {
 			this->start_standing_player(player_number);
@@ -1648,7 +1656,7 @@ void GameState::check_player_position(uint8_t player_number, Point<uint8_t> cons
 	}
 
 	// Check if on ground
-	if (this->check_on_ground(player_number)) {
+	if (this->check_on_ground(player_number).first) {
 		player.num_aerial_jumps = 0;
 		player.gravity = DEFAULT_GRAVITY;
 		mPlayerOngroundRoutines.at(player.state)(this, player_number);
@@ -1743,14 +1751,14 @@ bool GameState::boxes_overlap(Rectangle const& rect1, Rectangle const& rect2) co
 	return true;
 }
 
-bool GameState::check_on_ground(uint8_t player_number) {
+std::pair<bool, Stage::Platform*> GameState::check_on_ground(uint8_t player_number) {
 	//TODO adapt to v2: platforms are stored in a modifiable space. Characters can create it. Also, there is two types of platforms (simple and oos).
-	for (Stage::Platform const& platform : mStage.platforms) {
+	for (Stage::Platform& platform : mStage.platforms) {
 		if (this->check_on_platform(player_number, platform.position)) {
-			return true;
+			return std::pair<bool, Stage::Platform*>(true, &platform);
 		}
 	}
-	return false;
+	return std::pair<bool, Stage::Platform*>(false, nullptr);
 }
 
 bool GameState::check_on_platform(uint8_t player_number, Rectangle const& platform_position) {

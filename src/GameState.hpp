@@ -3,6 +3,7 @@
 #include <functional>
 #include <stdint.h>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 struct Rectangle {
@@ -165,7 +166,7 @@ private:
 
 	// Engine routines
 
-	bool check_on_ground(uint8_t player_number);
+	std::pair<bool, Stage::Platform*> check_on_ground(uint8_t player_number);
 	bool check_on_platform(uint8_t player_number, Rectangle const& platform_position);
 	void check_player_hit(uint8_t player_number);
 	void check_player_position(uint8_t player_number, Point<uint8_t> const& old_position);
