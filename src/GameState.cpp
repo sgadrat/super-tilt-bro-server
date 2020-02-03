@@ -1769,13 +1769,13 @@ bool GameState::check_on_platform(uint8_t player_number, Rectangle const& platfo
 	int16_t player_x = compose_int16(byte1(player.x), byte2(player.x));
 	int16_t player_y = compose_int16(byte1(player.y), byte2(player.y));
 
-	// if (X < platform_left - 1) then offground
-	if (player_x < platform_position.left - 1) {
+	// if (X < platform_left) then offground
+	if (player_x < platform_position.left) {
 		return false;
 	}
 
-	// if (platform_right + 1 < X) then offground
-	if (platform_position.right + 1 < player_x) {
+	// if (platform_right < X) then offground
+	if (platform_position.right < player_x) {
 		return false;
 	}
 
@@ -1822,6 +1822,11 @@ Point<int32_t> GameState::check_collision(Point<int16_t> const& old_position, Po
 		.y = compose_int16(byte1(final_position.y), byte2(final_position.y)),
 	};
 	Point<int32_t> result = final_position;
+
+	// Skip vertical edges collision checks if horizontal position is not impacted (pixel precision)
+	if (final_position_pixel.x == old_position.x) {
+		goto horizontal_edges;
+	}
 
 	// Skip vertical edges collision checks if the player is over or under the obstacle
 	if (final_position_pixel.y < block_position.top) {
