@@ -617,6 +617,26 @@ void GameState::serial(SerializationHandler& s) {
 		&mPlayerB.last_frame_btns.left_pressed,
 		&mPlayerB.last_frame_btns.right_pressed,
 	});
+	s.flags8({
+		&mControllerA.a_pressed,
+		&mControllerA.b_pressed,
+		&mControllerA.select_pressed,
+		&mControllerA.start_pressed,
+		&mControllerA.up_pressed,
+		&mControllerA.down_pressed,
+		&mControllerA.left_pressed,
+		&mControllerA.right_pressed,
+	});
+	s.flags8({
+		&mControllerB.a_pressed,
+		&mControllerB.b_pressed,
+		&mControllerB.select_pressed,
+		&mControllerB.start_pressed,
+		&mControllerB.up_pressed,
+		&mControllerB.down_pressed,
+		&mControllerB.left_pressed,
+		&mControllerB.right_pressed,
+	});
 
 	/*
 	 * Animations state
