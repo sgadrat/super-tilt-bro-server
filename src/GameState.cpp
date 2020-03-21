@@ -1753,23 +1753,23 @@ void GameState::keep_input_dirty(uint8_t player_number) {
 }
 
 bool GameState::boxes_overlap(Rectangle const& rect1, Rectangle const& rect2) const {
-	// No overlap possible if left of rect1 is on the right of rect2
-	if (rect1.left >= rect2.right) {
+	// No overlap possible if right of rect2 is on the left of rect1
+	if (rect2.right < rect1.left) {
 		return false;
 	}
 
-	// No overlap possible if left of rect2 is on the right of rect1
-	if (rect2.left >= rect1.right) {
+	// No overlap possible if right of rect1 is on the left of rect2
+	if (rect1.right < rect2.left) {
 		return false;
 	}
 
-	// No overlap possible if top of rect1 is lower than bottom of rect2
-	if (rect1.top >= rect2.bottom) {
+	// No overlap possible if bottom of rect2 is higher than top of rect1
+	if (rect2.bottom < rect1.top) {
 		return false;
 	}
 
-	// No overlap possible if top of rect1 is lower than bottom of rect2
-	if (rect2.top >= rect1.bottom) {
+	// No overlap possible if bottom of rect1 is higher than top of rect2
+	if (rect1.bottom < rect2.top) {
 		return false;
 	}
 
