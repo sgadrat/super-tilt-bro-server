@@ -1575,7 +1575,7 @@ GameState::Animation& GameState::findAnimation(std::string const& name) {
 		}
 	}
 
-	throw std::runtime_error("animation not found by name");
+	throw std::runtime_error(std::string("animation not found by name: '") + name + "'");
 }
 
 void GameState::update_sprites() {

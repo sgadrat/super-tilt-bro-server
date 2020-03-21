@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # usage:
-#   cat tilt/build.log 2>&1 | ./extract_anim_info.py tilt/game-mod/mod.json
+#   cat tilt/build.log | ./extract_anim_info.py tilt/game-mod/mod.json
 
 import os
 import re
@@ -24,6 +24,17 @@ for line in sys.stdin:
 				'addr': int(m.group('addr')),
 				'anim': None
 		}
+
+# Special animations handling
+assert 'anim_invisible' in animations
+animations['anim_invisible']['anim'] = stblib.animations.Animation(
+	name = 'anim_invisible',
+	frames = [
+		stblib.animations.Frame(duration = 255, hurtbox = stblib.animations.Hurtbox(
+			left = 0, right = 1, top = 0, bottom = 1
+		))
+	]
+)
 
 # Get animations data from game-mod
 mod_file = sys.argv[1]
