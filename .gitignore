@@ -3,3 +3,5 @@
 *.swp
 a.out
 experiments/replay_player
+tools/fm2_dumper
+tools/fm2_player
