@@ -17,16 +17,6 @@
  * and server.
  */
 
-// TODO remove
-//hexdump {
-//	std::ostringstream oss;
-//	oss << std::hex;
-//	for (uint8_t b : in_message->data) {
-//		oss << std::setfill('0') << std::setw(2) << (uint16_t)b << ' ';
-//	}
-//	std::cout << oss.str() << std::endl;
-//}
-
 class HexDumper {
 public:
 	void uint8(uint8_t& v) {
@@ -115,6 +105,11 @@ int main() {
 		fm2::GamepadState const& port0 = inputs.port0;
 		fm2::GamepadState const& port1 = inputs.port1;
 
+		// Dump gamestate
+		HexDumper serializer;
+		gamestate.serial(serializer);
+		std::cout << '\n';
+
 		// Show frame information
 		std::cout << "frame #" << frame_cnt << "\t" <<
 			b(port0.a) <<
@@ -159,12 +154,12 @@ int main() {
 		gamestate.setControllerBState(controller_state);
 
 		gamestate.tick();
-
-		// Dump gamestate
-		HexDumper serializer;
-		gamestate.serial(serializer);
-		std::cout << '\n';
 	}
+
+	// Dump gamestate after the last tick
+	HexDumper serializer;
+	gamestate.serial(serializer);
+	std::cout << '\n';
 
 	return 0;
 }
