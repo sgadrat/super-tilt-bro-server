@@ -231,8 +231,9 @@ void GameState::check_aerial_inputs(uint8_t player_number) {
 			[&](){this->start_spe_down_player(player_number);},
 			[&](){
 				// Fast fall, gravity * 1.5
-				player.gravity = DEFAULT_GRAVITY * 1.5;
-				player.velocity_v = (static_cast<int16_t>(DEFAULT_GRAVITY * 1.5) << 8);
+				uint8_t const fastfall_gravity = DEFAULT_GRAVITY * 2 - DEFAULT_GRAVITY / 2;
+				player.gravity = fastfall_gravity;
+				player.velocity_v = (static_cast<int16_t>(fastfall_gravity) << 8);
 			},
 			[&](){this->start_aerial_up_player(player_number);},
 
