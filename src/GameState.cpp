@@ -592,7 +592,7 @@ void GameState::jumping_player_input(uint8_t player_number) {
 
 	// The jump is cancellable by grounded movements during preparation
 	// and by aerial movements after that
-	if (player.num_aerial_jumps != 0 || player.state_clock > STATE_SINBAD_JUMP_PREPARATION_END) {
+	if (player.num_aerial_jumps != 0 || player.state_clock >= STATE_SINBAD_JUMP_PREPARATION_END) {
 		// not_grounded:
 		this->check_aerial_inputs(player_number);
 	}else {
