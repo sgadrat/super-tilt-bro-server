@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # usage:
-#   cat tilt/build.log | ./extract_anim_info.py tilt/game-mod/mod.json
+#   cat tilt/build.log | ./extract_anim_info_v2.py tilt/game-mod/mod.json
 
 import os
 import re
