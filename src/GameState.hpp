@@ -572,7 +572,8 @@ void GameState::serial(SerializationHandler& s) {
 	s.uint8(player_a_hitbox_bottom_msb);
 	s.uint8(player_b_hitbox_bottom_msb);
 
-	//TODO screenshake, particles and slow down - $70 to $7f (check feasibility/pertinance of $90 to $af)
+	//TODO screenshake + screen_shake_nextval, particles and slow down - $70 to $7f (check feasibility/pertinance of $90 to $af)
+	s.uint8(mScreenShakeCounter);
 
 	/*
 	 * Controllers state
