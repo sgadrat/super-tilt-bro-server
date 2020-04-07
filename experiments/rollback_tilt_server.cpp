@@ -208,6 +208,7 @@ int main(int argc, char** argv) {
 				std::cout << "send state to " << client_endpoint.address() << ":" << client_endpoint.port() << std::endl;
 			}
 
+#if 0
 			// Save replay file
 			std::ofstream ofs("/tmp/tilt.replay");
 			ofs << controller_a_history.size();
@@ -218,9 +219,13 @@ int main(int argc, char** argv) {
 			for (std::pair<uint32_t, GameState::ControllerState> const& entry : controller_b_history) {
 					ofs << ' ' << entry.first << ' ' << (uint16_t)entry.second.getRaw();
 			}
+#endif
 		}
 
-		// wait 1 PAL frame between updates
-		::usleep(20000);
+		// Let some time between updates
+		//  This value is a compromise between reactivity and chances of aggregating inputs of both clients in the same frame
+		//::usleep(20000); // 1 PAL frame: almost no chance of missing input merge possibility
+		//::usleep(5000); // 1/4 of a PAL frame: compromise favoring reactivity
+		::usleep(1000); // 1 millisecond: negligeable reactivity impact, probably in the range of variance in connections latency
 	}
 }
