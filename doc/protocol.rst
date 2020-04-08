@@ -4,7 +4,7 @@ Super Tilt Network Protocol
 Introduction
 ------------
 
-The Super Tilt Network Protocol (STNP) is a network protocol aimed to enable plays of Super Tilt Bro over the internet. Its goals are to be low overhead, to cope with limited resources of the NES, low latency and allow local machines to predict the game state, to keep it playable even with more than 16 millisecond of ping.
+The Super Tilt Network Protocol (STNP) is a network protocol aimed to enable plays of Super Tilt Bro over the internet. Its goals are to be low overhead, to cope with limited resources of the NES, low latency and allow local machines to predict the game state, to keep it playable even with more than 16 milliseconds of ping.
 
 STNP considere three peers. Two clients, which are NES machines running Super Tilt Bro, and a server, which is a computer in the network running the serving software. The server keeps the reference state of the game. The two clients connect to the server, send their input, receive the game state and display it. In order to obtain a smooth experience, clients should be able to predict game states and replay recent inputs on received reference game states.
 
@@ -72,21 +72,47 @@ Each time the controller of a client changes state, it should send a ControllerS
 **timestamp**: Frame number on which the change occured
 **buttons**: New state of each button of the controller, 0 released, 1 pressed. Buttons order is: A, B, select, start, up, down, left, right.
 
-Each time the server receives a ControllerState message, it use it to compute a new gamestate at *timestamp* + 1, affected by the button press. It then sends it to both clients in a NewGameState message.
+Each time the server receives a ControllerState message, it registers it to be considered four frames later, then computes a new gamestate at *timestamp*. It then sends it to both clients in a NewGameState message.
 
 ::
 	NewGameState {
 		uint8     message_type = 2;
 		uint8     prediction_id;
 		uint32    timestamp;
+		uint8[4]  next_opponent_inputs;
 		GameState state;
 	}
 
 **prediction_id**: Indicate if this gamestate is derived from the previous one or uses new inputs. This number should be incremented each time the state is computed because of some inputs. It may loop from 255 to 0.
 **timestamp**: Frame number on which this state is associated.
+**next_opponent_inputs**: List of inputs registered for delayed execution.
 **state**: The new state.
 
 NewGameState messages can be periodically updated then resent. In such case, the server should not change the *prediction_id*, set *timestamp* to an estimate of the current frame number being displayed on devices and *state* to an updated state to this timestamp. Clients may discard NewGameState messages when the *prediction_id* match the last one received.
+
+.. note::
+	Expected client behaviour when receiving a NewGameState message.
+
+	Considering a client that maintains a table of input history for each player.
+	History ranging from "enough frames" in the past to four frames in the futur.
+	"enough frames" means that no reasonably late message will come with a timestamp
+	before table's begining.
+
+	Case 1: The message is more than four frames in the past
+		copy next_opponent_inputs in opponent's input table at message timestamp
+		re-predict inputs between the end of next_opponent_inputs and now
+		rollback until now
+
+	Case 2: The message is less than four frames in the past
+		past predicted frames are the same as in the message
+			register futur delayed inputs in opponent's input table
+
+		past predicted frames are not as in the message
+			register delayed inputs (past and futur) in opponent's input table
+			rollback until now
+
+	Case 3: The message is at current timestamp or in the future
+		erase all
 
 Gameover
 --------

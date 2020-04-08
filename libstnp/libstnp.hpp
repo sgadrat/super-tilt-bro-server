@@ -223,15 +223,17 @@ struct ControllerState {
 };
 
 struct NewGameState {
+	std::vector<uint8_t> next_opponent_inputs;
+	std::vector<uint8_t> state;
 	uint32_t timestamp;
 	uint8_t prediction_id;
-	std::vector<uint8_t> state;
 
 	template <typename SerializationHandler>
 	void serial(SerializationHandler& s) {
 		s.type(ServerMessageType::NewGameState);
 		s.uint8(this->prediction_id);
 		s.uint32(this->timestamp);
+		s.dataFill(this->next_opponent_inputs);
 		s.dataFill(this->state);
 	}
 };
