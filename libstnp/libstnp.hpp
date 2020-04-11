@@ -25,6 +25,10 @@ enum class ServerMessageType : uint8_t {
 
 class MessageSerializer {
 public:
+	void clear() {
+		mBuffer.clear();
+	}
+
 	std::vector<uint8_t> const& serialized() const {
 		return mBuffer;
 	}
@@ -162,11 +166,13 @@ private:
 
 struct Connection {
 	uint32_t client_id;
+	uint8_t ping;
 
 	template <typename SerializationHandler>
 	void serial(SerializationHandler& s) {
 		s.type(ClientMessageType::Connection);
 		s.uint32(this->client_id);
+		s.uint8(this->ping);
 	}
 };
 

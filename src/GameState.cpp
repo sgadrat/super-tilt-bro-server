@@ -12,6 +12,8 @@
 *
 ********************************/
 
+#ifdef DEBUG_LOG
+
 class DbgGuard {
 public:
 	DbgGuard(std::string message)
@@ -31,6 +33,12 @@ public:
 	std::ostringstream dbg_oss;\
 	dbg_oss << m;\
 	DbgGuard dbg_g(dbg_oss.str())
+
+#else
+
+#define dbg(m)
+
+#endif
 
 /*
  * usage:
@@ -1435,6 +1443,7 @@ GameState::GameState(Stage stage)
 	::memset((void*)&mPlayerB, 0, sizeof(mPlayerB));
 	mScreenShakeCounter = 0;
 	mSlowDownCounter = 0;
+	mGameoverWinner = 0;
 
 	// Call stage initialization routine
 	stage.init();
@@ -1537,6 +1546,10 @@ bool GameState::tick() {
 	this->update_sprites();
 
 	return true;
+}
+
+uint8_t GameState::winner() {
+	return mGameoverWinner;
 }
 
 void GameState::setControllerAState(ControllerState state) {

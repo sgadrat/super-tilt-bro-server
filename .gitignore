@@ -5,3 +5,4 @@ a.out
 experiments/replay_player
 tools/fm2_dumper
 tools/fm2_player
+src/server/stb_server

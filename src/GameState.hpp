@@ -80,6 +80,7 @@ public:
 	GameState(Stage stage);
 
 	bool tick();
+	uint8_t winner();
 
 	void setControllerAState(ControllerState state);
 	void setControllerBState(ControllerState state);

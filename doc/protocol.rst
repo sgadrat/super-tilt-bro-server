@@ -15,17 +15,19 @@ Initialization
 
 Before initialization, the server is idle and clients offline. The goal of this phase is to start a game with clients and server synchronized.
 
-Client1 chooses a 4 bytes identifier, then send a Connection message to the server. The server reply with a Connected message. Client1 may repeat the Connection message until the response is received. The server may repeat the Connected message multiple times, repeated Connected messages must be strictly identical to the original.
+Client1 chooses a 4 bytes identifier, then send a Connection message to the server. The server replies with a Connected message. Client1 may repeat the Connection message until the response is received. The server may repeat the Connected message multiple times, repeated Connected messages must be strictly identical to the original.
 
-The server should send a Connected message each time it receive a Connection message during the initialization phase.
+The server should send a Connected message each time it receives a Connection message during the initialization phase.
 
 ::
 	Connection {
 		uint8  message_type = 0;
 		uint32 client_id;
+		uint8 ping;
 	}
 
 **client_id**: Identifier unique to this client.
+**ping**: Time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping=3 means 12ms of ping.)
 
 ::
 	Connected {
