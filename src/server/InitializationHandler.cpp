@@ -32,6 +32,11 @@ namespace {
 			GameInstance instance;
 			std::thread thread;
 	};
+
+	struct ClientData {
+		GameInstance::ClientInfo client;
+		uint_fast8_t ping; // Timescale 4ms (4 is an NTSC frame, 5 is a PAL frame)
+	};
 }
 
 InitializationHandler::InitializationHandler(
@@ -43,7 +48,7 @@ InitializationHandler::InitializationHandler(
 {}
 
 void InitializationHandler::run() {
-	std::deque<GameInstance::ClientInfo> clients;
+	std::deque<ClientData> clients;
 	std::vector<GameInstanceThread> game_instances;
 
 	while (true) {
@@ -59,12 +64,15 @@ void InitializationHandler::run() {
 
 			// Add client
 			bool found = false;
-			GameInstance::ClientInfo client = {
-				.endpoint = in_message->sender,
-				.id = connection_request.client_id
+			ClientData client = {
+				.client = {
+					.endpoint = in_message->sender,
+					.id = connection_request.client_id
+				},
+				.ping = connection_request.ping
 			};
-			for (GameInstance::ClientInfo const& existing_client: clients) {
-				if (existing_client.endpoint == client.endpoint && existing_client.id == client.id) {
+			for (ClientData const& existing_client: clients) {
+				if (existing_client.client.endpoint == client.client.endpoint && existing_client.client.id == client.client.id) {
 					found = true;
 					break;
 				}
@@ -81,14 +89,15 @@ void InitializationHandler::run() {
 			connection_response.serial(serializer);
 
 			std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
-			out_message->destination = client.endpoint;
+			out_message->destination = client.client.endpoint;
 			out_message->data = serializer.serialized();
 			this->out_messages->push(out_message);
 
 			// Start a match if there is enough clients
 			std::this_thread::sleep_for(std::chrono::milliseconds(200)); //HACK avoid spamming messages. It would be better to handle matchmaking independently of messages reception
 			if (clients.size() >= 2) {
-				syslog(LOG_NOTICE, "starting a game between %08x and %08x", clients.at(0).id, clients.at(1).id);
+				uint32_t const antilag_prediction = ((clients.at(0).ping + clients.at(0).ping) / 2) / 5; // total_ping / 2 = transmission time from one client to another ; 5 = frame duration (PAL)
+				syslog(LOG_NOTICE, "starting a game between %08x and %08x (%d antilag)", clients.at(0).client.id, clients.at(1).client.id, antilag_prediction);
 
 				// Prepare game instance
 				std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> game_in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
@@ -96,14 +105,14 @@ void InitializationHandler::run() {
 					game_in_messages,
 					this->out_messages,
 					nullptr, //TODO use it to gather statistics (and maybe destroy instance once terminated)
-					2, // TODO Determine best value from clients ping
-					clients.at(0),
-					clients.at(1)
+					antilag_prediction,
+					clients.at(0).client,
+					clients.at(1).client
 				);
 
 				// Adapt message routing
-				this->clients_routing->set_queue(clients.at(0).endpoint, game_in_messages);
-				this->clients_routing->set_queue(clients.at(1).endpoint, game_in_messages);
+				this->clients_routing->set_queue(clients.at(0).client.endpoint, game_in_messages);
+				this->clients_routing->set_queue(clients.at(1).client.endpoint, game_in_messages);
 
 				// Send StartGame message
 				stnp::message::StartGame start_signal;
@@ -114,7 +123,7 @@ void InitializationHandler::run() {
 
 				for (size_t client_index = 0; client_index <= 1; ++client_index) {
 					std::shared_ptr<network::OutgoingUdpMessage> start_signal_udp(new network::OutgoingUdpMessage);
-					start_signal_udp->destination = clients.at(client_index).endpoint;
+					start_signal_udp->destination = clients.at(client_index).client.endpoint;
 					start_signal_udp->data = serializer.serialized();
 					syslog(LOG_DEBUG, "send StartGame to %s:%d", start_signal_udp->destination.address().to_string().c_str(), start_signal_udp->destination.port());
 					this->out_messages->push(start_signal_udp);
