@@ -73,6 +73,7 @@ void GameInstance::run(
 	try {
 		// Process incoming messages
 		this->keep_running = true;
+		this->over = false;
 		std::shared_ptr<network::IncommingUdpMessage> in_message = nullptr;
 		std::vector<boost::asio::ip::udp::endpoint> clients({client_a.endpoint, client_b.endpoint});
 		std::map<uint32_t, GameState> gamestate_history{
@@ -222,9 +223,14 @@ void GameInstance::run(
 		syslog(LOG_ERR, "GameInstance: game crashed: %s", e.what());
 	}
 
-	//TODO Remove clients from routing table
+	//TODO Remove clients from routing table (or better, send an event in game_info_queue and let someby else cleaning things like the routing table)
+	this->over = true;
 }
 
 void GameInstance::stop() {
 	this->keep_running = false;
+}
+
+bool GameInstance::is_over() const {
+	return this->over;
 }

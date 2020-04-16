@@ -14,7 +14,8 @@ public:
 	void push(std::shared_ptr<T> e);
 	std::shared_ptr<T> pop();
 	std::shared_ptr<T> pop_block();
-	std::shared_ptr<T> pop_block(std::chrono::microseconds timeout);
+	template <typename Rep, typename Period>
+	std::shared_ptr<T> pop_block(std::chrono::duration<Rep, Period> timeout);
 
 private:
 	std::deque<std::shared_ptr<T>> mBuffer;
@@ -67,7 +68,17 @@ std::shared_ptr<T> ThreadSafeFifo<T>::pop_block() {
 }
 
 template <typename T>
-std::shared_ptr<T> ThreadSafeFifo<T>::pop_block(std::chrono::microseconds /*timeout*/) {
-	//TODO Actual implementation (this one ingores timeout)
-	return this->pop_block();
+template <typename Rep, typename Period>
+std::shared_ptr<T> ThreadSafeFifo<T>::pop_block(std::chrono::duration<Rep, Period> timeout) {
+	std::unique_lock<std::mutex> lock(mBufferLock);
+	if (mBuffer.size() == 0) {
+		mCondition.wait_for(lock, timeout);
+	}
+	if (mBuffer.size() == 0) {
+		throw std::runtime_error("ThreadSafeFifo pop timed out");
+	}
+
+	std::shared_ptr<T> e = mBuffer.front();
+	mBuffer.pop_front();
+	return e;
 }

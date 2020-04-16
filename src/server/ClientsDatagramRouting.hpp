@@ -13,6 +13,7 @@ public:
 
 	Queue get_queue(boost::asio::ip::udp::endpoint const& endpoint);
 	void set_queue(boost::asio::ip::udp::endpoint const& endpoint, Queue const& queue);
+	void remove_client(boost::asio::ip::udp::endpoint const& endpoint);
 
 private:
 	RoutingTable routing_table;

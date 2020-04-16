@@ -11,7 +11,7 @@ public:
 	/** Constructors necessary as atomic is not copy-constructible (and we want GameInstance to be)*/
 	GameInstance() = default;
 	GameInstance(GameInstance const& o)
-	: keep_running(o.keep_running.load())
+	: keep_running(o.keep_running.load()), over(o.over.load())
 	{}
 
 	/** Info usedful to distinguish between clients */
@@ -44,6 +44,10 @@ public:
 	/** Abort the game */
 	void stop();
 
+	/** Tell if run() has finished */
+	bool is_over() const;
+
 private:
 	std::atomic<bool> keep_running;
+	std::atomic<bool> over;
 };

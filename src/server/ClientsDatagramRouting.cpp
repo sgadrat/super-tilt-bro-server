@@ -15,3 +15,8 @@ void ClientsDatagramRouting::set_queue(boost::asio::ip::udp::endpoint const& end
 	std::lock_guard<std::mutex> lock(mutex);
 	this->routing_table[endpoint] = queue;
 }
+
+void ClientsDatagramRouting::remove_client(boost::asio::ip::udp::endpoint const& endpoint) {
+	std::lock_guard<std::mutex> lock(mutex);
+	this->routing_table.erase(endpoint);
+}
