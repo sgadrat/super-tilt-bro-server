@@ -1,6 +1,7 @@
 #include "server/InitializationHandler.hpp"
 
 #include "server/GameInstance.hpp"
+#include "server/utils.hpp"
 #include <libstnp/libstnp.hpp>
 
 #include <chrono>
@@ -80,7 +81,7 @@ void InitializationHandler::run() {
 			std::shared_ptr<network::IncommingUdpMessage> in_message = nullptr;
 			try {
 				in_message = this->in_messages->pop_block(GAME_TIMEOUT);
-				syslog(LOG_DEBUG, "InitializationHandler: received message of %d bytes from %s:%d", in_message->data.size(), in_message->sender.address().to_string().c_str(), in_message->sender.port());
+				srv_dbg(LOG_DEBUG, "InitializationHandler: received message of %d bytes from %s:%d", in_message->data.size(), in_message->sender.address().to_string().c_str(), in_message->sender.port());
 			}catch (std::runtime_error const& e) {
 				// Timeout, noting special to do, we will just not process message bellow
 			}
@@ -96,13 +97,13 @@ void InitializationHandler::run() {
 
 				// Join if terminated (allowing thread handle destruction)
 				if (instance->instance.is_over() && instance->thread.joinable()) {
-					syslog(LOG_DEBUG, "InitializationHandler: joining terminated game");
+					srv_dbg(LOG_DEBUG, "InitializationHandler: joining terminated game");
 					instance->thread.join();
 				}
 
 				// Delete joined games
 				if (!instance->thread.joinable()) {
-					syslog(LOG_DEBUG, "InitializationHandler: destorying joined game");
+					srv_dbg(LOG_DEBUG, "InitializationHandler: destorying joined game");
 
 					// Remove game's clients from routing table
 					this->clients_routing->remove_client(instance->get_clients().first.endpoint);
@@ -183,7 +184,7 @@ void InitializationHandler::run() {
 						std::shared_ptr<network::OutgoingUdpMessage> start_signal_udp(new network::OutgoingUdpMessage);
 						start_signal_udp->destination = clients.at(client_index).client.endpoint;
 						start_signal_udp->data = serializer.serialized();
-						syslog(LOG_DEBUG, "send StartGame to %s:%d", start_signal_udp->destination.address().to_string().c_str(), start_signal_udp->destination.port());
+						srv_dbg(LOG_DEBUG, "send StartGame to %s:%d", start_signal_udp->destination.address().to_string().c_str(), start_signal_udp->destination.port());
 						this->out_messages->push(start_signal_udp);
 					}
 

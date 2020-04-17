@@ -1,5 +1,6 @@
 #include "server/GameInstance.hpp"
 
+#include "server/utils.hpp"
 #include "GameState.hpp"
 #include "network.hpp"
 #include <libstnp/libstnp.hpp>
@@ -55,7 +56,7 @@ void debug_log_msg([[maybe_unused]] std::shared_ptr<network::IncommingUdpMessage
 	for (uint8_t b : in_message->data) {
 		oss << std::setfill('0') << std::setw(2) << (uint16_t)b << ' ';
 	}
-	syslog(LOG_DEBUG, oss.str().c_str());
+	srv_dbg(LOG_DEBUG, oss.str().c_str());
 #endif
 }
 
@@ -203,7 +204,7 @@ void GameInstance::run(
 							out_message->destination = client_endpoint;
 							out_message->data = serializer.serialized();
 							out_messages->push(out_message);
-							syslog(LOG_DEBUG, "send state to %s:%d", client_endpoint.address(), client_endpoint.port());
+							srv_dbg(LOG_DEBUG, "send state to %s:%d", client_endpoint.address(), client_endpoint.port());
 						}
 					}
 				}
