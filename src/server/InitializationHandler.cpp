@@ -5,7 +5,6 @@
 #include <libstnp/libstnp.hpp>
 
 #include <chrono>
-#include <deque>
 #include <list>
 #include <syslog.h>
 #include <thread>
@@ -58,6 +57,7 @@ namespace {
 	struct ClientData {
 		GameInstance::ClientInfo client;
 		uint_fast8_t ping; // Timescale 4ms (4 is an NTSC frame, 5 is a PAL frame)
+		std::chrono::time_point<std::chrono::steady_clock> last_heartbeat;
 	};
 }
 
@@ -71,8 +71,9 @@ InitializationHandler::InitializationHandler(
 
 void InitializationHandler::run() {
 	std::chrono::minutes const GAME_TIMEOUT(30);
+	std::chrono::seconds const CLIENT_TIMEOUT(5);
 
-	std::deque<ClientData> clients;
+	std::list<ClientData> clients;
 	std::list<GameInstanceThread> game_instances;
 
 	while (true) {
@@ -91,7 +92,9 @@ void InitializationHandler::run() {
 			for (std::list<GameInstanceThread>::iterator instance = game_instances.begin() ; instance != game_instances.end(); ++instance) {
 				// Ask to stop
 				if (now - instance->get_creation_time() >= GAME_TIMEOUT) {
-					syslog(LOG_INFO, "InitializationHandler: stopping timeouted game");
+					if (instance->thread.joinable()) {
+						syslog(LOG_INFO, "InitializationHandler: stopping timeouted game");
+					}
 					instance->instance.stop();
 				}
 
@@ -103,7 +106,7 @@ void InitializationHandler::run() {
 
 				// Delete joined games
 				if (!instance->thread.joinable()) {
-					srv_dbg(LOG_DEBUG, "InitializationHandler: destorying joined game");
+					srv_dbg(LOG_DEBUG, "InitializationHandler: destroying joined game");
 
 					// Remove game's clients from routing table
 					this->clients_routing->remove_client(instance->get_clients().first.endpoint);
@@ -128,10 +131,12 @@ void InitializationHandler::run() {
 						.endpoint = in_message->sender,
 						.id = connection_request.client_id
 					},
-					.ping = connection_request.ping
+					.ping = connection_request.ping,
+					.last_heartbeat = now
 				};
-				for (ClientData const& existing_client: clients) {
+				for (ClientData& existing_client: clients) {
 					if (existing_client.client.endpoint == client.client.endpoint && existing_client.client.id == client.client.id) {
+						existing_client.last_heartbeat = client.last_heartbeat;
 						found = true;
 						break;
 					}
@@ -152,11 +157,26 @@ void InitializationHandler::run() {
 				out_message->data = serializer.serialized();
 				this->out_messages->push(out_message);
 
+				// Clear timeouted clients
+				for (std::list<ClientData>::iterator client_it = clients.begin(); client_it != clients.end(); ++client_it) {
+					if (now - client_it->last_heartbeat >= CLIENT_TIMEOUT) {
+						syslog(LOG_INFO, "InitializationHandler: client timeouted: %s:%d id=%08x", client_it->client.endpoint.address().to_string().c_str(), client_it->client.endpoint.port(), client_it->client.id);
+						client_it = clients.erase(client_it);
+					}
+				}
+
 				// Start a match if there is enough clients
 				std::this_thread::sleep_for(std::chrono::milliseconds(200)); //HACK avoid spamming messages. It would be better to handle matchmaking independently of messages reception
-				if (clients.size() >= 2) {
-					uint32_t const antilag_prediction = ((clients.at(0).ping + clients.at(0).ping) / 2) / 5; // total_ping / 2 = transmission time from one client to another ; 5 = frame duration (PAL)
-					syslog(LOG_NOTICE, "starting a game between %08x and %08x (%d antilag)", clients.at(0).client.id, clients.at(1).client.id, antilag_prediction);
+				while (clients.size() >= 2) {
+					// Select clients to match
+					std::array<std::list<ClientData>::iterator, 2> const matched_clients = {
+						clients.begin(),
+						++clients.begin()
+					};
+
+					// Compute antilag prediction
+					uint32_t const antilag_prediction = ((matched_clients.at(0)->ping + matched_clients.at(0)->ping) / 2) / 5; // total_ping / 2 = transmission time from one client to another ; 5 = frame duration (PAL)
+					syslog(LOG_NOTICE, "starting a game between %08x and %08x (%d antilag)", matched_clients.at(0)->client.id, matched_clients.at(1)->client.id, antilag_prediction);
 
 					// Prepare game instance
 					std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> game_in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
@@ -165,13 +185,13 @@ void InitializationHandler::run() {
 						this->out_messages,
 						nullptr, //TODO use it to gather statistics (and maybe destroy instance once terminated)
 						antilag_prediction,
-						clients.at(0).client,
-						clients.at(1).client
+						matched_clients.at(0)->client,
+						matched_clients.at(1)->client
 					);
 
 					// Adapt message routing
-					this->clients_routing->set_queue(clients.at(0).client.endpoint, game_in_messages);
-					this->clients_routing->set_queue(clients.at(1).client.endpoint, game_in_messages);
+					this->clients_routing->set_queue(matched_clients.at(0)->client.endpoint, game_in_messages);
+					this->clients_routing->set_queue(matched_clients.at(1)->client.endpoint, game_in_messages);
 
 					// Send StartGame message
 					stnp::message::StartGame start_signal;
@@ -182,7 +202,7 @@ void InitializationHandler::run() {
 
 					for (size_t client_index = 0; client_index <= 1; ++client_index) {
 						std::shared_ptr<network::OutgoingUdpMessage> start_signal_udp(new network::OutgoingUdpMessage);
-						start_signal_udp->destination = clients.at(client_index).client.endpoint;
+						start_signal_udp->destination = matched_clients.at(client_index)->client.endpoint;
 						start_signal_udp->data = serializer.serialized();
 						srv_dbg(LOG_DEBUG, "send StartGame to %s:%d", start_signal_udp->destination.address().to_string().c_str(), start_signal_udp->destination.port());
 						this->out_messages->push(start_signal_udp);

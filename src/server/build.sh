@@ -1,7 +1,12 @@
 #!/bin/bash
 
+dbg_log_flags=""
+if [ "x$1" == "xdbg" ]; then
+	dbg_log_flags="-DLOOG_FLOOD"
+fi
+
 g++ \
-	-O3 -o stb_server \
+	-O3 -o stb_server $dbg_log_flags \
 	-I .. -I ../.. \
 	stb_server.cpp \
 	../network.cpp \
