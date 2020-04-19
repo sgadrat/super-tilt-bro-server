@@ -6,6 +6,7 @@
 
 #include <chrono>
 #include <list>
+#include <stdexcept>
 #include <syslog.h>
 #include <thread>
 #include <utility>
@@ -122,95 +123,128 @@ void InitializationHandler::run() {
 				// Parse message
 				stnp::message::Connection connection_request;
 				stnp::message::MessageDeserializer deserializer(in_message->data);
-				connection_request.serial(deserializer);
-
-				// Add client
-				bool found = false;
-				ClientData client = {
-					.client = {
-						.endpoint = in_message->sender,
-						.id = connection_request.client_id
-					},
-					.ping = connection_request.ping,
-					.last_heartbeat = now
-				};
-				for (ClientData& existing_client: clients) {
-					if (existing_client.client.endpoint == client.client.endpoint && existing_client.client.id == client.client.id) {
-						existing_client.last_heartbeat = client.last_heartbeat;
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					syslog(LOG_INFO, "InitializationHandler: new client: %s:%d id=%08x", in_message->sender.address().to_string().c_str(), in_message->sender.port(), connection_request.client_id);
-					clients.push_back(client);
+				uint8_t client_protocol_version = 0xff;
+				try {
+					connection_request.serial(deserializer);
+					client_protocol_version = connection_request.protocol_version;
+				}catch (std::out_of_range const&) {
+					// First protype was using a version of the protocol missing the
+					// protocol_version field in connected message, hence the out_of_range
+					// error when trying to deserialize it
 				}
 
-				// Send response
-				stnp::message::Connected connection_response;
-				connection_response.player_number = (clients.size() + 1) % 2; //NOTE interesting, it would be better to wait for matchmaking decision. Should place this info in StartGame.
-				stnp::message::MessageSerializer serializer;
-				connection_response.serial(serializer);
-
-				std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
-				out_message->destination = client.client.endpoint;
-				out_message->data = serializer.serialized();
-				this->out_messages->push(out_message);
-
-				// Clear timeouted clients
-				for (std::list<ClientData>::iterator client_it = clients.begin(); client_it != clients.end(); ++client_it) {
-					if (now - client_it->last_heartbeat >= CLIENT_TIMEOUT) {
-						syslog(LOG_INFO, "InitializationHandler: client timeouted: %s:%d id=%08x", client_it->client.endpoint.address().to_string().c_str(), client_it->client.endpoint.port(), client_it->client.id);
-						client_it = clients.erase(client_it);
-					}
-				}
-
-				// Start a match if there is enough clients
-				std::this_thread::sleep_for(std::chrono::milliseconds(200)); //HACK avoid spamming messages. It would be better to handle matchmaking independently of messages reception
-				while (clients.size() >= 2) {
-					// Select clients to match
-					std::array<std::list<ClientData>::iterator, 2> const matched_clients = {
-						clients.begin(),
-						++clients.begin()
-					};
-
-					// Compute antilag prediction
-					uint32_t const antilag_prediction = ((matched_clients.at(0)->ping + matched_clients.at(0)->ping) / 2) / 5; // total_ping / 2 = transmission time from one client to another ; 5 = frame duration (PAL)
-					syslog(LOG_NOTICE, "starting a game between %08x and %08x (%d antilag)", matched_clients.at(0)->client.id, matched_clients.at(1)->client.id, antilag_prediction);
-
-					// Prepare game instance
-					std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> game_in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
-					game_instances.emplace_back(
-						game_in_messages,
-						this->out_messages,
-						nullptr, //TODO use it to gather statistics (and maybe destroy instance once terminated)
-						antilag_prediction,
-						matched_clients.at(0)->client,
-						matched_clients.at(1)->client
+				if (client_protocol_version != 0) {
+					// Send error
+					syslog(LOG_NOTICE, "InitializationHandler: connection request with bad protocol: requested protocol %d", client_protocol_version);
+					std::string const reason(
+						"bad protocol version    "
+						"                        "
+						"you seem to run an old  "
+						"version of the game     "
+						"                        "
+						"                        "
+						"                        "
+						"                        "
 					);
+					stnp::message::Disconnected connection_response;
+					connection_response.reason.reserve(reason.size());
+					connection_response.reason.insert(connection_response.reason.begin(), reason.begin(), reason.end());
+					stnp::message::MessageSerializer serializer;
+					connection_response.serial(serializer);
 
-					// Adapt message routing
-					this->clients_routing->set_queue(matched_clients.at(0)->client.endpoint, game_in_messages);
-					this->clients_routing->set_queue(matched_clients.at(1)->client.endpoint, game_in_messages);
-
-					// Send StartGame message
-					stnp::message::StartGame start_signal;
-					start_signal.stage = 0;
-					start_signal.stocks = 4;
-					serializer.clear();
-					start_signal.serial(serializer);
-
-					for (size_t client_index = 0; client_index <= 1; ++client_index) {
-						std::shared_ptr<network::OutgoingUdpMessage> start_signal_udp(new network::OutgoingUdpMessage);
-						start_signal_udp->destination = matched_clients.at(client_index)->client.endpoint;
-						start_signal_udp->data = serializer.serialized();
-						srv_dbg(LOG_DEBUG, "send StartGame to %s:%d", start_signal_udp->destination.address().to_string().c_str(), start_signal_udp->destination.port());
-						this->out_messages->push(start_signal_udp);
+					std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
+					out_message->destination = in_message->sender;
+					out_message->data = serializer.serialized();
+					this->out_messages->push(out_message);
+				}else {
+					// Add client
+					bool found = false;
+					ClientData client = {
+						.client = {
+							.endpoint = in_message->sender,
+							.id = connection_request.client_id
+						},
+						.ping = connection_request.ping,
+						.last_heartbeat = now
+					};
+					for (ClientData& existing_client: clients) {
+						if (existing_client.client.endpoint == client.client.endpoint && existing_client.client.id == client.client.id) {
+							existing_client.last_heartbeat = client.last_heartbeat;
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						syslog(LOG_INFO, "InitializationHandler: new client: %s:%d id=%08x", in_message->sender.address().to_string().c_str(), in_message->sender.port(), connection_request.client_id);
+						clients.push_back(client);
 					}
 
-					// Forget these clients
-					clients.pop_front();
-					clients.pop_front();
+					// Send response
+					stnp::message::Connected connection_response;
+					stnp::message::MessageSerializer serializer;
+					connection_response.serial(serializer);
+
+					std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
+					out_message->destination = client.client.endpoint;
+					out_message->data = serializer.serialized();
+					this->out_messages->push(out_message);
+
+					// Clear timeouted clients
+					for (std::list<ClientData>::iterator client_it = clients.begin(); client_it != clients.end(); ++client_it) {
+						if (now - client_it->last_heartbeat >= CLIENT_TIMEOUT) {
+							syslog(LOG_INFO, "InitializationHandler: client timeouted: %s:%d id=%08x", client_it->client.endpoint.address().to_string().c_str(), client_it->client.endpoint.port(), client_it->client.id);
+							client_it = clients.erase(client_it);
+						}
+					}
+
+					// Start a match if there is enough clients
+					std::this_thread::sleep_for(std::chrono::milliseconds(200)); //HACK avoid spamming messages. It would be better to handle matchmaking independently of messages reception
+					while (clients.size() >= 2) {
+						// Select clients to match
+						std::array<std::list<ClientData>::iterator, 2> const matched_clients = {
+							clients.begin(),
+							++clients.begin()
+						};
+
+						// Compute antilag prediction
+						uint32_t const antilag_prediction = ((matched_clients.at(0)->ping + matched_clients.at(0)->ping) / 2) / 5; // total_ping / 2 = transmission time from one client to another ; 5 = frame duration (PAL)
+						syslog(LOG_NOTICE, "starting a game between %08x and %08x (%d antilag)", matched_clients.at(0)->client.id, matched_clients.at(1)->client.id, antilag_prediction);
+
+						// Prepare game instance
+						std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> game_in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
+						game_instances.emplace_back(
+							game_in_messages,
+							this->out_messages,
+							nullptr, //TODO use it to gather statistics (and maybe destroy instance once terminated)
+							antilag_prediction,
+							matched_clients.at(0)->client,
+							matched_clients.at(1)->client
+						);
+
+						// Adapt message routing
+						this->clients_routing->set_queue(matched_clients.at(0)->client.endpoint, game_in_messages);
+						this->clients_routing->set_queue(matched_clients.at(1)->client.endpoint, game_in_messages);
+
+						// Send StartGame messages
+						for (size_t client_index = 0; client_index <= 1; ++client_index) {
+							stnp::message::StartGame start_signal;
+							start_signal.stage = 0;
+							start_signal.stocks = 3;
+							start_signal.player_number = client_index;
+							serializer.clear();
+							start_signal.serial(serializer);
+
+							std::shared_ptr<network::OutgoingUdpMessage> start_signal_udp(new network::OutgoingUdpMessage);
+							start_signal_udp->destination = matched_clients.at(client_index)->client.endpoint;
+							start_signal_udp->data = serializer.serialized();
+							srv_dbg(LOG_DEBUG, "send StartGame to %s:%d", start_signal_udp->destination.address().to_string().c_str(), start_signal_udp->destination.port());
+							this->out_messages->push(start_signal_udp);
+						}
+
+						// Forget these clients
+						clients.pop_front();
+						clients.pop_front();
+					}
 				}
 			}
 		}catch (std::exception const& e) {

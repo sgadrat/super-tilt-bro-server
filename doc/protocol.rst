@@ -19,41 +19,56 @@ Client1 chooses a 4 bytes identifier, then send a Connection message to the serv
 
 The server should send a Connected message each time it receives a Connection message during the initialization phase.
 
+At any time during the initialization phase, the server may send a Disconnected message, in which case the initialization is aborted.
+
 ::
 	Connection {
 		uint8  message_type = 0;
 		uint32 client_id;
 		uint8 ping;
+		uint8 protocol_version;
 	}
 
 **client_id**: Identifier unique to this client.
 **ping**: Time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping=3 means 12ms of ping.)
+**protocol_version**: Expected version of this protocol. This document describes version 0.
 
 ::
 	Connected {
 		uint8 message_type = 0;
-		uint8 player_number;
 	}
-
-**player_number**: Indicates the avatar that this client will control. 0 for player one, 1 for player two.
 
 At this stage Client1 may display a message indicating that it is waiting for another player to join the game.
 
-Client2 follows the same steps: sending Connection until a Connected is received. In the Connected message, the value of *player_number* must differ from the one sent to Client1.
+Client2 follows the same steps: sending Connection until a Connected is received.
 
 When both clients are connected, the server sends a StartGame message, ending the initialization phase, starting the in-game phase.
+
+::
+	Disconnected {
+		uint8 message_type = 4;
+		uint8[24*8] reason;
+	}
+
+**reason**: ascii characters explaining why the client is disconnected. Each 24 character sequence is to be displayed as a line on client' screen.
+
+Upon reception of this message, the client should display the message and stop sending connection requests.
 
 ::
 	StartGame {
 		uint8 message_type = 1;
 		uint8 stage;
 		uint8 stocks;
+		uint8 player_number;
 	}
 
 **stage**: Stage on which the game will be played. 0 for Flatland, 1 for The Pit, 2 for Skyride or 3 for The Hunt.
 **stocks**: Initial number of lifes for each opponent.
+**player_number**: Indicates the avatar that this client will control. 0 for player one, 1 for player two.
 
 Uppon reception of this message, clients should immediatly start a game on the selected stage.
+
+The value of *player_number* must not be the same for Client1 and Client2.
 
 In-Game
 -------

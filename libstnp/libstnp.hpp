@@ -21,6 +21,7 @@ enum class ServerMessageType : uint8_t {
 	StartGame = 1,
 	NewGameState = 2,
 	GameOver = 3,
+	Disconnected = 4,
 };
 
 class MessageSerializer {
@@ -112,21 +113,21 @@ public:
 
 	void uint8(uint8_t& v) {
 		assert(mPosition > 0);
-		v = mBuffer[mPosition++];
+		v = mBuffer.at(mPosition++);
 	}
 
 	void uint16(uint16_t& v) {
 		assert(mPosition > 0);
-		v = mBuffer[mPosition++];
-		v += static_cast<uint32_t>(mBuffer[mPosition++]) << 8;
+		v = mBuffer.at(mPosition++);
+		v += static_cast<uint32_t>(mBuffer.at(mPosition++)) << 8;
 	}
 
 	void uint32(uint32_t& v) {
 		assert(mPosition > 0);
-		v = mBuffer[mPosition++];
-		v += static_cast<uint32_t>(mBuffer[mPosition++]) << 8;
-		v += static_cast<uint32_t>(mBuffer[mPosition++]) << 16;
-		v += static_cast<uint32_t>(mBuffer[mPosition++]) << 24;
+		v = mBuffer.at(mPosition++);
+		v += static_cast<uint32_t>(mBuffer.at(mPosition++)) << 8;
+		v += static_cast<uint32_t>(mBuffer.at(mPosition++)) << 16;
+		v += static_cast<uint32_t>(mBuffer.at(mPosition++)) << 24;
 	}
 
 	void int16(int16_t& v) {
@@ -167,34 +168,35 @@ private:
 struct Connection {
 	uint32_t client_id;
 	uint8_t ping;
+	uint8_t protocol_version;
 
 	template <typename SerializationHandler>
 	void serial(SerializationHandler& s) {
 		s.type(ClientMessageType::Connection);
 		s.uint32(this->client_id);
 		s.uint8(this->ping);
+		s.uint8(this->protocol_version);
 	}
 };
 
 struct Connected {
-	uint8_t player_number;
-
 	template <typename SerializationHandler>
     void serial(SerializationHandler& s) {
 		s.type(ServerMessageType::Connected);
-		s.uint8(this->player_number);
 	}
 };
 
 struct StartGame {
 	uint8_t stage;
 	uint8_t stocks;
+	uint8_t player_number;
 
 	template <typename SerializationHandler>
 	void serial(SerializationHandler& s) {
 		s.type(ServerMessageType::StartGame);
 		s.uint8(this->stage);
 		s.uint8(this->stocks);
+		s.uint8(this->player_number);
 	}
 };
 
@@ -251,6 +253,16 @@ struct GameOver {
 	void serial(SerializationHandler& s) {
 		s.type(ServerMessageType::GameOver);
 		s.uint8(this->winner_player_number);
+	}
+};
+
+struct Disconnected {
+	std::vector<uint8_t> reason;
+
+	template <typename SerializationHandler>
+    void serial(SerializationHandler& s) {
+		s.type(ServerMessageType::Disconnected);
+		s.dataFill(this->reason);
 	}
 };
 

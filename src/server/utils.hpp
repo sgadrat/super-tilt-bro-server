@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef LOOG_FLOOD
-#	define srv_dbg(...) syslog(...)
+#	define srv_dbg(...) syslog(__VA_ARGS__)
 #else
 #	define srv_dbg(...)
 #endif
