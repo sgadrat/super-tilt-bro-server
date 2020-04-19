@@ -175,7 +175,7 @@ void InitializationHandler::run() {
 						}
 					}
 					if (!found) {
-						syslog(LOG_INFO, "InitializationHandler: new client: %s:%d id=%08x", in_message->sender.address().to_string().c_str(), in_message->sender.port(), connection_request.client_id);
+						syslog(LOG_INFO, "InitializationHandler: new client: %s:%d id=%08x ping=%dms", in_message->sender.address().to_string().c_str(), in_message->sender.port(), connection_request.client_id, connection_request.ping * 4);
 						clients.push_back(client);
 					}
 

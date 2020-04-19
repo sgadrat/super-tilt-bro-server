@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 
 	// Prepare components
 	std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages(new ThreadSafeFifo<network::OutgoingUdpMessage>(5));
-	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
+	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(50));
 	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> new_clients_queue(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
 	std::shared_ptr<ClientsDatagramRouting> clients_queues(new ClientsDatagramRouting);
 
