@@ -109,7 +109,12 @@ void GameInstance::run(
 					// Parse message
 					stnp::message::ControllerState message;
 					stnp::message::MessageDeserializer deserializer(in_message->data);
-					message.serial(deserializer);
+					try {
+						message.serial(deserializer);
+					}catch (std::runtime_error const& e) {
+						syslog(LOG_WARNING, "GameInstance: failed to parse message from %s:%d: %s", in_message->sender.address().to_string().c_str(), in_message->sender.port(), e.what());
+						continue;
+					}
 
 					// Update inputs history
 					GameState::ControllerState controller_state = controller_state_from_message(message);
