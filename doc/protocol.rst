@@ -25,13 +25,15 @@ At any time during the initialization phase, the server may send a Disconnected 
 	Connection {
 		uint8  message_type = 0;
 		uint32 client_id;
-		uint8 ping;
+		uint8 ping_min;
 		uint8 protocol_version;
+		uint8 ping_max;
 	}
 
 **client_id**: Identifier unique to this client.
-**ping**: Time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping=3 means 12ms of ping.)
-**protocol_version**: Expected version of this protocol. This document describes version 0.
+**ping_min**: Minimal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_min=3 means 12ms of ping.)
+**protocol_version**: Expected version of this protocol. This document describes version 1.
+**ping_max**: Maximal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_max=3 means 12ms of ping.)
 
 ::
 	Connected {
@@ -60,11 +62,15 @@ Upon reception of this message, the client should display the message and stop s
 		uint8 stage;
 		uint8 stocks;
 		uint8 player_number;
+		uint4 player_a_connection_quality;
+		uint4 player_b_connection_quality;
 	}
 
 **stage**: Stage on which the game will be played. 0 for Flatland, 1 for The Pit, 2 for Skyride or 3 for The Hunt.
 **stocks**: Initial number of lifes for each opponent.
 **player_number**: Indicates the avatar that this client will control. 0 for player one, 1 for player two.
+**player_a_connection_quality**: Indicator of the quality level of the connection between player one and the server (0: excellent, 1: good, 2: acceptable)
+**player_b_connection_quality**: Indicator of the quality level of the connection between player two and the server (0: excellent, 1: good, 2: acceptable)
 
 Uppon reception of this message, clients should immediatly start a game on the selected stage.
 

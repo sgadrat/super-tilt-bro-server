@@ -4,6 +4,7 @@
 #include "server/utils.hpp"
 #include <libstnp/libstnp.hpp>
 
+#include <algorithm>
 #include <chrono>
 #include <list>
 #include <stdexcept>
@@ -12,6 +13,8 @@
 #include <utility>
 
 namespace {
+	constexpr uint8_t STNP_VERSION = 1;
+
 	class GameInstanceThread {
 		public:
 			GameInstanceThread() {}; // Note: creation_time is invalid on a default constructed GameInstanceThread (change it if needed)
@@ -57,9 +60,48 @@ namespace {
 
 	struct ClientData {
 		GameInstance::ClientInfo client;
-		uint_fast8_t ping; // Timescale 4ms (4 is an NTSC frame, 5 is a PAL frame)
+		uint_fast8_t ping_min; // Timescale 4ms (4 is an NTSC frame, 5 is a PAL frame)
+		uint_fast8_t ping_max;
 		std::chrono::time_point<std::chrono::steady_clock> last_heartbeat;
 	};
+
+	uint8_t compute_connection_indicator(uint8_t ping_min, uint8_t ping_max) {
+		// Inconsistent info, determinist result
+		if (ping_min > ping_max) {
+			//HACK this log would be better in new client code, placed here for convenience as it should not happen and main function is already too big
+			syslog(
+				LOG_WARNING,
+				"incosistent ping info min > max (%d > %d)",
+				ping_min, ping_max
+			);
+			return 2;
+		}
+
+		// Compute quality based on max ping
+		//  excelent < 40ms
+		//  good     < 80ms
+		//  acceptable otherwise
+		uint8_t max_ping_indicator = 0;
+		if (ping_max >= 80 / 4) {
+			max_ping_indicator = 2;
+		}else if (ping_max >= 40 / 4) {
+			max_ping_indicator = 1;
+		}
+
+		// Compute quality based on variance in ping
+		//  excelent <= 8ms
+		//  good     <= 20ms
+		//  acceptable otherwise
+		uint8_t ping_diff = ping_max - ping_min;
+		uint8_t ping_diff_indicator = 0;
+		if (ping_diff > 20 / 4) {
+			ping_diff_indicator = 2;
+		}else if (ping_diff > 8 / 4) {
+			ping_diff_indicator = 1;
+		}
+
+		return std::max(max_ping_indicator, ping_diff_indicator);
+	}
 }
 
 InitializationHandler::InitializationHandler(
@@ -133,7 +175,7 @@ void InitializationHandler::run() {
 					// error when trying to deserialize it
 				}
 
-				if (client_protocol_version != 0) {
+				if (client_protocol_version != STNP_VERSION) {
 					// Send error
 					syslog(LOG_NOTICE, "InitializationHandler: connection request with bad protocol: requested protocol %d", client_protocol_version);
 					std::string const reason(
@@ -142,8 +184,8 @@ void InitializationHandler::run() {
 						"you seem to run an old  "
 						"version of the game     "
 						"                        "
-						"                        "
-						"                        "
+						"please download latest  "
+						"version                 "
 						"                        "
 					);
 					stnp::message::Disconnected connection_response;
@@ -164,7 +206,8 @@ void InitializationHandler::run() {
 							.endpoint = in_message->sender,
 							.id = connection_request.client_id
 						},
-						.ping = connection_request.ping,
+						.ping_min = connection_request.ping_min,
+						.ping_max = connection_request.ping_max,
 						.last_heartbeat = now
 					};
 					for (ClientData& existing_client: clients) {
@@ -175,7 +218,15 @@ void InitializationHandler::run() {
 						}
 					}
 					if (!found) {
-						syslog(LOG_INFO, "InitializationHandler: new client: %s:%d id=%08x ping=%dms", in_message->sender.address().to_string().c_str(), in_message->sender.port(), connection_request.client_id, connection_request.ping * 4);
+						syslog(
+							LOG_INFO,
+							"InitializationHandler: new client: %s:%d id=%08x ping_min=%dms ping_max=%dms",
+							in_message->sender.address().to_string().c_str(),
+							in_message->sender.port(),
+							connection_request.client_id,
+							connection_request.ping_min * 4,
+							connection_request.ping_max * 4
+						);
 						clients.push_back(client);
 					}
 
@@ -207,8 +258,17 @@ void InitializationHandler::run() {
 						};
 
 						// Compute antilag prediction
-						uint32_t const antilag_prediction = ((matched_clients.at(0)->ping + matched_clients.at(0)->ping) / 2) / 5; // total_ping / 2 = transmission time from one client to another ; 5 = frame duration (PAL)
-						syslog(LOG_NOTICE, "starting a game between %08x and %08x (%d antilag)", matched_clients.at(0)->client.id, matched_clients.at(1)->client.id, antilag_prediction);
+						//   total_ping / 2 = transmission time from one client to another ; 5 = frame duration (PAL)
+						uint32_t const antilag_prediction =
+							((matched_clients.at(0)->ping_min + matched_clients.at(1)->ping_min) / 2) / 5
+						;
+						syslog(
+							LOG_NOTICE,
+							"starting a game between %08x and %08x (%d antilag)",
+							matched_clients.at(0)->client.id,
+							matched_clients.at(1)->client.id,
+							antilag_prediction
+						);
 
 						// Prepare game instance
 						std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> game_in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
@@ -226,13 +286,17 @@ void InitializationHandler::run() {
 						this->clients_routing->set_queue(matched_clients.at(1)->client.endpoint, game_in_messages);
 
 						// Send StartGame messages
+						uint8_t const player_a_connection = compute_connection_indicator(matched_clients.at(0)->ping_min, matched_clients.at(0)->ping_max);
+						uint8_t const player_b_connection = compute_connection_indicator(matched_clients.at(1)->ping_min, matched_clients.at(1)->ping_max);
 						for (size_t client_index = 0; client_index <= 1; ++client_index) {
 							stnp::message::StartGame start_signal;
 							start_signal.stage = 0;
 							start_signal.stocks = 3;
 							start_signal.player_number = client_index;
+							start_signal.player_a_connection_quality(player_a_connection);
+							start_signal.player_b_connection_quality(player_b_connection);
 							serializer.clear();
-							start_signal.serial(serializer);
+							start_signal.serial(serializer, STNP_VERSION);
 
 							std::shared_ptr<network::OutgoingUdpMessage> start_signal_udp(new network::OutgoingUdpMessage);
 							start_signal_udp->destination = matched_clients.at(client_index)->client.endpoint;

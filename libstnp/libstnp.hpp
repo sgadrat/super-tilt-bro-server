@@ -167,15 +167,19 @@ private:
 
 struct Connection {
 	uint32_t client_id;
-	uint8_t ping;
+	uint8_t ping_min;
 	uint8_t protocol_version;
+	uint8_t ping_max;
 
 	template <typename SerializationHandler>
 	void serial(SerializationHandler& s) {
 		s.type(ClientMessageType::Connection);
 		s.uint32(this->client_id);
-		s.uint8(this->ping);
+		s.uint8(this->ping_min);
 		s.uint8(this->protocol_version);
+		if (this->protocol_version >= 1) {
+			s.uint8(this->ping_max);
+		}
 	}
 };
 
@@ -190,13 +194,41 @@ struct StartGame {
 	uint8_t stage;
 	uint8_t stocks;
 	uint8_t player_number;
+	uint8_t connections_quality = 0;
+
+	uint8_t player_a_connection_quality() const {
+		return this->connections_quality >> 4;
+	}
+
+	void player_a_connection_quality(uint8_t quality) {
+		assert(quality <= 0b0000'0011);
+		this->connections_quality =
+			(this->connections_quality & 0b1100'1111) +
+			(quality << 4)
+		;
+	}
+
+	uint8_t player_b_connection_quality() const {
+		return this->connections_quality | 0b0000'0011;
+	}
+
+	void player_b_connection_quality(uint8_t quality) {
+		assert(quality <= 0b0000'0011);
+		this->connections_quality =
+			(this->connections_quality & 0b1111'1100) +
+			quality
+		;
+	}
 
 	template <typename SerializationHandler>
-	void serial(SerializationHandler& s) {
+	void serial(SerializationHandler& s, uint8_t protocol_version) {
 		s.type(ServerMessageType::StartGame);
 		s.uint8(this->stage);
 		s.uint8(this->stocks);
 		s.uint8(this->player_number);
+		if (protocol_version >= 1) {
+			s.uint8(this->connections_quality);
+		}
 	}
 };
 
