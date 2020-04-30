@@ -95,6 +95,11 @@ public:
 	, mPosition(0)
 	{}
 
+	void reset(std::vector<uint8_t> const& buffer) {
+		mBuffer = buffer;
+		mPosition = 0;
+	}
+
 	void type(ClientMessageType const& t) {
 		assert(mPosition == 0);
 		if (mBuffer.at(mPosition) != static_cast<uint8_t>(t)) {

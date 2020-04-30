@@ -2,6 +2,7 @@
 *.gch
 *.swp
 a.out
+experiments/dumb_bot
 experiments/replay_player
 tools/fm2_dumper
 tools/fm2_player
