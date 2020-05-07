@@ -64,9 +64,9 @@ static int32_t screen_pixel_to_screen_pixel_subpixel(int16_t screen_pixel, uint8
 *
 ********************************/
 
-const uint8_t DEFAULT_GRAVITY = 3;
+const uint8_t DEFAULT_GRAVITY = 2;
 const uint8_t INITIAL_STOCKS = 3;
-const uint8_t PLAYER_DOWN_TAP_MAX_DURATION = 7;
+const uint8_t PLAYER_DOWN_TAP_MAX_DURATION = 9;
 
 const uint8_t PLAYER_STATE_THROWN = 0x00;
 const uint8_t PLAYER_STATE_RESPAWN = 0x01;
@@ -94,6 +94,8 @@ const uint8_t PLAYER_STATE_SPE_DOWN = 0x16;
 const uint8_t PLAYER_STATE_UP_TILT = 0x17;
 const uint8_t PLAYER_STATE_SHIELDING = 0x18;
 const uint8_t PLAYER_STATE_SHIELDLAG = 0x19;
+
+const uint8_t SINBAD_FASTFALL_GRAVITY = 5;
 
 const uint8_t DIRECTION_LEFT = 0x00;
 const uint8_t DIRECTION_RIGHT = 0x01;
@@ -238,10 +240,8 @@ void GameState::check_aerial_inputs(uint8_t player_number) {
 			[&](){this->start_spe_up_player(player_number);},
 			[&](){this->start_spe_down_player(player_number);},
 			[&](){
-				// Fast fall, gravity * 1.5
-				uint8_t const fastfall_gravity = DEFAULT_GRAVITY * 2 - DEFAULT_GRAVITY / 2;
-				player.gravity = fastfall_gravity;
-				player.velocity_v = (static_cast<int16_t>(fastfall_gravity) << 8);
+				player.gravity = SINBAD_FASTFALL_GRAVITY;
+				player.velocity_v = (static_cast<int16_t>(SINBAD_FASTFALL_GRAVITY) << 8);
 			},
 			[&](){this->start_aerial_up_player(player_number);},
 
@@ -566,7 +566,7 @@ void GameState::jumping_player(uint8_t player_number) {
 	}
 	if (player.state_clock == STATE_SINBAD_JUMP_PREPARATION_END) {
 		// Put initial jumping velocity
-		player.velocity_v = bin_int(0xfac0);
+		player.velocity_v = bin_int(0xfb80);
 		return;
 	}
 
@@ -1270,7 +1270,7 @@ void GameState::special_player_input(uint8_t player_number) {
 	}
 }
 
-uint8_t const TECH_MAX_FRAMES_BEFORE_COLLISION = 10;
+uint8_t const TECH_MAX_FRAMES_BEFORE_COLLISION = 15;
 uint8_t const TECH_NB_FORBIDDEN_FRAMES = 60;
 void GameState::start_thrown_player(uint8_t player_number) {
 	dbg("start_thrown_player " << (uint16_t)player_number);
