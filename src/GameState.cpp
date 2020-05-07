@@ -1405,10 +1405,10 @@ GameState::GameState(Stage stage)
 	mPlayerOffgroundRoutines = {
 		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::start_falling_player,
 		&GameState::start_falling_player, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::start_falling_player, &GameState::dummy_routine,
-		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::start_helpless_player, &GameState::start_helpless_player,
+		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::start_falling_player, &GameState::start_falling_player,
 		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine,
-		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::start_helpless_player,
-		&GameState::start_helpless_player,
+		&GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::start_falling_player,
+		&GameState::start_falling_player,
 	};
 	mPlayerOngroundRoutines = {
 		&GameState::thrown_player_on_ground, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine, &GameState::dummy_routine,
