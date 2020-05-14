@@ -1,0 +1,91 @@
+<html>
+<head>
+<script src="webrtc-to-udp.js"></script>
+<script>
+var chan = null;
+const frame_duration = 20; // PAL - 20ms
+const bot_delay = 20 * frame_duration;
+const bot_client_id = 123;
+var game_begining = null;
+var bot_state = 'right';
+
+function construct_msg_connection(client_id, ping_min, ping_max, protocol_version) {
+	let payload = new ArrayBuffer(8);
+	let v = new DataView(payload);
+	v.setUint8(0, 0); // message_type
+	v.setUint32(1, client_id, true);
+	v.setUint8(5, ping_min);
+	v.setUint8(6, protocol_version);
+	v.setUint8(7, ping_max);
+	return payload;
+}
+
+function construct_msg_controller_state(client_id, current_frame, a, b, select, start, up, down, left, right) {
+	let payload = new ArrayBuffer(10);
+	let v = new DataView(payload);
+	v.setUint8(0, 1); // message_type
+	v.setUint32(1, client_id, true);
+	v.setUint32(5, current_frame, true);
+	v.setUint8(9, (
+		(a << 7) +
+		(b << 6) +
+		(select << 5) +
+		(start << 4) +
+		(up << 3) +
+		(down << 2) +
+		(left << 1) +
+		right
+	));
+	return payload;
+}
+
+function get_msg_type(msg) {
+	return new DataView(msg).getUint8(0);
+}
+
+function doit() {
+	document.getElementById('log').innerHTML = '<p>Connecting to relay...</p>';
+	wtu.get_channel(
+		{'address': 'localhost', 'port': 3003},
+		{'address': '127.0.0.1', 'port': 3000},
+	)
+	.then(function(new_chan) {
+		console.log('Channel available for pwning noobs!');
+		new_chan.binaryType = 'arraybuffer'; // Firefox implements the spec which says "blob" by default. Others are rebels. Let's get the same behaviour everywhere.
+		new_chan.onmessage = function(e) { udp_datagram(e.data); };
+		chan = new_chan;
+
+		document.getElementById('log').innerHTML += '<p>Connecting to the game...</p>';
+		chan.send(construct_msg_connection(bot_client_id, 0, 0, 1));
+	});
+}
+
+function udp_datagram(data) {
+	const START_GAME = 1;
+	if (get_msg_type(data) === START_GAME) {
+		document.getElementById('log').innerHTML += '<p>Having fun...</p>';
+		game_begining = Date.now();
+		setTimeout(bot_tick, bot_delay);
+	}
+}
+
+function bot_tick() {
+	var current_frame = (Date.now() - game_begining) / frame_duration;
+	console.log('bot tick, frame='+ current_frame)
+	if (bot_state === 'right') {
+		chan.send(construct_msg_controller_state(bot_client_id, current_frame, 0,0,0,0,0,0,0,1));
+		bot_state = 'left';
+	}else {
+		chan.send(construct_msg_controller_state(bot_client_id, current_frame, 0,0,0,0,0,0,1,0));
+		bot_state = 'right';
+	}
+	setTimeout(bot_tick, bot_delay);
+}
+</script>
+</head>
+<body onload="doit();">
+<h1>Super Tilt Bot</h1>
+<div id="log">
+</div>
+</body>
+</html>
