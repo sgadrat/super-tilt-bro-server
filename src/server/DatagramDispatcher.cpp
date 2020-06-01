@@ -15,7 +15,8 @@ void safe_push(
 {
 	try {
 		srv_dbg(
-			LOG_DEBUG, "DatagramDispatcher: pushing message from %s:%d to %s queue",
+			LOG_DEBUG, "%llu DatagramDispatcher: pushing message from %s:%d to %s queue",
+			wall_clock_milli(),
 			message->sender.address().to_string().c_str(),
 			message->sender.port(),
 			queue_name

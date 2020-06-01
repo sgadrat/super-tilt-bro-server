@@ -75,14 +75,7 @@ UdpOutput::UdpOutput(uint16_t srcPort, SocketPool* sockets, ThreadSafeFifo<Outgo
 void UdpOutput::run() {
 	mRun.store(true);
 	while(mRun.load()) {
-		std::shared_ptr<OutgoingUdpMessage> message(nullptr);
-		try {
-			message = mIn->pop();
-		}catch (std::exception const& e) {
-			::usleep(16000);
-			continue;
-		}
-
+		std::shared_ptr<OutgoingUdpMessage> message(mIn->pop_block());
 		mSockets->get(mPort)->send_to(boost::asio::buffer(message->data), message->destination);
 	}
 }
