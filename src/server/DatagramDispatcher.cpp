@@ -2,7 +2,36 @@
 
 #include "server/utils.hpp"
 
+#include <libstnp/libstnp.hpp>
 #include <syslog.h>
+
+namespace {
+
+void safe_push(
+	std::shared_ptr<network::IncommingUdpMessage> message,
+	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> queue,
+	char const* queue_name
+)
+{
+	try {
+		srv_dbg(
+			LOG_DEBUG, "DatagramDispatcher: pushing message from %s:%d to %s queue",
+			message->sender.address().to_string().c_str(),
+			message->sender.port(),
+			queue_name
+		);
+		queue->push(message);
+	}catch (std::runtime_error const& e) {
+		syslog(
+			LOG_ERR, "DatagramDispatcher: failed to push message from %s:%d to %s queue, lost it",
+			message->sender.address().to_string().c_str(),
+			message->sender.port(),
+			queue_name
+		);
+	}
+}
+
+}
 
 DatagramDispatcher::DatagramDispatcher(
 	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> incoming,
@@ -16,20 +45,15 @@ DatagramDispatcher::DatagramDispatcher(
 void DatagramDispatcher::run() {
 	while (true) {
 		std::shared_ptr<network::IncommingUdpMessage> message = this->incoming->pop_block();
-		std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> destination_queue = this->clients_queues->get_queue(message->sender);
-		if (destination_queue) {
-			try {
-				srv_dbg(LOG_DEBUG, "DatagramDispatcher: pushing message from %s:%d to its destination queue", message->sender.address().to_string().c_str(), message->sender.port());
-				destination_queue->push(message);
-			}catch (std::runtime_error const& e) {
-				syslog(LOG_ERR, "DatagramDispatcher: failed to push message from %s:%d to its destination queue, lost it", message->sender.address().to_string().c_str(), message->sender.port());
-			}
+
+		if (message->data.size() > 0 && message->data[0] == static_cast<uint8_t>(stnp::message::ClientMessageType::Ping)) {
+			safe_push(message, this->unknown_client_queue, "global");
 		}else {
-			try {
-				srv_dbg(LOG_DEBUG, "DatagramDispatcher: pushing message from %s:%d to default queue", message->sender.address().to_string().c_str(), message->sender.port());
-				this->unknown_client_queue->push(message);
-			}catch (std::runtime_error const& e) {
-				syslog(LOG_ERR, "DatagramDispatcher: failed to push message from %s:%d to default queue, lost it: %s", message->sender.address().to_string().c_str(), message->sender.port(), e.what());
+			std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> destination_queue = this->clients_queues->get_queue(message->sender);
+			if (destination_queue) {
+				safe_push(message, destination_queue, "its destination");
+			}else {
+				safe_push(message, this->unknown_client_queue, "default");
 			}
 		}
 	}

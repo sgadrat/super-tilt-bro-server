@@ -14,6 +14,7 @@ namespace message {
 enum class ClientMessageType : uint8_t {
 	Connection = 0,
 	ControllerState = 1,
+	Ping = 2,
 };
 
 enum class ServerMessageType : uint8_t {
@@ -22,6 +23,7 @@ enum class ServerMessageType : uint8_t {
 	NewGameState = 2,
 	GameOver = 3,
 	Disconnected = 4,
+	Pong = 5,
 };
 
 class MessageSerializer {
@@ -300,6 +302,26 @@ struct Disconnected {
     void serial(SerializationHandler& s) {
 		s.type(ServerMessageType::Disconnected);
 		s.dataFill(this->reason);
+	}
+};
+
+struct Ping {
+	std::vector<uint8_t> free_data;
+
+	template <typename SerializationHandler>
+    void serial(SerializationHandler& s) {
+		s.type(ClientMessageType::Ping);
+		s.dataFill(this->free_data);
+	}
+};
+
+struct Pong {
+	std::vector<uint8_t> client_data;
+
+	template <typename SerializationHandler>
+    void serial(SerializationHandler& s) {
+		s.type(ServerMessageType::Pong);
+		s.dataFill(this->client_data);
 	}
 };
 

@@ -130,6 +130,29 @@ void InitializationHandler::run() {
 				// Timeout, noting special to do, we will just not process message bellow
 			}
 
+			// Special handling for Ping requests
+			//FIXME whould be better in a "Global messages" component, but for now InitializationHandler receives all non-connected messages
+			if (in_message != nullptr && in_message->data.size() > 0 && in_message->data[0] == static_cast<uint8_t>(stnp::message::ClientMessageType::Ping)) {
+				// Parse message
+				stnp::message::Ping ping_request;
+				stnp::message::MessageDeserializer deserializer(in_message->data);
+				ping_request.serial(deserializer);
+
+				// Send response
+				stnp::message::Pong ping_response;
+				ping_response.client_data = std::move(ping_request.free_data);
+				stnp::message::MessageSerializer serializer;
+				ping_response.serial(serializer);
+
+				std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
+				out_message->destination = in_message->sender;
+				out_message->data = serializer.serialized();
+				this->out_messages->push(out_message);
+
+				// Avoid further processing of this message
+				in_message = nullptr;
+			}
+
 			// Stop timeouted/terminated games
 			std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
 			for (std::list<GameInstanceThread>::iterator instance = game_instances.begin() ; instance != game_instances.end(); ++instance) {

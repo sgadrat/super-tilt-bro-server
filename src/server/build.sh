@@ -2,7 +2,7 @@
 
 dbg_log_flags=""
 if [ "x$1" == "xdbg" ]; then
-	dbg_log_flags="-DLOOG_FLOOD"
+	dbg_log_flags="-DLOG_FLOOD"
 fi
 
 g++ \

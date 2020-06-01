@@ -154,3 +154,26 @@ GameState
 ---------
 
 The GameState type is not explicitely defined here, is may change from one version of Super Tilt Bro to another. It is expected to be a copy of the memory in the range reserved to the ingame state of Super Tilt Bro.
+
+Global messages
+---------------
+
+These messages are independent of the connection's phase.
+
+Ping/pong mechanism to measure roundtrip time from between the client and the server. Ping is emmited by the client, Pong is answered by the server. Ping messages may be emmited at any time, even before the first Connection message. A client must not emmit more than one ping message per second. The server should block any client missbehaving with ping requests, like emmiting more than one request per second or not connecting after a reasonable number of ping requests.
+
+::
+	Ping {
+		uint8 message_type = 2;
+		uint8[9] free_data;
+	}
+
+**free_data**: Data freely chosen by the client.
+
+::
+	Pong {
+		uint8 message_type = 5;
+		uint8[9] client_data;
+	}
+
+**client_data**: Copy **free_data** from related Ping message.
