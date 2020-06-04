@@ -22,20 +22,39 @@ The server should send a Connected message each time it receives a Connection me
 At any time during the initialization phase, the server may send a Disconnected message, in which case the initialization is aborted.
 
 ::
+
 	Connection {
 		uint8  message_type = 0;
 		uint32 client_id;
 		uint8 ping_min;
 		uint8 protocol_version;
 		uint8 ping_max;
+		uint1 framerate;
+		uint2 support;
+		uint2 release_type;
+		uint3 version_major;
+		uint8 version_minor;
 	}
 
-**client_id**: Identifier unique to this client.
-**ping_min**: Minimal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_min=3 means 12ms of ping.)
-**protocol_version**: Expected version of this protocol. This document describes version 1.
-**ping_max**: Maximal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_max=3 means 12ms of ping.)
+* **client_id**: Identifier unique to this client.
+* **ping_min**: Minimal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_min=3 means 12ms of ping.)
+* **protocol_version**: Expected version of this protocol. This document describes version 2.
+* **ping_max**: Maximal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_max=3 means 12ms of ping.)
+* **framerate**: 0: 50Hz, 1: 60Hz.
+* **support**: 0: physical cartridge, 1: native emulator, 2: web emulator, 3: unknown/other
+* **release_type**: 0: alpha, 1: beta, 2: release candidate, 3: release
+* **version_major**: version's major number
+* **version_minor**: version's minor number
+
+.. note::
+	Bytes 8 and 9 may be refered as flags and version.
+
+	A client with version "2.alpha-3" running in a PAL emulator would be noted as
+
+	0 01 00 010 00000011 (50Hz, native emulator, alpha, 2, 3)
 
 ::
+
 	Connected {
 		uint8 message_type = 0;
 	}
@@ -47,16 +66,18 @@ Client2 follows the same steps: sending Connection until a Connected is received
 When both clients are connected, the server sends a StartGame message, ending the initialization phase, starting the in-game phase.
 
 ::
+
 	Disconnected {
 		uint8 message_type = 4;
 		uint8[24*8] reason;
 	}
 
-**reason**: ascii characters explaining why the client is disconnected. Each 24 character sequence is to be displayed as a line on client' screen.
+* **reason**: ascii characters explaining why the client is disconnected. Each 24 character sequence is to be displayed as a line on client' screen.
 
 Upon reception of this message, the client should display the message and stop sending connection requests.
 
 ::
+
 	StartGame {
 		uint8 message_type = 1;
 		uint8 stage;
@@ -66,11 +87,11 @@ Upon reception of this message, the client should display the message and stop s
 		uint4 player_b_connection_quality;
 	}
 
-**stage**: Stage on which the game will be played. 0 for Flatland, 1 for The Pit, 2 for Skyride or 3 for The Hunt.
-**stocks**: Initial number of lifes for each opponent.
-**player_number**: Indicates the avatar that this client will control. 0 for player one, 1 for player two.
-**player_a_connection_quality**: Indicator of the quality level of the connection between player one and the server (0: excellent, 1: good, 2: acceptable)
-**player_b_connection_quality**: Indicator of the quality level of the connection between player two and the server (0: excellent, 1: good, 2: acceptable)
+* **stage**: Stage on which the game will be played. 0 for Flatland, 1 for The Pit, 2 for Skyride or 3 for The Hunt.
+* **stocks**: Initial number of lifes for each opponent.
+* **player_number**: Indicates the avatar that this client will control. 0 for player one, 1 for player two.
+* **player_a_connection_quality**: Indicator of the quality level of the connection between player one and the server (0: excellent, 1: good, 2: acceptable)
+* **player_b_connection_quality**: Indicator of the quality level of the connection between player two and the server (0: excellent, 1: good, 2: acceptable)
 
 Uppon reception of this message, clients should immediatly start a game on the selected stage.
 
@@ -84,6 +105,7 @@ The in-game phase handles the sharing of a common game state. It expects the ser
 Each time the controller of a client changes state, it should send a ControllerState message. This message can be repeated periodically.
 
 ::
+
 	ControllerState {
 		uint8  message_type = 1;
 		uint32 client_id;
@@ -91,13 +113,14 @@ Each time the controller of a client changes state, it should send a ControllerS
 		uint1  buttons[8];
 	}
 
-**client_id**: Identifier unique to this client. The same as sent in Connection.
-**timestamp**: Frame number on which the change occured
-**buttons**: New state of each button of the controller, 0 released, 1 pressed. Buttons order is: A, B, select, start, up, down, left, right.
+* **client_id**: Identifier unique to this client. The same as sent in Connection.
+* **timestamp**: Frame number on which the change occured
+* **buttons**: New state of each button of the controller, 0 released, 1 pressed. Buttons order is: A, B, select, start, up, down, left, right.
 
 Each time the server receives a ControllerState message, it registers it to be considered four frames later, then computes a new gamestate at *timestamp*. It then sends it to both clients in a NewGameState message.
 
 ::
+
 	NewGameState {
 		uint8     message_type = 2;
 		uint8     prediction_id;
@@ -106,10 +129,10 @@ Each time the server receives a ControllerState message, it registers it to be c
 		GameState state;
 	}
 
-**prediction_id**: Indicate if this gamestate is derived from the previous one or uses new inputs. This number should be incremented each time the state is computed because of some inputs. It may loop from 255 to 0.
-**timestamp**: Frame number on which this state is associated.
-**next_opponent_inputs**: List of inputs registered for delayed execution.
-**state**: The new state.
+* **prediction_id**: Indicate if this gamestate is derived from the previous one or uses new inputs. This number should be incremented each time the state is computed because of some inputs. It may loop from 255 to 0.
+* **timestamp**: Frame number on which this state is associated.
+* **next_opponent_inputs**: List of inputs registered for delayed execution.
+* **state**: The new state.
 
 NewGameState messages can be periodically updated then resent. In such case, the server should not change the *prediction_id*, set *timestamp* to an estimate of the current frame number being displayed on devices and *state* to an updated state to this timestamp. Clients may discard NewGameState messages when the *prediction_id* match the last one received.
 
@@ -143,12 +166,13 @@ Gameover
 When the game is over the server must stop to send NewGameState messages. If it receives a ControllerState message, it may reply with a GameOver message.
 
 ::
+
 	GameOver {
 		uint8 message_type = 3;
 		uint8 winner_player_number;
 	}
 
-**winner_player_number**: Number of the player who won the game. May be *255* if unknown.
+* **winner_player_number**: Number of the player who won the game. May be *255* if unknown.
 
 GameState
 ---------
@@ -163,17 +187,19 @@ These messages are independent of the connection's phase.
 Ping/pong mechanism to measure roundtrip time from between the client and the server. Ping is emmited by the client, Pong is answered by the server. Ping messages may be emmited at any time, even before the first Connection message. A client must not emmit more than one ping message per second. The server should block any client missbehaving with ping requests, like emmiting more than one request per second or not connecting after a reasonable number of ping requests.
 
 ::
+
 	Ping {
 		uint8 message_type = 2;
 		uint8[9] free_data;
 	}
 
-**free_data**: Data freely chosen by the client.
+* **free_data**: Data freely chosen by the client.
 
 ::
+
 	Pong {
 		uint8 message_type = 5;
 		uint8[9] client_data;
 	}
 
-**client_data**: Copy **free_data** from related Ping message.
+* **client_data**: Copy **free_data** from related Ping message.

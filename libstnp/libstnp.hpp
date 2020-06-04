@@ -177,6 +177,42 @@ struct Connection {
 	uint8_t ping_min;
 	uint8_t protocol_version;
 	uint8_t ping_max;
+	uint8_t flags_and_major_version;
+	uint8_t minor_version;
+
+	enum class SupportType {
+		CARTRIDGE = 0,
+		NATIVE_EMULATOR = 1,
+		WEB_EMULATOR = 2,
+		UNKNOWN = 3,
+	};
+
+	enum class ReleaseType {
+		ALPHA = 0,
+		BETA = 1,
+		RELEASE_CANDIDATE = 2,
+		RELEASE = 3,
+	};
+
+	bool is_ntsc() const {
+		return this->flags_and_major_version & 0b10000000;
+	}
+
+	SupportType get_support_type() const {
+		return static_cast<SupportType>(
+			(this->flags_and_major_version & 0b01100000) >> 5
+		);
+	}
+
+	ReleaseType get_release_type() const {
+		return static_cast<ReleaseType>(
+			(this->flags_and_major_version & 0b00011000) >> 3
+		);
+	}
+
+	uint8_t get_major_version() const {
+		return this->flags_and_major_version & 0b00000111;
+	}
 
 	template <typename SerializationHandler>
 	void serial(SerializationHandler& s) {
@@ -186,6 +222,10 @@ struct Connection {
 		s.uint8(this->protocol_version);
 		if (this->protocol_version >= 1) {
 			s.uint8(this->ping_max);
+		}
+		if (this->protocol_version >= 2) {
+			s.uint8(this->flags_and_major_version);
+			s.uint8(this->minor_version);
 		}
 	}
 };
