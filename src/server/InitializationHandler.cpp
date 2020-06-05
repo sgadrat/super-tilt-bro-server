@@ -5,15 +5,18 @@
 #include <libstnp/libstnp.hpp>
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <list>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 #include <syslog.h>
 #include <thread>
 #include <utility>
 
 namespace {
-	constexpr uint8_t STNP_VERSION = 1;
+	constexpr uint8_t STNP_VERSION = 2;
 
 	class GameInstanceThread {
 		public:
@@ -101,6 +104,23 @@ namespace {
 		}
 
 		return std::max(max_ping_indicator, ping_diff_indicator);
+	}
+
+	std::string computeVersionName(stnp::message::Connection const& message) {
+		constexpr std::array<char const*, 4> support_types = {"cartridge", "native-emulator", "web-emulator", "unknown"};
+		constexpr std::array<char const*, 4> release_types = {"alpha-", "beta-", "rc-", ""};
+		if (message.protocol_version < 2) {
+			return "unknown(old protocol)";
+		}
+		size_t const support_index = static_cast<size_t>(message.get_support_type());
+		size_t const release_index = static_cast<size_t>(message.get_release_type());
+		if (support_index > support_types.size() || release_index > release_types.size()) {
+			return "unknown(inconsistent message)";
+		}
+
+		std::ostringstream oss;
+		oss << uint16_t(message.get_major_version()) << '.' << release_types[release_index] << uint16_t(message.minor_version) << '/' << support_types[support_index] << '(' << (message.is_ntsc()?"NTSC":"PAL") << ')';
+		return oss.str();
 	}
 }
 
@@ -201,7 +221,7 @@ void InitializationHandler::run() {
 				if (client_protocol_version != STNP_VERSION) {
 					// Send error
 					syslog(LOG_NOTICE, "InitializationHandler: connection request with bad protocol: requested protocol %d", client_protocol_version);
-					std::string const reason(
+					this->rejectConnection(
 						"bad protocol version    "
 						"                        "
 						"you seem to run an old  "
@@ -209,18 +229,23 @@ void InitializationHandler::run() {
 						"                        "
 						"please download latest  "
 						"version                 "
-						"                        "
+						"                        ",
+						in_message->sender
 					);
-					stnp::message::Disconnected connection_response;
-					connection_response.reason.reserve(reason.size());
-					connection_response.reason.insert(connection_response.reason.begin(), reason.begin(), reason.end());
-					stnp::message::MessageSerializer serializer;
-					connection_response.serial(serializer);
-
-					std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
-					out_message->destination = in_message->sender;
-					out_message->data = serializer.serialized();
-					this->out_messages->push(out_message);
+				}else if (connection_request.is_ntsc()) {
+					// Send error
+					syslog(LOG_NOTICE, "InitializationHandler: connection request with NTSC timing: client version %s", computeVersionName(connection_request).c_str());
+					this->rejectConnection(
+						"bad system              "
+						"                        "
+						"you seem to run the game"
+						"on an ntsc system       "
+						"                        "
+						"netplay not available on"
+						"ntsc systems for now    "
+						"                        ",
+						in_message->sender
+					);
 				}else {
 					// Add client
 					bool found = false;
@@ -243,12 +268,13 @@ void InitializationHandler::run() {
 					if (!found) {
 						syslog(
 							LOG_INFO,
-							"InitializationHandler: new client: %s:%d id=%08x ping_min=%dms ping_max=%dms",
+							"InitializationHandler: new client: %s:%d id=%08x ping_min=%dms ping_max=%dms version=%s",
 							in_message->sender.address().to_string().c_str(),
 							in_message->sender.port(),
 							connection_request.client_id,
 							connection_request.ping_min * 4,
-							connection_request.ping_max * 4
+							connection_request.ping_max * 4,
+							computeVersionName(connection_request).c_str()
 						);
 						clients.push_back(client);
 					}
@@ -338,6 +364,23 @@ void InitializationHandler::run() {
 			syslog(LOG_ERR, "InitializationHandler: failed to process a message: %s", e.what());
 		}
 	}
+}
+
+void InitializationHandler::rejectConnection(std::string const& reason, boost::asio::ip::udp::endpoint const& client) {
+	// Construct Disconnected message
+	stnp::message::Disconnected connection_response;
+	connection_response.reason.reserve(reason.size());
+	connection_response.reason.insert(connection_response.reason.begin(), reason.begin(), reason.end());
+
+	// Serialize message
+	stnp::message::MessageSerializer serializer;
+	connection_response.serial(serializer);
+
+	// Send message
+	std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
+	out_message->destination = client;
+	out_message->data = serializer.serialized();
+	this->out_messages->push(out_message);
 }
 
 void InitializationHandler::stop() {

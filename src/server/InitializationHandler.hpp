@@ -6,6 +6,7 @@
 #include "utils.hpp"
 
 #include <memory>
+#include <string>
 
 /** Component handling initialization phase of the STNP protocol */
 class InitializationHandler {
@@ -20,6 +21,8 @@ public:
 	void stop();
 
 private:
+	void rejectConnection(std::string const& reason, boost::asio::ip::udp::endpoint const& client);
+
 	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages;
 	std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages;
 	std::shared_ptr<ClientsDatagramRouting> clients_routing;
