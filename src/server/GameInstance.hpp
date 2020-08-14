@@ -38,7 +38,8 @@ public:
 		std::shared_ptr<ThreadSafeFifo<GameInfo>> game_info_queue,
 		uint32_t antilag_prediction,
 		ClientInfo client_a,
-		ClientInfo clcient_b
+		ClientInfo client_b,
+		uint8_t stage_id
 	);
 
 	/** Abort the game */

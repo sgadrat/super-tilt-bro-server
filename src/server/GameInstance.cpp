@@ -12,17 +12,62 @@ namespace  {
 
 uint32_t constexpr INPUT_LAG = 4;
 
-GameState initial_gamestate() {
+GameState initial_gamestate(uint8_t stage_id) {
 	Stage stage;
-	stage.spawn_player_a = Stage::Spawn{ .x = 0x4000, .y = 0x80ff };
-	stage.spawn_player_b = Stage::Spawn{ .x = 0xa000, .y = 0x80ff };
-	stage.respawn = Stage::Spawn{ .x = 0x7000, .y = 0x6000 },
-	stage.platforms = std::vector<Stage::Platform>{
-		Stage::Platform{
-			.position = { .left = 0x29, .right = 0xcf, .top = 0x81, .bottom = 0xff },
-			.is_smooth = false,
-		},
-	};
+	switch (stage_id) {
+		case 0:
+			//stage_plateau_data:
+			//STAGE_HEADER($4000, $a000, $80ff, $80ff, $7000, $6000) ; player_a_x, player_b_x, player_a_y, player_b_y, respawn_x, respawn_y
+			//stage_plateau_elements:
+			//PLATFORM($29, $cf, $81, $ff) ; left, right, top, bot
+			//END_OF_STAGE
+			stage.spawn_player_a = Stage::Spawn{ .x = 0x4000, .y = 0x80ff };
+			stage.spawn_player_b = Stage::Spawn{ .x = 0xa000, .y = 0x80ff };
+			stage.respawn = Stage::Spawn{ .x = 0x7000, .y = 0x6000 },
+			stage.platforms = std::vector<Stage::Platform>{
+				Stage::Platform{
+					.position = { .left = 0x29, .right = 0xcf, .top = 0x81, .bottom = 0xff },
+					.is_smooth = false,
+				},
+			};
+			break;
+		case 2:
+			//stage_shelf_data:
+			//STAGE_HEADER($4000, $a000, $80ff, $80ff, $8000, $9000) ; player_a_x, player_b_x, player_a_y, player_b_y, respawn_x, respawn_y
+			//stage_shelf_elements:
+			//PLATFORM($29, $cf, $a9, $ff) ; left, right, top, bot
+			//SMOOTH_PLATFORM($19, $67, $81) ; left, right, top
+			//SMOOTH_PLATFORM($91, $df, $81) ; left, right, top
+			//SMOOTH_PLATFORM($49, $af, $51) ; left, right, top
+			//END_OF_STAGE
+			stage.spawn_player_a = Stage::Spawn{ .x = 0x4000, .y = 0x80ff };
+			stage.spawn_player_b = Stage::Spawn{ .x = 0xa000, .y = 0x80ff };
+			stage.respawn = Stage::Spawn{ .x = 0x8000, .y = 0x9000 },
+			stage.platforms = std::vector<Stage::Platform>{
+				Stage::Platform{
+					.position = { .left = 0x29, .right = 0xcf, .top = 0xa9, .bottom = 0xff },
+					.is_smooth = false,
+				},
+				Stage::Platform{
+					.position = { .left = 0x19, .right = 0x67, .top = 0x81, .bottom = 0xff },
+					.is_smooth = true,
+				},
+				Stage::Platform{
+					.position = { .left = 0x91, .right = 0xdf, .top = 0x81, .bottom = 0xff },
+					.is_smooth = true,
+				},
+				Stage::Platform{
+					.position = { .left = 0x49, .right = 0xaf, .top = 0x51, .bottom = 0xff },
+					.is_smooth = true,
+				},
+			};
+			break;
+		default: {
+			std::ostringstream oss;
+			oss << "unable to create stage with id " << uint16_t(stage_id);
+			throw std::runtime_error(oss.str());
+		}
+	}
 	return GameState(stage);
 }
 
@@ -68,7 +113,8 @@ void GameInstance::run(
 	std::shared_ptr<ThreadSafeFifo<GameInfo>> game_info_queue,
 	uint32_t antilag_prediction,
 	ClientInfo client_a,
-	ClientInfo client_b
+	ClientInfo client_b,
+	uint8_t stage
 )
 {
 	try {
@@ -78,7 +124,7 @@ void GameInstance::run(
 		std::shared_ptr<network::IncommingUdpMessage> in_message = nullptr;
 		std::vector<boost::asio::ip::udp::endpoint> clients({client_a.endpoint, client_b.endpoint});
 		std::map<uint32_t, GameState> gamestate_history{
-			{0, initial_gamestate()}
+			{0, initial_gamestate(stage)}
 		};
 		std::map<uint32_t, GameState::ControllerState> controller_a_history{
 			{0, GameState::ControllerState()}
