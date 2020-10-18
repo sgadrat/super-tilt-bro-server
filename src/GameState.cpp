@@ -836,7 +836,7 @@ void GameState::shielding_player_input(uint8_t player_number) {
 	//  down is pressed - avoid to reset the shield state (and hit counter)
 	if (player.btns.getRaw() == 0) {
 		std::pair<bool, Stage::Platform*> on_ground = this->check_on_ground(player_number);
-		if (player.state_clock <= PLAYER_DOWN_TAP_MAX_DURATION  && on_ground.first && on_ground.second->is_smooth) {
+		if (player.state_clock < PLAYER_DOWN_TAP_MAX_DURATION && on_ground.first && on_ground.second->is_smooth) {
 			player.y += 0x000300;
 			this->start_falling_player(player_number);
 		}else {
