@@ -6,9 +6,10 @@ if [ "x$1" == "xdbg" ]; then
 fi
 
 g++ \
-	-O3 -o stb_server $dbg_log_flags \
+	-O3 -DNDEBUG -flto -o stb_server $dbg_log_flags \
 	-I .. -I ../.. \
 	stb_server.cpp \
+	../../mos6502/mos6502.cpp \
 	../network.cpp \
 	../GameState.cpp \
 	DatagramDispatcher.cpp \

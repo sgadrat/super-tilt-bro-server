@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 
-// g++ -std=c++17 fm2_player.cpp ../src/GameState.cpp -I ../src -o fm2_player
+// g++ -std=c++17 -O3 -DNDEBUG -flto fm2_player.cpp ../src/GameState.cpp ../mos6502/mos6502.cpp -I ../src -I  .. -o fm2_player
 
 /*
  * Take inputs from a movie file and run it in a GameState,
@@ -80,17 +80,7 @@ private:
 };
 
 GameState initial_gamestate() {
-	Stage stage;
-	stage.spawn_player_a = Stage::Spawn{ .x = 0x4000, .y = 0x80ff };
-	stage.spawn_player_b = Stage::Spawn{ .x = 0xa000, .y = 0x80ff };
-	stage.respawn = Stage::Spawn{ .x = 0x7000, .y = 0x6000 },
-		stage.platforms = std::vector<Stage::Platform>{
-			Stage::Platform{
-				.position = { .left = 0x29, .right = 0xcf, .top = 0x81, .bottom = 0xff },
-				.is_smooth = false,
-			},
-		};
-	return GameState(stage);
+	return GameState(0, [](std::string const & m) {std::cerr << m << '\n';});
 }
 
 int main() {
