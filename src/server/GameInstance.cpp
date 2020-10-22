@@ -50,6 +50,56 @@ void debug_log_msg([[maybe_unused]] std::shared_ptr<network::IncommingUdpMessage
 #endif
 }
 
+std::pair<uint32_t, GameState> compute_game_state_at(
+	uint32_t target_time,
+	std::map<uint32_t, GameState> const& gamestate_history,
+	std::map<uint32_t, GameState::ControllerState> const& controller_a_history,
+	std::map<uint32_t, GameState::ControllerState> const& controller_b_history
+)
+{
+	std::map<uint32_t, GameState>::const_iterator gamestate_history_entry = gamestate_history.upper_bound(target_time);
+	assert(gamestate_history_entry != gamestate_history.begin()); // Upper bound, and gamestate history must not be empty (initial gamestate is here)
+	--gamestate_history_entry;
+
+	std::pair<uint32_t, GameState> result = *gamestate_history_entry;
+	uint32_t& gamestate_time = result.first;
+	GameState& gamestate = result.second;
+	bool gameover = false;
+
+	while (!gameover && gamestate_time < target_time) {
+		// Apply inputs
+		std::map<uint32_t, GameState::ControllerState>::const_iterator controller_history_entry(controller_a_history.find(gamestate_time));
+		if (controller_history_entry != controller_a_history.end()) {
+			gamestate.setControllerAState(controller_history_entry->second);
+		}
+
+		controller_history_entry = controller_b_history.find(gamestate_time);
+		if (controller_history_entry != controller_b_history.end()) {
+			gamestate.setControllerBState(controller_history_entry->second);
+		}
+
+		// Tick Simulation
+		if (!gamestate.tick()) {
+			gameover = true;
+		}
+		++gamestate_time;
+	}
+
+	// Apply inputs for the final state
+	std::map<uint32_t, GameState::ControllerState>::const_iterator controller_history_entry(controller_a_history.find(gamestate_time));
+	if (controller_history_entry != controller_a_history.end()) {
+		gamestate.setControllerAState(controller_history_entry->second);
+	}
+
+	controller_history_entry = controller_b_history.find(gamestate_time);
+	if (controller_history_entry != controller_b_history.end()) {
+		gamestate.setControllerBState(controller_history_entry->second);
+	}
+
+	// Return computed state
+	return result;
+}
+
 }
 
 void GameInstance::run(
@@ -116,7 +166,8 @@ void GameInstance::run(
 					//  Note we don't want to keep states after that, even if still valid because of input delay.
 					//  Not keeping it allows to ensure that the last computed gamestate is the one to send in the message (matching delayed frames)
 					std::map<uint32_t, GameState>::iterator first_invalid_gamestate(gamestate_history.lower_bound(message.timestamp));
-					if (first_invalid_gamestate != gamestate_history.end()) {
+					bool const history_rewrite = first_invalid_gamestate != gamestate_history.end();
+					if (history_rewrite) {
 						if (first_invalid_gamestate->first == 0) {
 							syslog(LOG_WARNING, "GameInstance: warning: prevented modification of initial gamestate");
 						}else {
@@ -126,51 +177,22 @@ void GameInstance::run(
 
 					// Compute gamestate at the last input in history (minus delayed frames)
 					{
-						uint32_t gamestate_time = gamestate_history.rbegin()->first;
-						GameState gamestate = gamestate_history.rbegin()->second;
 						uint32_t last_input_time = sender_controller_history.rbegin()->first;
 						assert(last_input_time >= INPUT_LAG);
 						uint32_t current_gamestate_time = last_input_time - INPUT_LAG;
-						bool gameover = false;
 
-						while (!gameover && gamestate_time < current_gamestate_time + antilag_prediction) {
-							// Apply inputs
-							std::map<uint32_t, GameState::ControllerState>::const_iterator controller_history_entry(controller_a_history.find(gamestate_time));
-							if (controller_history_entry != controller_a_history.end()) {
-								gamestate.setControllerAState(controller_history_entry->second);
-							}
-
-							controller_history_entry = controller_b_history.find(gamestate_time);
-							if (controller_history_entry != controller_b_history.end()) {
-								gamestate.setControllerBState(controller_history_entry->second);
-							}
-
-							// Tick Simulation
-							if (!gamestate.tick()) {
-								gameover = true;
-							}
-							++gamestate_time;
-						}
+						std::pair<uint32_t, GameState> computed_gamestate = compute_game_state_at(
+							current_gamestate_time + antilag_prediction,
+							gamestate_history, controller_a_history, controller_b_history
+						);
 
 						// Stop procesing if the game is over (we don't want to send this state, better send a GameOver message)
-						if (gameover) {
+						if (computed_gamestate.second.is_gameover()) {
 							this->keep_running = false;
 							break;
 						}
 
-						// Apply inputs (for physical input to match with history)
-						//TODO find a cleaner way (like removing physical inputs from gamestate and integrating it in delayed inputs)
-						std::map<uint32_t, GameState::ControllerState>::const_iterator controller_history_entry(controller_a_history.find(gamestate_time));
-						if (controller_history_entry != controller_a_history.end()) {
-							gamestate.setControllerAState(controller_history_entry->second);
-						}
-
-						controller_history_entry = controller_b_history.find(gamestate_time);
-						if (controller_history_entry != controller_b_history.end()) {
-							gamestate.setControllerBState(controller_history_entry->second);
-						}
-
-						gamestate_history.insert(std::pair<uint32_t, GameState>(gamestate_time, gamestate));
+						gamestate_history.insert(computed_gamestate);
 					}
 
 					// Increment prediction ID
@@ -216,8 +238,8 @@ void GameInstance::run(
 			game_info->winner = (clients.at(gamestate_history.rbegin()->second.winner()) == client_a.endpoint ? client_a.id : client_b.id);
 			game_info_queue->push(game_info);
 		}
-	}catch(std::exception const& e) {
-		syslog(LOG_ERR, "GameInstance: game crashed: %s", e.what());
+	}catch(int/*std::exception const& e*/) {
+		//syslog(LOG_ERR, "GameInstance: game crashed: %s", e.what());
 	}
 
 	//TODO Remove clients from routing table (or better, send an event in game_info_queue and let someby else cleaning things like the routing table)
