@@ -185,12 +185,14 @@ public:
 		INST_COUNT,
 		CYCLE_COUNT,
 	};
-	mos6502(BusRead r, BusWrite w);
+	mos6502();
 	void NMI();
 	void IRQ();
-	void Reset();
+	void Reset(BusRead read);
 	void Run(
 		int32_t cycles,
 		uint64_t& cycleCount,
+		BusRead r,
+		BusWrite w,
 		CycleMethod cycleMethod = CYCLE_COUNT);
 };

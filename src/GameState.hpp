@@ -56,7 +56,8 @@ public:
 	GameState(uint8_t stage, LoggerCallback logger = nullptr);
 
 	bool tick();
-	uint8_t winner();
+	bool is_gameover() const {return this->gameover;}
+	uint8_t winner() const;
 
 	void setControllerAState(ControllerState state);
 	void setControllerBState(ControllerState state);

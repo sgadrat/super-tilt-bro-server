@@ -1,9 +1,7 @@
 #include "mos6502.hpp"
 
-mos6502::mos6502(BusRead r, BusWrite w)
+mos6502::mos6502()
 {
-	ExternalWrite = (BusWrite)w;
-	Read = (BusRead)r;
 	Instr instr;
 
 	// fill jump table with ILLEGALs
@@ -816,13 +814,13 @@ uint16_t mos6502::Addr_INY()
 	return addr;
 }
 
-void mos6502::Reset()
+void mos6502::Reset(BusRead read)
 {
 	A = 0x00;
 	Y = 0x00;
 	X = 0x00;
 
-	pc = (Read(rstVectorH) << 8) + Read(rstVectorL); // load PC from reset vector
+	pc = (read(rstVectorH) << 8) + read(rstVectorL); // load PC from reset vector
 
 	sp = 0xFF;
 
@@ -880,10 +878,15 @@ void mos6502::NMI()
 void mos6502::Run(
 	int32_t cyclesRemaining,
 	uint64_t& cycleCount,
+	BusRead r,
+	BusWrite w,
 	CycleMethod cycleMethod
 ) {
 	uint8_t opcode;
 	Instr instr;
+
+	Read = r;
+	ExternalWrite = w;
 
 	stopped = false;
 	illegalOpcode = false;

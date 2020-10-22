@@ -73,18 +73,22 @@ std::string hex(uint8_t v) {
 }
 
 GameState::GameState(uint8_t stage, GameState::LoggerCallback logger)
-: emulator(std::bind(&GameState::emulatorRead, this, _1), std::bind(&GameState::emulatorWrite, this, _1, _2))
-, logger(logger)
+: logger(logger)
 {
 	// Init RAM at zero (we do not want random bugs)
 	this->emulator_ram.fill(0);
 
 	// Call bytecode initialization routine
 	this->emulator_ram[0] = stage;
-	this->emulator.Reset();
+	this->emulator.Reset([this](uint16_t addr) { return this->emulatorRead(addr); });
 	this->emulator.pc = (uint16_t(this->emulatorRead(bytecodeVectorInitHigh)) << 8) + this->emulatorRead(bytecodeVectorInitLow);
 	uint64_t cycles_count = 0;
-	this->emulator.Run(1'000'000, cycles_count, mos6502::INST_COUNT);
+	this->emulator.Run(
+		1'000'000, cycles_count,
+		[this](uint16_t addr) { return this->emulatorRead(addr); },
+		[this](uint16_t addr, uint8_t value) { return this->emulatorWrite(addr, value); },
+		mos6502::INST_COUNT
+	);
 
 	// Handle emulation errors
 	if (!this->emulator.stopped) {
@@ -108,10 +112,15 @@ bool GameState::tick() {
 	this->emulator_ram[controller_b_btns] = mControllerB.getRaw();
 
 	// Emulate tick routine
-	this->emulator.Reset();
+	this->emulator.Reset([this](uint16_t addr) { return this->emulatorRead(addr); });
 	this->emulator.pc = (uint16_t(this->emulatorRead(bytecodeVectorTickHigh)) << 8) + this->emulatorRead(bytecodeVectorTickLow);
 	uint64_t cycles_count = 0;
-	this->emulator.Run(1'000'000, cycles_count, mos6502::INST_COUNT);
+	this->emulator.Run(
+		1'000'000, cycles_count,
+		[this](uint16_t addr) { return this->emulatorRead(addr); },
+		[this](uint16_t addr, uint8_t value) { return this->emulatorWrite(addr, value); },
+		mos6502::INST_COUNT
+	);
 
 	// Handle emulation errors
 	if (!this->emulator.stopped) {
@@ -128,7 +137,7 @@ bool GameState::tick() {
 	return !this->gameover;
 }
 
-uint8_t GameState::winner() {
+uint8_t GameState::winner() const {
 	return this->emulator_ram[gameover_winner];
 }
 
