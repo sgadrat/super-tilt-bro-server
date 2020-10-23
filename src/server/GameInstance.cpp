@@ -223,6 +223,7 @@ void GameInstance::run(
 					++prediction_id;
 
 					// Send the new game state to impacted clients
+					//TODO don't send anything if there is other messages waiting to be processed (beware, history rewrite should be global to the batch of messages)
 					for (boost::asio::ip::udp::endpoint const& client_endpoint : clients) {
 						if (!(client_endpoint == in_message->sender)) {
 							// Get gamestate
@@ -235,6 +236,20 @@ void GameInstance::run(
 							out_message->data = serialize_new_game_state_msg(prediction_id, gamestate_time, gamestate, sender_controller_history);
 							out_messages->push(out_message);
 							srv_dbg(LOG_DEBUG, "send state to %s:%d", client_endpoint.address(), client_endpoint.port());
+						}else {
+							if (history_rewrite) {
+								// Get gamestate
+								GameState& gamestate = gamestate_history.rbegin()->second;
+								uint32_t const gamestate_time = gamestate_history.rbegin()->first;
+								std::map<uint32_t, GameState::ControllerState>& non_sender_controller_history = (message.client_id == client_a.id ? controller_b_history : controller_a_history);
+
+								// Send message
+								std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
+								out_message->destination = client_endpoint;
+								out_message->data = serialize_new_game_state_msg(prediction_id, gamestate_time, gamestate, non_sender_controller_history);
+								out_messages->push(out_message);
+								srv_dbg(LOG_DEBUG, "send erratum to %s:%d", client_endpoint.address(), client_endpoint.port());
+							}
 						}
 					}
 				}
