@@ -100,6 +100,29 @@ std::pair<uint32_t, GameState> compute_game_state_at(
 	return result;
 }
 
+std::vector<uint8_t> serialize_new_game_state_msg(
+	uint8_t prediction_id,
+	uint32_t gamestate_time,
+	GameState& gamestate,
+	std::map<uint32_t, GameState::ControllerState> const& controller_history
+)
+{
+	stnp::message::NewGameState new_gamestate_msg;
+	new_gamestate_msg.timestamp = gamestate_time;
+	new_gamestate_msg.prediction_id = prediction_id;
+	stnp::message::MessageSerializer state_serializer;
+	gamestate.serial(state_serializer);
+	new_gamestate_msg.state = state_serializer.serialized();
+
+	new_gamestate_msg.next_opponent_inputs.reserve(INPUT_LAG);
+	for (uint32_t i = gamestate_time + 1; i <= gamestate_time + INPUT_LAG; ++i) {
+		new_gamestate_msg.next_opponent_inputs.push_back(get_history_value_at(controller_history, i).getRaw());
+	}
+
+	stnp::message::MessageSerializer serializer;
+	new_gamestate_msg.serial(serializer);
+	return serializer.serialized();
+}
 }
 
 void GameInstance::run(
@@ -165,6 +188,7 @@ void GameInstance::run(
 					// Invalidate gamestate history from message's timestamp
 					//  Note we don't want to keep states after that, even if still valid because of input delay.
 					//  Not keeping it allows to ensure that the last computed gamestate is the one to send in the message (matching delayed frames)
+					//TODO reassess, especially the last line which will be of no interest as we'll be able to compute states at any time point
 					std::map<uint32_t, GameState>::iterator first_invalid_gamestate(gamestate_history.lower_bound(message.timestamp));
 					bool const history_rewrite = first_invalid_gamestate != gamestate_history.end();
 					if (history_rewrite) {
@@ -177,11 +201,11 @@ void GameInstance::run(
 
 					// Compute gamestate at the last input in history (minus delayed frames)
 					{
-						uint32_t last_input_time = sender_controller_history.rbegin()->first;
+						uint32_t const last_input_time = sender_controller_history.rbegin()->first; //TODO compute max from both history (we want to share the timeline)
 						assert(last_input_time >= INPUT_LAG);
-						uint32_t current_gamestate_time = last_input_time - INPUT_LAG;
+						uint32_t const current_gamestate_time = last_input_time - INPUT_LAG;
 
-						std::pair<uint32_t, GameState> computed_gamestate = compute_game_state_at(
+						std::pair<uint32_t, GameState> const computed_gamestate = compute_game_state_at(
 							current_gamestate_time + antilag_prediction,
 							gamestate_history, controller_a_history, controller_b_history
 						);
@@ -198,29 +222,17 @@ void GameInstance::run(
 					// Increment prediction ID
 					++prediction_id;
 
-					// Serialize new gamestate message with sender's delayed inputs
-					stnp::message::NewGameState gamestate;
-
-					gamestate.timestamp = gamestate_history.rbegin()->first;
-					gamestate.prediction_id = prediction_id;
-					stnp::message::MessageSerializer state_serializer;
-					gamestate_history.rbegin()->second.serial(state_serializer);
-					gamestate.state = state_serializer.serialized();
-
-					gamestate.next_opponent_inputs.reserve(INPUT_LAG);
-					for (uint32_t i = gamestate.timestamp + 1; i <= gamestate.timestamp + INPUT_LAG; ++i) {
-						gamestate.next_opponent_inputs.push_back(get_history_value_at(sender_controller_history, i).getRaw());
-					}
-
-					stnp::message::MessageSerializer serializer;
-					gamestate.serial(serializer);
-
 					// Send the new game state to impacted clients
 					for (boost::asio::ip::udp::endpoint const& client_endpoint : clients) {
 						if (!(client_endpoint == in_message->sender)) {
+							// Get gamestate
+							GameState& gamestate = gamestate_history.rbegin()->second;
+							uint32_t const gamestate_time = gamestate_history.rbegin()->first;
+
+							// Send message
 							std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
 							out_message->destination = client_endpoint;
-							out_message->data = serializer.serialized();
+							out_message->data = serialize_new_game_state_msg(prediction_id, gamestate_time, gamestate, sender_controller_history);
 							out_messages->push(out_message);
 							srv_dbg(LOG_DEBUG, "send state to %s:%d", client_endpoint.address(), client_endpoint.port());
 						}
@@ -242,7 +254,7 @@ void GameInstance::run(
 		//syslog(LOG_ERR, "GameInstance: game crashed: %s", e.what());
 	}
 
-	//TODO Remove clients from routing table (or better, send an event in game_info_queue and let someby else cleaning things like the routing table)
+	//TODO Remove clients from routing table (or better, send an event in game_info_queue and let somebody else clean things like the routing table)
 	this->over = true;
 }
 
