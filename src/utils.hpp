@@ -16,11 +16,12 @@ public:
 	std::shared_ptr<T> pop_block();
 	template <typename Rep, typename Period>
 	std::shared_ptr<T> pop_block(std::chrono::duration<Rep, Period> timeout);
+	bool empty() const;
 
 private:
 	std::deque<std::shared_ptr<T>> mBuffer;
 	uint32_t mBufferMaxSize;
-	std::mutex mBufferLock;
+	mutable std::mutex mBufferLock;
 	std::condition_variable mCondition;
 };
 
@@ -81,4 +82,10 @@ std::shared_ptr<T> ThreadSafeFifo<T>::pop_block(std::chrono::duration<Rep, Perio
 	std::shared_ptr<T> e = mBuffer.front();
 	mBuffer.pop_front();
 	return e;
+}
+
+template <typename T>
+bool ThreadSafeFifo<T>::empty() const {
+	std::lock_guard<std::mutex> lock(mBufferLock);
+	return mBuffer.size() == 0;
 }

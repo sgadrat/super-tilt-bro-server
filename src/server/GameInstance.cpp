@@ -136,7 +136,7 @@ void GameInstance::run(
 )
 {
 	try {
-		// Process incoming messages
+		// Variables with lifetime spanning entire run() duration
 		this->keep_running = true;
 		this->over = false;
 		std::shared_ptr<network::IncommingUdpMessage> in_message = nullptr;
@@ -151,6 +151,11 @@ void GameInstance::run(
 			{0, GameState::ControllerState()}
 		};
 		uint8_t prediction_id = 0;
+
+		// Variables reset each time a state is sent
+		std::array<bool, 2> impacted_clients = {false, false}; // For each client, true if the state has to be sent
+
+		// Process incoming messages
 		while (this->keep_running) {
 			// Reconstruct gamestate history according to bufferized messages
 			bool handled_message = false;
@@ -180,6 +185,11 @@ void GameInstance::run(
 						continue;
 					}
 
+					// Mark the other client as impacted
+					uint8_t const sender_index = (message.client_id == client_a.id ? 0 : 1);
+					uint8_t const opponent_index = (message.client_id == client_a.id ? 1 : 0);
+					impacted_clients[opponent_index] = true;
+
 					// Update inputs history
 					GameState::ControllerState controller_state = controller_state_from_message(message);
 					std::map<uint32_t, GameState::ControllerState>& sender_controller_history = (message.client_id == client_a.id ? controller_a_history : controller_b_history);
@@ -197,6 +207,11 @@ void GameInstance::run(
 						}else {
 							gamestate_history.erase(first_invalid_gamestate, gamestate_history.end());
 						}
+					}
+
+					// If history was rewriten, we must refresh sender's state as we may have sent him a misspredicted one last time
+					if (history_rewrite) {
+						impacted_clients[sender_index] = true;
 					}
 
 					// Compute gamestate at the last input in history (minus delayed frames)
@@ -222,35 +237,28 @@ void GameInstance::run(
 					// Increment prediction ID
 					++prediction_id;
 
-					// Send the new game state to impacted clients
-					//TODO don't send anything if there is other messages waiting to be processed (beware, history rewrite should be global to the batch of messages)
-					for (boost::asio::ip::udp::endpoint const& client_endpoint : clients) {
-						if (!(client_endpoint == in_message->sender)) {
-							// Get gamestate
-							GameState& gamestate = gamestate_history.rbegin()->second;
-							uint32_t const gamestate_time = gamestate_history.rbegin()->first;
-
-							// Send message
-							std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
-							out_message->destination = client_endpoint;
-							out_message->data = serialize_new_game_state_msg(prediction_id, gamestate_time, gamestate, sender_controller_history);
-							out_messages->push(out_message);
-							srv_dbg(LOG_DEBUG, "send state to %s:%d", client_endpoint.address(), client_endpoint.port());
-						}else {
-							if (history_rewrite) {
+					// Send current state to clients when there is no more message waiting to be processed
+					if (in_messages->empty()) {
+						// Send the new game state to impacted clients
+						for (size_t client_index = 0; client_index < clients.size(); ++client_index) {
+							if (impacted_clients[client_index]) {
 								// Get gamestate
 								GameState& gamestate = gamestate_history.rbegin()->second;
 								uint32_t const gamestate_time = gamestate_history.rbegin()->first;
-								std::map<uint32_t, GameState::ControllerState>& non_sender_controller_history = (message.client_id == client_a.id ? controller_b_history : controller_a_history);
+								std::map<uint32_t, GameState::ControllerState>& opponent_controller_history = (client_index == 0 ? controller_b_history : controller_a_history);
 
 								// Send message
+								boost::asio::ip::udp::endpoint const& client_endpoint = clients.at(client_index);
 								std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
 								out_message->destination = client_endpoint;
-								out_message->data = serialize_new_game_state_msg(prediction_id, gamestate_time, gamestate, non_sender_controller_history);
+								out_message->data = serialize_new_game_state_msg(prediction_id, gamestate_time, gamestate, opponent_controller_history);
 								out_messages->push(out_message);
-								srv_dbg(LOG_DEBUG, "send erratum to %s:%d", client_endpoint.address(), client_endpoint.port());
+								srv_dbg(LOG_DEBUG, "send %s to %s:%d", (client_index != sender_index ? "state" : "eratum"), client_endpoint.address(), client_endpoint.port());
 							}
 						}
+
+						// Reset variables for this batch of incomming messages
+						impacted_clients = {false, false};
 					}
 				}
 			}
