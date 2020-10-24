@@ -264,15 +264,15 @@ void GameInstance::run(
 								out_message->destination = client_endpoint;
 								out_message->data = serialize_new_game_state_msg(prediction_id, gamestate_time, gamestate, opponent_controller_history);
 								out_messages->push(out_message);
-								srv_dbg(LOG_DEBUG, "send %s to %s:%d", (client_index != sender_index ? "state" : "eratum"), client_endpoint.address(), client_endpoint.port());
+								srv_dbg(LOG_DEBUG, "send %s to %s:%d", (client_index != sender_index ? "state" : "eratum"), client_endpoint.address().to_string().c_str(), client_endpoint.port());
 							}
 						}
 
 						// Log time spent computing states
 						microseconds const time_spent_in_batch = duration_cast<microseconds>(steady_clock::now() - input_batch_begin);
-						srv_dbg(LOG_DEBUG, "GameInstance: Time spent in input batch: %d us", time_spent_in_batch.count());
+						srv_dbg(LOG_DEBUG, "GameInstance: Time spent in input batch: %ld us", time_spent_in_batch.count());
 						if (time_spent_in_batch > microseconds(10'000)) {
-							syslog(LOG_WARNING, "GameInstance: Long time spent in input batch: %d us", time_spent_in_batch.count());
+							syslog(LOG_WARNING, "GameInstance: Long time spent in input batch: %ld us", time_spent_in_batch.count());
 						}
 
 						// Reset variables for this batch of incomming messages

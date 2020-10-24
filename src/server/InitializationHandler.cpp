@@ -149,7 +149,7 @@ void InitializationHandler::run() {
 			std::shared_ptr<network::IncommingUdpMessage> in_message = nullptr;
 			try {
 				in_message = this->in_messages->pop_block(GAME_TIMEOUT);
-				srv_dbg(LOG_DEBUG, "InitializationHandler: received message of %d bytes from %s:%d", in_message->data.size(), in_message->sender.address().to_string().c_str(), in_message->sender.port());
+				srv_dbg(LOG_DEBUG, "InitializationHandler: received message of %zu bytes from %s:%d", in_message->data.size(), in_message->sender.address().to_string().c_str(), in_message->sender.port());
 			}catch (std::runtime_error const& e) {
 				// Timeout, noting special to do, we will just not process message bellow
 			}

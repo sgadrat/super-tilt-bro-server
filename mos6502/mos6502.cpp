@@ -1,4 +1,67 @@
 #include "mos6502.hpp"
+#include "src/GameState.bytecodeinfo.hpp"
+
+namespace {
+uint16_t const bytecodeVectorInitHigh = mos6502::rstVectorH;
+uint16_t const bytecodeVectorInitLow = mos6502::rstVectorL;
+uint16_t const bytecodeVectorTickHigh = mos6502::nmiVectorH;
+uint16_t const bytecodeVectorTickLow = mos6502::nmiVectorL;
+
+uint16_t const rainbow_prg_banking_1 = 0x5002;
+uint16_t const stop_trigger_addr = 0xffff;
+uint16_t const nes_register_ppustatus = 0x2002;
+
+uint8_t ExternalRead(uint16_t addr, mos6502::RunContext* context) {
+	// RAM
+	if (addr < 0x2000) {
+		addr = addr % 0x0800;
+		return context->ram[addr];
+	}
+
+	// ROM
+	if (addr >= 0x8000) {
+		uint8_t const bank = (addr >= 0xc000 ? 0x1f : context->bank);
+		size_t const bank_offset_in_rom = bank * 0x4000;
+		uint16_t const addr_in_bank = (addr - 0x8000) % 0x4000;
+		return context->rom[bank_offset_in_rom + addr_in_bank];
+	}
+
+	// PPUSTATUS register
+	if (addr == nes_register_ppustatus) {
+		return 0x80; // Always set VBI flag, so waits for VBI are immediate
+	}
+
+	// Other
+	//  Warning, the default value must not trigger the netcode. If complexe,
+	//  special registers should be handled before default value is returned.
+	return 0;
+}
+
+bool ExternalWrite(uint16_t addr, uint8_t value, mos6502::RunContext* context) {
+	// RAM
+	if (addr < 0x2000) {
+		addr = addr % 0x0800;
+		context->ram[addr] = value;
+
+		// Stop emulation on gameover (and note that the game is over)
+		if (addr == global_game_state) {
+			context->gameover = true;
+			return true;
+		}
+
+		return false;
+	}
+
+	// Banking register
+	if (addr == rainbow_prg_banking_1) {
+		context->bank = value;
+		return false;
+	}
+
+	// Stop the emulation if emulated code notified its end
+	return addr == stop_trigger_addr;
+}
+}
 
 mos6502::mos6502()
 {
@@ -814,13 +877,14 @@ uint16_t mos6502::Addr_INY()
 	return addr;
 }
 
-void mos6502::Reset(BusRead read)
+void mos6502::Reset(RunContext* context)
 {
+	this->run_context = context;
 	A = 0x00;
 	Y = 0x00;
 	X = 0x00;
 
-	pc = (read(rstVectorH) << 8) + read(rstVectorL); // load PC from reset vector
+	pc = (Read(rstVectorH) << 8) + Read(rstVectorL); // load PC from reset vector
 
 	sp = 0xFF;
 
@@ -831,9 +895,14 @@ void mos6502::Reset(BusRead read)
 	return;
 }
 
+uint8_t mos6502::Read(uint16_t addr)
+{
+	return ExternalRead(addr, this->run_context);
+}
+
 void mos6502::Write(uint16_t addr, uint8_t byte)
 {
-	stopped = ExternalWrite(addr, byte);
+	stopped = ExternalWrite(addr, byte, this->run_context);
 }
 
 void mos6502::StackPush(uint8_t byte)
@@ -878,15 +947,13 @@ void mos6502::NMI()
 void mos6502::Run(
 	int32_t cyclesRemaining,
 	uint64_t& cycleCount,
-	BusRead r,
-	BusWrite w,
+	RunContext* context,
 	CycleMethod cycleMethod
 ) {
 	uint8_t opcode;
 	Instr instr;
 
-	Read = r;
-	ExternalWrite = w;
+	this->run_context = context;
 
 	stopped = false;
 	illegalOpcode = false;

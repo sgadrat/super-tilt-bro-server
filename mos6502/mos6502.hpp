@@ -6,7 +6,7 @@
 // Description : A MOS 6502 CPU emulator written in C++
 //============================================================================
 
-#include <functional>
+#include <array>
 #include <iostream>
 #include <stdint.h>
 using namespace std;
@@ -43,6 +43,13 @@ using namespace std;
 class mos6502
 {
 public:
+	struct RunContext {
+		std::array<uint8_t, 0x800> ram;
+		uint8_t const* rom;
+		uint8_t bank;
+		bool gameover;
+	};
+
 	// registers
 	uint8_t A; // accumulator
 	uint8_t X; // X-index
@@ -170,11 +177,9 @@ private:
 	void Op_ILLEGAL(uint16_t src);
 
 	// read/write callbacks
-	typedef std::function<bool (uint16_t, uint8_t)> BusWrite;
-	typedef std::function<uint8_t (uint16_t)> BusRead;
-	BusRead Read;
-	BusWrite ExternalWrite;
+	uint8_t Read(uint16_t);
 	void Write(uint16_t, uint8_t);
+	RunContext* run_context;
 
 	// stack operations
 	inline void StackPush(uint8_t byte);
@@ -188,11 +193,10 @@ public:
 	mos6502();
 	void NMI();
 	void IRQ();
-	void Reset(BusRead read);
+	void Reset(RunContext* context);
 	void Run(
 		int32_t cycles,
 		uint64_t& cycleCount,
-		BusRead r,
-		BusWrite w,
+		RunContext* context,
 		CycleMethod cycleMethod = CYCLE_COUNT);
 };

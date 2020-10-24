@@ -4,6 +4,7 @@
 #include "GameState.bytecodeinfo.hpp"
 
 #include <array>
+#include <functional>
 #include <sstream>
 #include <stdint.h>
 
@@ -56,7 +57,7 @@ public:
 	GameState(uint8_t stage, LoggerCallback logger = nullptr);
 
 	bool tick();
-	bool is_gameover() const {return this->gameover;}
+	bool is_gameover() const {return this->emulator_context.gameover;}
 	uint8_t winner() const;
 
 	void setControllerAState(ControllerState state);
@@ -72,11 +73,14 @@ private:
 
 private:
 	static std::array<uint8_t, 0x80000> const emulator_rom;
-	std::array<uint8_t, 0x800> emulator_ram;
-	uint8_t emulator_bank = 0;
+	mos6502::RunContext emulator_context = {
+		.ram = {0},
+		.rom = GameState::emulator_rom.data(),
+		.bank = 0,
+		.gameover = false
+	};
 	mos6502 emulator;
 
-	bool gameover = false;
 	ControllerState mControllerA;
 	ControllerState mControllerB;
 
@@ -87,22 +91,22 @@ template <typename SerializationHandler>
 void GameState::serial(SerializationHandler& s) {
 	// Copy gamestate
 	for (size_t i = 0; i < 0x4f; ++i) {
-		s.uint8(this->emulator_ram[i]);
+		s.uint8(this->emulator_context.ram[i]);
 	}
 
 	// Copy hitboxes MSB
 	for (size_t i = 0; i < 0x10; ++i) {
-		s.uint8(this->emulator_ram[player_a_hurtbox_left_msb + i]);
+		s.uint8(this->emulator_context.ram[player_a_hurtbox_left_msb + i]);
 	}
 
 	// Copy special state
-	s.uint8(this->emulator_ram[screen_shake_counter]);
+	s.uint8(this->emulator_context.ram[screen_shake_counter]);
 
 	// Copy controllers state
-	s.uint8(this->emulator_ram[controller_a_btns]);
-	s.uint8(this->emulator_ram[controller_b_btns]);
-	s.uint8(this->emulator_ram[controller_a_last_frame_btns]);
-	s.uint8(this->emulator_ram[controller_b_last_frame_btns]);
+	s.uint8(this->emulator_context.ram[controller_a_btns]);
+	s.uint8(this->emulator_context.ram[controller_b_btns]);
+	s.uint8(this->emulator_context.ram[controller_a_last_frame_btns]);
+	s.uint8(this->emulator_context.ram[controller_b_last_frame_btns]);
 
 	// Copy actually pressed opponent btns (keep_input_dirty may mess with normal values, but not this one)
 	s.flags8({
@@ -128,6 +132,6 @@ void GameState::serial(SerializationHandler& s) {
 
 	// Copy animation states
 	for (size_t i = 0; i < 12*2; ++i) {
-		s.uint8(this->emulator_ram[player_a_animation + i]);
+		s.uint8(this->emulator_context.ram[player_a_animation + i]);
 	}
 }
