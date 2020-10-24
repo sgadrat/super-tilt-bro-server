@@ -5,6 +5,7 @@
 #include "network.hpp"
 #include <libstnp/libstnp.hpp>
 
+#include <chrono>
 #include <sstream>
 #include <syslog.h>
 
@@ -135,6 +136,10 @@ void GameInstance::run(
 	uint8_t stage
 )
 {
+	using std::chrono::duration_cast;
+	using std::chrono::microseconds;
+	using std::chrono::steady_clock;
+
 	try {
 		// Variables with lifetime spanning entire run() duration
 		this->keep_running = true;
@@ -153,7 +158,9 @@ void GameInstance::run(
 		uint8_t prediction_id = 0;
 
 		// Variables reset each time a state is sent
+		bool new_input_batch = true;
 		std::array<bool, 2> impacted_clients = {false, false}; // For each client, true if the state has to be sent
+		steady_clock::time_point input_batch_begin;
 
 		// Process incoming messages
 		while (this->keep_running) {
@@ -162,7 +169,11 @@ void GameInstance::run(
 			while (this->keep_running) {
 				// Get next incomming message
 				try {
-					in_message = in_messages->pop_block(std::chrono::microseconds(1'000'000));
+					in_message = in_messages->pop_block(microseconds(1'000'000));
+					if (new_input_batch) {
+						input_batch_begin = steady_clock::now();
+						new_input_batch = false;
+					}
 					handled_message = true;
 				}catch(std::exception const& e) {
 					in_message = nullptr;
@@ -257,8 +268,16 @@ void GameInstance::run(
 							}
 						}
 
+						// Log time spent computing states
+						microseconds const time_spent_in_batch = duration_cast<microseconds>(steady_clock::now() - input_batch_begin);
+						srv_dbg(LOG_DEBUG, "GameInstance: Time spent in input batch: %d us", time_spent_in_batch.count());
+						if (time_spent_in_batch > microseconds(10'000)) {
+							syslog(LOG_WARNING, "GameInstance: Long time spent in input batch: %d us", time_spent_in_batch.count());
+						}
+
 						// Reset variables for this batch of incomming messages
 						impacted_clients = {false, false};
+						new_input_batch = true;
 					}
 				}
 			}
