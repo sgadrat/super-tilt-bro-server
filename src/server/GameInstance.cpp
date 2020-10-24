@@ -198,7 +198,6 @@ void GameInstance::run(
 					// Invalidate gamestate history from message's timestamp
 					//  Note we don't want to keep states after that, even if still valid because of input delay.
 					//  Not keeping it allows to ensure that the last computed gamestate is the one to send in the message (matching delayed frames)
-					//TODO reassess, especially the last line which will be of no interest as we'll be able to compute states at any time point
 					std::map<uint32_t, GameState>::iterator first_invalid_gamestate(gamestate_history.lower_bound(message.timestamp));
 					bool const history_rewrite = first_invalid_gamestate != gamestate_history.end();
 					if (history_rewrite) {
@@ -216,7 +215,7 @@ void GameInstance::run(
 
 					// Compute gamestate at the last input in history (minus delayed frames)
 					{
-						uint32_t const last_input_time = sender_controller_history.rbegin()->first; //TODO compute max from both history (we want to share the timeline)
+						uint32_t const last_input_time = std::max(controller_a_history.rbegin()->first, controller_b_history.rbegin()->first);
 						assert(last_input_time >= INPUT_LAG);
 						uint32_t const current_gamestate_time = last_input_time - INPUT_LAG;
 
@@ -274,8 +273,8 @@ void GameInstance::run(
 			game_info->winner = (clients.at(gamestate_history.rbegin()->second.winner()) == client_a.endpoint ? client_a.id : client_b.id);
 			game_info_queue->push(game_info);
 		}
-	}catch(int/*std::exception const& e*/) {
-		//syslog(LOG_ERR, "GameInstance: game crashed: %s", e.what());
+	}catch(std::exception const& e) {
+		syslog(LOG_ERR, "GameInstance: game crashed: %s", e.what());
 	}
 
 	//TODO Remove clients from routing table (or better, send an event in game_info_queue and let somebody else clean things like the routing table)
