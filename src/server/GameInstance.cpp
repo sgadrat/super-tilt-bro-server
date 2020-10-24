@@ -243,6 +243,7 @@ void GameInstance::run(
 						for (size_t client_index = 0; client_index < clients.size(); ++client_index) {
 							if (impacted_clients[client_index]) {
 								// Get gamestate
+								// TODO messages to sender should use a specific antilag derived only from its ping (full rational: git blame this line)
 								GameState& gamestate = gamestate_history.rbegin()->second;
 								uint32_t const gamestate_time = gamestate_history.rbegin()->first;
 								std::map<uint32_t, GameState::ControllerState>& opponent_controller_history = (client_index == 0 ? controller_b_history : controller_a_history);
