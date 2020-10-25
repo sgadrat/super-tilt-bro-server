@@ -2,6 +2,7 @@
 #include <GameState.hpp>
 
 #include <cassert>
+#include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -88,6 +89,7 @@ int main() {
 	fm2::Movie movie = fm2::parse_file("/tmp/movie.fm2");
 
 	// Play movie input log
+	std::chrono::nanoseconds total(0);
 	GameState gamestate = initial_gamestate();
 	auto b = [](bool v) {return v ? '1' : '_';};
 	for (size_t frame_cnt = 0; frame_cnt < movie.input_log.size(); ++frame_cnt) {
@@ -143,13 +145,19 @@ int main() {
 		controller_state.right_pressed = port1.right;
 		gamestate.setControllerBState(controller_state);
 
+		auto const begin = std::chrono::steady_clock::now();
 		gamestate.tick();
+		auto const end = std::chrono::steady_clock::now();
+		total += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 	}
 
 	// Dump gamestate after the last tick
 	HexDumper serializer;
 	gamestate.serial(serializer);
 	std::cout << '\n';
+
+	// Dump performance info
+	std::cerr << movie.input_log.size() << " ticks in " << (total.count() / 1000) << " us : " << ((total.count()/movie.input_log.size()) / 1000) << " us/tick\n";
 
 	return 0;
 }
