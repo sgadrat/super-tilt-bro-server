@@ -58,6 +58,10 @@ std::pair<uint32_t, GameState> compute_game_state_at(
 	std::map<uint32_t, GameState::ControllerState> const& controller_b_history
 )
 {
+	using std::chrono::duration_cast;
+	using std::chrono::nanoseconds;
+	using std::chrono::steady_clock;
+
 	std::map<uint32_t, GameState>::const_iterator gamestate_history_entry = gamestate_history.upper_bound(target_time);
 	assert(gamestate_history_entry != gamestate_history.begin()); // Upper bound, and gamestate history must not be empty (initial gamestate is here)
 	--gamestate_history_entry;
@@ -66,6 +70,11 @@ std::pair<uint32_t, GameState> compute_game_state_at(
 	uint32_t& gamestate_time = result.first;
 	GameState& gamestate = result.second;
 	bool gameover = false;
+
+#ifdef LOG_FLOOD
+	nanoseconds total_time(0);
+	uint32_t const n_ticks = target_time - gamestate_time;
+#endif
 
 	while (!gameover && gamestate_time < target_time) {
 		// Apply inputs
@@ -80,11 +89,23 @@ std::pair<uint32_t, GameState> compute_game_state_at(
 		}
 
 		// Tick Simulation
+#ifdef LOG_FLOOD
+		steady_clock::time_point const tick_begin = steady_clock::now();
+#endif
 		if (!gamestate.tick()) {
 			gameover = true;
 		}
+#ifdef LOG_FLOOD
+		auto const tick_end = steady_clock::now();
+		total_time += duration_cast<nanoseconds>(tick_end - tick_begin);
+#endif
 		++gamestate_time;
 	}
+
+#ifdef LOG_FLOOD
+	// Dump stats
+	srv_dbg(LOG_INFO, "%u ticks in %lu us : %lu us/tick", n_ticks, total_time.count() / 1000, (total_time.count() / 1000) / n_ticks);
+#endif
 
 	// Apply inputs for the final state
 	std::map<uint32_t, GameState::ControllerState>::const_iterator controller_history_entry(controller_a_history.find(gamestate_time));
