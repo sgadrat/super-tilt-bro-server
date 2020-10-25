@@ -224,6 +224,11 @@ void GameInstance::run(
 						impacted_clients[sender_index] = true;
 					}
 
+					// Avoid computing states if there are other inputs to considere
+					if (!in_messages->empty()) {
+						continue;
+					}
+
 					// Compute gamestate at the last input in history (minus delayed frames)
 					{
 						uint32_t const last_input_time = std::max(controller_a_history.rbegin()->first, controller_b_history.rbegin()->first);
