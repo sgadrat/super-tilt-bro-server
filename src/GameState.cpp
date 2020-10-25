@@ -157,7 +157,7 @@ void GameState::emulatorDump() const {
 		" SP=$" << hex(this->emulator.sp) <<
 		" PC=$" << hex(this->emulator.pc) <<
 		" STATUS=$" << hex(this->emulator.status) <<
-		" bank=$" << hex(this->emulator_context.bank)
+		" bank=$" << hex(uint16_t(this->emulator_context.bank_offset / 0x4000))
 	);
 	for (size_t i = 0; i < this->emulator_context.ram.size(); i += 16) {
 		warn(

@@ -46,7 +46,7 @@ public:
 	struct RunContext {
 		std::array<uint8_t, 0x800> ram;
 		uint8_t const* rom;
-		uint8_t bank;
+		size_t bank_offset;
 		bool gameover;
 	};
 

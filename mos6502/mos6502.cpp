@@ -20,10 +20,14 @@ uint8_t ExternalRead(uint16_t addr, mos6502::RunContext* context) {
 
 	// ROM
 	if (addr >= 0x8000) {
-		uint8_t const bank = (addr >= 0xc000 ? 0x1f : context->bank);
-		size_t const bank_offset_in_rom = bank * 0x4000;
-		uint16_t const addr_in_bank = (addr - 0x8000) % 0x4000;
-		return context->rom[bank_offset_in_rom + addr_in_bank];
+		if (addr >= 0xc000) {
+			uint16_t const addr_in_bank = addr - 0xc000;
+			size_t const bank_offset_in_rom = 0x1f * 0x4000;
+			return context->rom[bank_offset_in_rom + addr_in_bank];
+		}else {
+			uint16_t const addr_in_bank = addr - 0x8000;
+			return context->rom[context->bank_offset + addr_in_bank];
+		}
 	}
 
 	// PPUSTATUS register
@@ -54,7 +58,7 @@ bool ExternalWrite(uint16_t addr, uint8_t value, mos6502::RunContext* context) {
 
 	// Banking register
 	if (addr == rainbow_prg_banking_1) {
-		context->bank = value;
+		context->bank_offset = value * 0x4000;
 		return false;
 	}
 

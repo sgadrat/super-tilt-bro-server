@@ -76,7 +76,7 @@ private:
 	mos6502::RunContext emulator_context = {
 		.ram = {0},
 		.rom = GameState::emulator_rom.data(),
-		.bank = 0,
+		.bank_offset = 0,
 		.gameover = false
 	};
 	mos6502 emulator;
