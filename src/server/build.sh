@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dbg_log_flags=""
+dbg_log_flags="-g -DLOG_FLOOD"
 optim_flags="-O3 -DNDEBUG -flto"
 if [ "x$1" == "xdbg" ]; then
 	dbg_log_flags="-DLOG_FLOOD"
@@ -8,7 +8,7 @@ if [ "x$1" == "xdbg" ]; then
 fi
 
 g++ \
-	-O3 -DNDEBUG -flto -o stb_server $dbg_log_flags \
+	$optim_flags -o stb_server $dbg_log_flags \
 	-I .. -I ../.. \
 	stb_server.cpp \
 	../../mos6502/mos6502.cpp \

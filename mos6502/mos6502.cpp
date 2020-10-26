@@ -51,530 +51,295 @@ bool ExternalWrite(uint16_t addr, uint8_t value, mos6502::RunContext* context) {
 }
 }
 
-mos6502::mos6502()
-{
-	Instr instr;
+mos6502::Instr const mos6502::InstrTable[256] = {
+	// 00
+	/*00*/ {&mos6502::Op_BRK_IMP, 7},
+	/*01*/ {&mos6502::Op_ORA_INX, 6},
+	/*02*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*03*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*04*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*05*/ {&mos6502::Op_ORA_ZER, 3},
+	/*06*/ {&mos6502::Op_ASL_ZER, 5},
+	/*07*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*08*/ {&mos6502::Op_PHP_IMP, 3},
+	/*09*/ {&mos6502::Op_ORA_IMM, 2},
+	/*0a*/ {&mos6502::Op_ASL_ACC_ACC, 2},
+	/*0b*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*0c*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*0d*/ {&mos6502::Op_ORA_ABS, 4},
+	/*0e*/ {&mos6502::Op_ASL_ABS, 6},
+	/*0f*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	// fill jump table with ILLEGALs
-	instr.code = &mos6502::Op_ILLEGAL_IMP;
-	for(int i = 0; i < 256; i++)
-	{
-		InstrTable[i] = instr;
-	}
+	// 10
+	/*10*/ {&mos6502::Op_BPL_REL, 2},
+	/*11*/ {&mos6502::Op_ORA_INY, 5},
+	/*12*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*13*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*14*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*15*/ {&mos6502::Op_ORA_ZEX, 4},
+	/*16*/ {&mos6502::Op_ASL_ZEX, 6},
+	/*17*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*18*/ {&mos6502::Op_CLC_IMP, 2},
+	/*19*/ {&mos6502::Op_ORA_ABY, 4},
+	/*1a*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*1b*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*1c*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*1d*/ {&mos6502::Op_ORA_ABX, 4},
+	/*1e*/ {&mos6502::Op_ASL_ABX, 7},
+	/*1f*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	// insert opcodes
+	// 20
+	/*20*/ {&mos6502::Op_JSR_ABS, 6},
+	/*21*/ {&mos6502::Op_AND_INX, 6},
+	/*22*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*23*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*24*/ {&mos6502::Op_BIT_ZER, 3},
+	/*25*/ {&mos6502::Op_AND_ZER, 3},
+	/*26*/ {&mos6502::Op_ROL_ZER, 5},
+	/*27*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*28*/ {&mos6502::Op_PLP_IMP, 4},
+	/*29*/ {&mos6502::Op_AND_IMM, 2},
+	/*2a*/ {&mos6502::Op_ROL_ACC_ACC, 2},
+	/*2b*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*2c*/ {&mos6502::Op_BIT_ABS, 4},
+	/*2d*/ {&mos6502::Op_AND_ABS, 4},
+	/*2e*/ {&mos6502::Op_ROL_ABS, 6},
+	/*2f*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	instr.code = &mos6502::Op_ADC_IMM;
-	instr.cycles = 2;
-	InstrTable[0x69] = instr;
-	instr.code = &mos6502::Op_ADC_ABS;
-	instr.cycles = 4;
-	InstrTable[0x6D] = instr;
-	instr.code = &mos6502::Op_ADC_ZER;
-	instr.cycles = 3;
-	InstrTable[0x65] = instr;
-	instr.code = &mos6502::Op_ADC_INX;
-	instr.cycles = 6;
-	InstrTable[0x61] = instr;
-	instr.code = &mos6502::Op_ADC_INY;
-	instr.cycles = 6;
-	InstrTable[0x71] = instr;
-	instr.code = &mos6502::Op_ADC_ZEX;
-	instr.cycles = 4;
-	InstrTable[0x75] = instr;
-	instr.code = &mos6502::Op_ADC_ABX;
-	instr.cycles = 4;
-	InstrTable[0x7D] = instr;
-	instr.code = &mos6502::Op_ADC_ABY;
-	instr.cycles = 4;
-	InstrTable[0x79] = instr;
+	// 30
+	/*30*/ {&mos6502::Op_BMI_REL, 2},
+	/*31*/ {&mos6502::Op_AND_INY, 5},
+	/*32*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*33*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*34*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*35*/ {&mos6502::Op_AND_ZEX, 4},
+	/*36*/ {&mos6502::Op_ROL_ZEX, 6},
+	/*37*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*38*/ {&mos6502::Op_SEC_IMP, 2},
+	/*39*/ {&mos6502::Op_AND_ABY, 4},
+	/*3a*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*3b*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*3c*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*3d*/ {&mos6502::Op_AND_ABX, 4},
+	/*3e*/ {&mos6502::Op_ROL_ABX, 7},
+	/*3f*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	instr.code = &mos6502::Op_AND_IMM;
-	instr.cycles = 2;
-	InstrTable[0x29] = instr;
-	instr.code = &mos6502::Op_AND_ABS;
-	instr.cycles = 4;
-	InstrTable[0x2D] = instr;
-	instr.code = &mos6502::Op_AND_ZER;
-	instr.cycles = 3;
-	InstrTable[0x25] = instr;
-	instr.code = &mos6502::Op_AND_INX;
-	instr.cycles = 6;
-	InstrTable[0x21] = instr;
-	instr.code = &mos6502::Op_AND_INY;
-	instr.cycles = 5;
-	InstrTable[0x31] = instr;
-	instr.code = &mos6502::Op_AND_ZEX;
-	instr.cycles = 4;
-	InstrTable[0x35] = instr;
-	instr.code = &mos6502::Op_AND_ABX;
-	instr.cycles = 4;
-	InstrTable[0x3D] = instr;
-	instr.code = &mos6502::Op_AND_ABY;
-	instr.cycles = 4;
-	InstrTable[0x39] = instr;
+	// 40
+	/*40*/ {&mos6502::Op_RTI_IMP, 6},
+	/*41*/ {&mos6502::Op_EOR_INX, 6},
+	/*42*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*43*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*44*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*45*/ {&mos6502::Op_EOR_ZER, 3},
+	/*46*/ {&mos6502::Op_LSR_ZER, 5},
+	/*47*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*48*/ {&mos6502::Op_PHA_IMP, 3},
+	/*49*/ {&mos6502::Op_EOR_IMM, 2},
+	/*4a*/ {&mos6502::Op_LSR_ACC_ACC, 2},
+	/*4b*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*4c*/ {&mos6502::Op_JMP_ABS, 3},
+	/*4d*/ {&mos6502::Op_EOR_ABS, 4},
+	/*4e*/ {&mos6502::Op_LSR_ABS, 6},
+	/*4f*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	instr.code = &mos6502::Op_ASL_ABS;
-	instr.cycles = 6;
-	InstrTable[0x0E] = instr;
-	instr.code = &mos6502::Op_ASL_ZER;
-	instr.cycles = 5;
-	InstrTable[0x06] = instr;
-	instr.code = &mos6502::Op_ASL_ACC_ACC;
-	instr.cycles = 2;
-	InstrTable[0x0A] = instr;
-	instr.code = &mos6502::Op_ASL_ZEX;
-	instr.cycles = 6;
-	InstrTable[0x16] = instr;
-	instr.code = &mos6502::Op_ASL_ABX;
-	instr.cycles = 7;
-	InstrTable[0x1E] = instr;
+	// 50
+	/*50*/ {&mos6502::Op_BVC_REL, 2},
+	/*51*/ {&mos6502::Op_EOR_INY, 5},
+	/*52*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*53*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*54*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*55*/ {&mos6502::Op_EOR_ZEX, 4},
+	/*56*/ {&mos6502::Op_LSR_ZEX, 6},
+	/*57*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*58*/ {&mos6502::Op_CLI_IMP, 2},
+	/*59*/ {&mos6502::Op_EOR_ABY, 4},
+	/*5a*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*5b*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*5c*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*5d*/ {&mos6502::Op_EOR_ABX, 4},
+	/*5e*/ {&mos6502::Op_LSR_ABX, 7},
+	/*5f*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	instr.code = &mos6502::Op_BCC_REL;
-	instr.cycles = 2;
-	InstrTable[0x90] = instr;
+	// 60
+	/*60*/ {&mos6502::Op_RTS_IMP, 6},
+	/*61*/ {&mos6502::Op_ADC_INX, 6},
+	/*62*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*63*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*64*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*65*/ {&mos6502::Op_ADC_ZER, 3},
+	/*66*/ {&mos6502::Op_ROR_ZER, 5},
+	/*67*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*68*/ {&mos6502::Op_PLA_IMP, 4},
+	/*69*/ {&mos6502::Op_ADC_IMM, 2},
+	/*6a*/ {&mos6502::Op_ROR_ACC_ACC, 2},
+	/*6b*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*6c*/ {&mos6502::Op_JMP_ABI, 5},
+	/*6d*/ {&mos6502::Op_ADC_ABS, 4},
+	/*6e*/ {&mos6502::Op_ROR_ABS, 6},
+	/*6f*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	instr.code = &mos6502::Op_BCS_REL;
-	instr.cycles = 2;
-	InstrTable[0xB0] = instr;
+	// 70
+	/*70*/ {&mos6502::Op_BVS_REL, 2},
+	/*71*/ {&mos6502::Op_ADC_INY, 6},
+	/*72*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*73*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*74*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*75*/ {&mos6502::Op_ADC_ZEX, 4},
+	/*76*/ {&mos6502::Op_ROR_ZEX, 6},
+	/*77*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*78*/ {&mos6502::Op_SEI_IMP, 2},
+	/*79*/ {&mos6502::Op_ADC_ABY, 4},
+	/*7a*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*7b*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*7c*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*7d*/ {&mos6502::Op_ADC_ABX, 4},
+	/*7e*/ {&mos6502::Op_ROR_ABX, 7},
+	/*7f*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	instr.code = &mos6502::Op_BEQ_REL;
-	instr.cycles = 2;
-	InstrTable[0xF0] = instr;
+	// 80
+	/*80*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*81*/ {&mos6502::Op_STA_INX, 6},
+	/*82*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*83*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*84*/ {&mos6502::Op_STY_ZER, 3},
+	/*85*/ {&mos6502::Op_STA_ZER, 3},
+	/*86*/ {&mos6502::Op_STX_ZER, 3},
+	/*87*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*88*/ {&mos6502::Op_DEY_IMP, 2},
+	/*89*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*8a*/ {&mos6502::Op_TXA_IMP, 2},
+	/*8b*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*8c*/ {&mos6502::Op_STY_ABS, 4},
+	/*8d*/ {&mos6502::Op_STA_ABS, 4},
+	/*8e*/ {&mos6502::Op_STX_ABS, 4},
+	/*8f*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	instr.code = &mos6502::Op_BIT_ABS;
-	instr.cycles = 4;
-	InstrTable[0x2C] = instr;
-	instr.code = &mos6502::Op_BIT_ZER;
-	instr.cycles = 3;
-	InstrTable[0x24] = instr;
+	// 90
+	/*90*/ {&mos6502::Op_BCC_REL, 2},
+	/*91*/ {&mos6502::Op_STA_INY, 6},
+	/*92*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*93*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*94*/ {&mos6502::Op_STY_ZEX, 4},
+	/*95*/ {&mos6502::Op_STA_ZEX, 4},
+	/*96*/ {&mos6502::Op_STX_ZEY, 4},
+	/*97*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*98*/ {&mos6502::Op_TYA_IMP, 2},
+	/*99*/ {&mos6502::Op_STA_ABY, 5},
+	/*9a*/ {&mos6502::Op_TXS_IMP, 2},
+	/*9b*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*9c*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*9d*/ {&mos6502::Op_STA_ABX, 5},
+	/*9e*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*9f*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	instr.code = &mos6502::Op_BMI_REL;
-	instr.cycles = 2;
-	InstrTable[0x30] = instr;
+	// a0
+	/*a0*/ {&mos6502::Op_LDY_IMM, 2},
+	/*a1*/ {&mos6502::Op_LDA_INX, 6},
+	/*a2*/ {&mos6502::Op_LDX_IMM, 2},
+	/*a3*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*a4*/ {&mos6502::Op_LDY_ZER, 3},
+	/*a5*/ {&mos6502::Op_LDA_ZER, 3},
+	/*a6*/ {&mos6502::Op_LDX_ZER, 3},
+	/*a7*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*a8*/ {&mos6502::Op_TAY_IMP, 2},
+	/*a9*/ {&mos6502::Op_LDA_IMM, 2},
+	/*aa*/ {&mos6502::Op_TAX_IMP, 2},
+	/*ab*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*ac*/ {&mos6502::Op_LDY_ABS, 4},
+	/*ad*/ {&mos6502::Op_LDA_ABS, 4},
+	/*ae*/ {&mos6502::Op_LDX_ABS, 4},
+	/*af*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	instr.code = &mos6502::Op_BNE_REL;
-	instr.cycles = 2;
-	InstrTable[0xD0] = instr;
+	// b0
+	/*b0*/ {&mos6502::Op_BCS_REL, 2},
+	/*b1*/ {&mos6502::Op_LDA_INY, 5},
+	/*b2*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*b3*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*b4*/ {&mos6502::Op_LDY_ZEX, 4},
+	/*b5*/ {&mos6502::Op_LDA_ZEX, 4},
+	/*b6*/ {&mos6502::Op_LDX_ZEY, 4},
+	/*b7*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*b8*/ {&mos6502::Op_CLV_IMP, 2},
+	/*b9*/ {&mos6502::Op_LDA_ABY, 4},
+	/*ba*/ {&mos6502::Op_TSX_IMP, 2},
+	/*bb*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*bc*/ {&mos6502::Op_LDY_ABX, 4},
+	/*bd*/ {&mos6502::Op_LDA_ABX, 4},
+	/*be*/ {&mos6502::Op_LDX_ABY, 4},
+	/*bf*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	instr.code = &mos6502::Op_BPL_REL;
-	instr.cycles = 2;
-	InstrTable[0x10] = instr;
+	// c0
+	/*c0*/ {&mos6502::Op_CPY_IMM, 2},
+	/*c1*/ {&mos6502::Op_CMP_INX, 6},
+	/*c2*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*c3*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*c4*/ {&mos6502::Op_CPY_ZER, 3},
+	/*c5*/ {&mos6502::Op_CMP_ZER, 3},
+	/*c6*/ {&mos6502::Op_DEC_ZER, 5},
+	/*c7*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*c8*/ {&mos6502::Op_INY_IMP, 2},
+	/*c9*/ {&mos6502::Op_CMP_IMM, 2},
+	/*ca*/ {&mos6502::Op_DEX_IMP, 2},
+	/*cb*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*cc*/ {&mos6502::Op_CPY_ABS, 4},
+	/*cd*/ {&mos6502::Op_CMP_ABS, 4},
+	/*ce*/ {&mos6502::Op_DEC_ABS, 6},
+	/*cf*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	instr.code = &mos6502::Op_BRK_IMP;
-	instr.cycles = 7;
-	InstrTable[0x00] = instr;
+	// d0
+	/*d0*/ {&mos6502::Op_BNE_REL, 2},
+	/*d1*/ {&mos6502::Op_CMP_INY, 3},
+	/*d2*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*d3*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*d4*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*d5*/ {&mos6502::Op_CMP_ZEX, 4},
+	/*d6*/ {&mos6502::Op_DEC_ZEX, 6},
+	/*d7*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*d8*/ {&mos6502::Op_CLD_IMP, 2},
+	/*d9*/ {&mos6502::Op_CMP_ABY, 4},
+	/*da*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*db*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*dc*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*dd*/ {&mos6502::Op_CMP_ABX, 4},
+	/*de*/ {&mos6502::Op_DEC_ABX, 7},
+	/*df*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	instr.code = &mos6502::Op_BVC_REL;
-	instr.cycles = 2;
-	InstrTable[0x50] = instr;
+	// e0
+	/*e0*/ {&mos6502::Op_CPX_IMM, 2},
+	/*e1*/ {&mos6502::Op_SBC_INX, 6},
+	/*e2*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*e3*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*e4*/ {&mos6502::Op_CPX_ZER, 3},
+	/*e5*/ {&mos6502::Op_SBC_ZER, 3},
+	/*e6*/ {&mos6502::Op_INC_ZER, 5},
+	/*e7*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*e8*/ {&mos6502::Op_INX_IMP, 2},
+	/*e9*/ {&mos6502::Op_SBC_IMM, 2},
+	/*ea*/ {&mos6502::Op_NOP_IMP, 2},
+	/*eb*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*ec*/ {&mos6502::Op_CPX_ABS, 4},
+	/*ed*/ {&mos6502::Op_SBC_ABS, 4},
+	/*ee*/ {&mos6502::Op_INC_ABS, 6},
+	/*ef*/ {&mos6502::Op_ILLEGAL_IMP, 0},
 
-	instr.code = &mos6502::Op_BVS_REL;
-	instr.cycles = 2;
-	InstrTable[0x70] = instr;
-
-	instr.code = &mos6502::Op_CLC_IMP;
-	instr.cycles = 2;
-	InstrTable[0x18] = instr;
-
-	instr.code = &mos6502::Op_CLD_IMP;
-	instr.cycles = 2;
-	InstrTable[0xD8] = instr;
-
-	instr.code = &mos6502::Op_CLI_IMP;
-	instr.cycles = 2;
-	InstrTable[0x58] = instr;
-
-	instr.code = &mos6502::Op_CLV_IMP;
-	instr.cycles = 2;
-	InstrTable[0xB8] = instr;
-
-	instr.code = &mos6502::Op_CMP_IMM;
-	instr.cycles = 2;
-	InstrTable[0xC9] = instr;
-	instr.code = &mos6502::Op_CMP_ABS;
-	instr.cycles = 4;
-	InstrTable[0xCD] = instr;
-	instr.code = &mos6502::Op_CMP_ZER;
-	instr.cycles = 3;
-	InstrTable[0xC5] = instr;
-	instr.code = &mos6502::Op_CMP_INX;
-	instr.cycles = 6;
-	InstrTable[0xC1] = instr;
-	instr.code = &mos6502::Op_CMP_INY;
-	instr.cycles = 3;
-	InstrTable[0xD1] = instr;
-	instr.code = &mos6502::Op_CMP_ZEX;
-	instr.cycles = 4;
-	InstrTable[0xD5] = instr;
-	instr.code = &mos6502::Op_CMP_ABX;
-	instr.cycles = 4;
-	InstrTable[0xDD] = instr;
-	instr.code = &mos6502::Op_CMP_ABY;
-	instr.cycles = 4;
-	InstrTable[0xD9] = instr;
-
-	instr.code = &mos6502::Op_CPX_IMM;
-	instr.cycles = 2;
-	InstrTable[0xE0] = instr;
-	instr.code = &mos6502::Op_CPX_ABS;
-	instr.cycles = 4;
-	InstrTable[0xEC] = instr;
-	instr.code = &mos6502::Op_CPX_ZER;
-	instr.cycles = 3;
-	InstrTable[0xE4] = instr;
-
-	instr.code = &mos6502::Op_CPY_IMM;
-	instr.cycles = 2;
-	InstrTable[0xC0] = instr;
-	instr.code = &mos6502::Op_CPY_ABS;
-	instr.cycles = 4;
-	InstrTable[0xCC] = instr;
-	instr.code = &mos6502::Op_CPY_ZER;
-	instr.cycles = 3;
-	InstrTable[0xC4] = instr;
-
-	instr.code = &mos6502::Op_DEC_ABS;
-	instr.cycles = 6;
-	InstrTable[0xCE] = instr;
-	instr.code = &mos6502::Op_DEC_ZER;
-	instr.cycles = 5;
-	InstrTable[0xC6] = instr;
-	instr.code = &mos6502::Op_DEC_ZEX;
-	instr.cycles = 6;
-	InstrTable[0xD6] = instr;
-	instr.code = &mos6502::Op_DEC_ABX;
-	instr.cycles = 7;
-	InstrTable[0xDE] = instr;
-
-	instr.code = &mos6502::Op_DEX_IMP;
-	instr.cycles = 2;
-	InstrTable[0xCA] = instr;
-
-	instr.code = &mos6502::Op_DEY_IMP;
-	instr.cycles = 2;
-	InstrTable[0x88] = instr;
-
-	instr.code = &mos6502::Op_EOR_IMM;
-	instr.cycles = 2;
-	InstrTable[0x49] = instr;
-	instr.code = &mos6502::Op_EOR_ABS;
-	instr.cycles = 4;
-	InstrTable[0x4D] = instr;
-	instr.code = &mos6502::Op_EOR_ZER;
-	instr.cycles = 3;
-	InstrTable[0x45] = instr;
-	instr.code = &mos6502::Op_EOR_INX;
-	instr.cycles = 6;
-	InstrTable[0x41] = instr;
-	instr.code = &mos6502::Op_EOR_INY;
-	instr.cycles = 5;
-	InstrTable[0x51] = instr;
-	instr.code = &mos6502::Op_EOR_ZEX;
-	instr.cycles = 4;
-	InstrTable[0x55] = instr;
-	instr.code = &mos6502::Op_EOR_ABX;
-	instr.cycles = 4;
-	InstrTable[0x5D] = instr;
-	instr.code = &mos6502::Op_EOR_ABY;
-	instr.cycles = 4;
-	InstrTable[0x59] = instr;
-
-	instr.code = &mos6502::Op_INC_ABS;
-	instr.cycles = 6;
-	InstrTable[0xEE] = instr;
-	instr.code = &mos6502::Op_INC_ZER;
-	instr.cycles = 5;
-	InstrTable[0xE6] = instr;
-	instr.code = &mos6502::Op_INC_ZEX;
-	instr.cycles = 6;
-	InstrTable[0xF6] = instr;
-	instr.code = &mos6502::Op_INC_ABX;
-	instr.cycles = 7;
-	InstrTable[0xFE] = instr;
-
-	instr.code = &mos6502::Op_INX_IMP;
-	instr.cycles = 2;
-	InstrTable[0xE8] = instr;
-
-	instr.code = &mos6502::Op_INY_IMP;
-	instr.cycles = 2;
-	InstrTable[0xC8] = instr;
-
-	instr.code = &mos6502::Op_JMP_ABS;
-	instr.cycles = 3;
-	InstrTable[0x4C] = instr;
-	instr.code = &mos6502::Op_JMP_ABI;
-	instr.cycles = 5;
-	InstrTable[0x6C] = instr;
-
-	instr.code = &mos6502::Op_JSR_ABS;
-	instr.cycles = 6;
-	InstrTable[0x20] = instr;
-
-	instr.code = &mos6502::Op_LDA_IMM;
-	instr.cycles = 2;
-	InstrTable[0xA9] = instr;
-	instr.code = &mos6502::Op_LDA_ABS;
-	instr.cycles = 4;
-	InstrTable[0xAD] = instr;
-	instr.code = &mos6502::Op_LDA_ZER;
-	instr.cycles = 3;
-	InstrTable[0xA5] = instr;
-	instr.code = &mos6502::Op_LDA_INX;
-	instr.cycles = 6;
-	InstrTable[0xA1] = instr;
-	instr.code = &mos6502::Op_LDA_INY;
-	instr.cycles = 5;
-	InstrTable[0xB1] = instr;
-	instr.code = &mos6502::Op_LDA_ZEX;
-	instr.cycles = 4;
-	InstrTable[0xB5] = instr;
-	instr.code = &mos6502::Op_LDA_ABX;
-	instr.cycles = 4;
-	InstrTable[0xBD] = instr;
-	instr.code = &mos6502::Op_LDA_ABY;
-	instr.cycles = 4;
-	InstrTable[0xB9] = instr;
-
-	instr.code = &mos6502::Op_LDX_IMM;
-	instr.cycles = 2;
-	InstrTable[0xA2] = instr;
-	instr.code = &mos6502::Op_LDX_ABS;
-	instr.cycles = 4;
-	InstrTable[0xAE] = instr;
-	instr.code = &mos6502::Op_LDX_ZER;
-	instr.cycles = 3;
-	InstrTable[0xA6] = instr;
-	instr.code = &mos6502::Op_LDX_ABY;
-	instr.cycles = 4;
-	InstrTable[0xBE] = instr;
-	instr.code = &mos6502::Op_LDX_ZEY;
-	instr.cycles = 4;
-	InstrTable[0xB6] = instr;
-
-	instr.code = &mos6502::Op_LDY_IMM;
-	instr.cycles = 2;
-	InstrTable[0xA0] = instr;
-	instr.code = &mos6502::Op_LDY_ABS;
-	instr.cycles = 4;
-	InstrTable[0xAC] = instr;
-	instr.code = &mos6502::Op_LDY_ZER;
-	instr.cycles = 3;
-	InstrTable[0xA4] = instr;
-	instr.code = &mos6502::Op_LDY_ZEX;
-	instr.cycles = 4;
-	InstrTable[0xB4] = instr;
-	instr.code = &mos6502::Op_LDY_ABX;
-	instr.cycles = 4;
-	InstrTable[0xBC] = instr;
-
-	instr.code = &mos6502::Op_LSR_ABS;
-	instr.cycles = 6;
-	InstrTable[0x4E] = instr;
-	instr.code = &mos6502::Op_LSR_ZER;
-	instr.cycles = 5;
-	InstrTable[0x46] = instr;
-	instr.code = &mos6502::Op_LSR_ACC_ACC;
-	instr.cycles = 2;
-	InstrTable[0x4A] = instr;
-	instr.code = &mos6502::Op_LSR_ZEX;
-	instr.cycles = 6;
-	InstrTable[0x56] = instr;
-	instr.code = &mos6502::Op_LSR_ABX;
-	instr.cycles = 7;
-	InstrTable[0x5E] = instr;
-
-	instr.code = &mos6502::Op_NOP_IMP;
-	instr.cycles = 2;
-	InstrTable[0xEA] = instr;
-
-	instr.code = &mos6502::Op_ORA_IMM;
-	instr.cycles = 2;
-	InstrTable[0x09] = instr;
-	instr.code = &mos6502::Op_ORA_ABS;
-	instr.cycles = 4;
-	InstrTable[0x0D] = instr;
-	instr.code = &mos6502::Op_ORA_ZER;
-	instr.cycles = 3;
-	InstrTable[0x05] = instr;
-	instr.code = &mos6502::Op_ORA_INX;
-	instr.cycles = 6;
-	InstrTable[0x01] = instr;
-	instr.code = &mos6502::Op_ORA_INY;
-	instr.cycles = 5;
-	InstrTable[0x11] = instr;
-	instr.code = &mos6502::Op_ORA_ZEX;
-	instr.cycles = 4;
-	InstrTable[0x15] = instr;
-	instr.code = &mos6502::Op_ORA_ABX;
-	instr.cycles = 4;
-	InstrTable[0x1D] = instr;
-	instr.code = &mos6502::Op_ORA_ABY;
-	instr.cycles = 4;
-	InstrTable[0x19] = instr;
-
-	instr.code = &mos6502::Op_PHA_IMP;
-	instr.cycles = 3;
-	InstrTable[0x48] = instr;
-
-	instr.code = &mos6502::Op_PHP_IMP;
-	instr.cycles = 3;
-	InstrTable[0x08] = instr;
-
-	instr.code = &mos6502::Op_PLA_IMP;
-	instr.cycles = 4;
-	InstrTable[0x68] = instr;
-
-	instr.code = &mos6502::Op_PLP_IMP;
-	instr.cycles = 4;
-	InstrTable[0x28] = instr;
-
-	instr.code = &mos6502::Op_ROL_ABS;
-	instr.cycles = 6;
-	InstrTable[0x2E] = instr;
-	instr.code = &mos6502::Op_ROL_ZER;
-	instr.cycles = 5;
-	InstrTable[0x26] = instr;
-	instr.code = &mos6502::Op_ROL_ACC_ACC;
-	instr.cycles = 2;
-	InstrTable[0x2A] = instr;
-	instr.code = &mos6502::Op_ROL_ZEX;
-	instr.cycles = 6;
-	InstrTable[0x36] = instr;
-	instr.code = &mos6502::Op_ROL_ABX;
-	instr.cycles = 7;
-	InstrTable[0x3E] = instr;
-
-	instr.code = &mos6502::Op_ROR_ABS;
-	instr.cycles = 6;
-	InstrTable[0x6E] = instr;
-	instr.code = &mos6502::Op_ROR_ZER;
-	instr.cycles = 5;
-	InstrTable[0x66] = instr;
-	instr.code = &mos6502::Op_ROR_ACC_ACC;
-	instr.cycles = 2;
-	InstrTable[0x6A] = instr;
-	instr.code = &mos6502::Op_ROR_ZEX;
-	instr.cycles = 6;
-	InstrTable[0x76] = instr;
-	instr.code = &mos6502::Op_ROR_ABX;
-	instr.cycles = 7;
-	InstrTable[0x7E] = instr;
-
-	instr.code = &mos6502::Op_RTI_IMP;
-	instr.cycles = 6;
-	InstrTable[0x40] = instr;
-
-	instr.code = &mos6502::Op_RTS_IMP;
-	instr.cycles = 6;
-	InstrTable[0x60] = instr;
-
-	instr.code = &mos6502::Op_SBC_IMM;
-	instr.cycles = 2;
-	InstrTable[0xE9] = instr;
-	instr.code = &mos6502::Op_SBC_ABS;
-	instr.cycles = 4;
-	InstrTable[0xED] = instr;
-	instr.code = &mos6502::Op_SBC_ZER;
-	instr.cycles = 3;
-	InstrTable[0xE5] = instr;
-	instr.code = &mos6502::Op_SBC_INX;
-	instr.cycles = 6;
-	InstrTable[0xE1] = instr;
-	instr.code = &mos6502::Op_SBC_INY;
-	instr.cycles = 5;
-	InstrTable[0xF1] = instr;
-	instr.code = &mos6502::Op_SBC_ZEX;
-	instr.cycles = 4;
-	InstrTable[0xF5] = instr;
-	instr.code = &mos6502::Op_SBC_ABX;
-	instr.cycles = 4;
-	InstrTable[0xFD] = instr;
-	instr.code = &mos6502::Op_SBC_ABY;
-	instr.cycles = 4;
-	InstrTable[0xF9] = instr;
-
-	instr.code = &mos6502::Op_SEC_IMP;
-	instr.cycles = 2;
-	InstrTable[0x38] = instr;
-
-	instr.code = &mos6502::Op_SED_IMP;
-	instr.cycles = 2;
-	InstrTable[0xF8] = instr;
-
-	instr.code = &mos6502::Op_SEI_IMP;
-	instr.cycles = 2;
-	InstrTable[0x78] = instr;
-
-	instr.code = &mos6502::Op_STA_ABS;
-	instr.cycles = 4;
-	InstrTable[0x8D] = instr;
-	instr.code = &mos6502::Op_STA_ZER;
-	instr.cycles = 3;
-	InstrTable[0x85] = instr;
-	instr.code = &mos6502::Op_STA_INX;
-	instr.cycles = 6;
-	InstrTable[0x81] = instr;
-	instr.code = &mos6502::Op_STA_INY;
-	instr.cycles = 6;
-	InstrTable[0x91] = instr;
-	instr.code = &mos6502::Op_STA_ZEX;
-	instr.cycles = 4;
-	InstrTable[0x95] = instr;
-	instr.code = &mos6502::Op_STA_ABX;
-	instr.cycles = 5;
-	InstrTable[0x9D] = instr;
-	instr.code = &mos6502::Op_STA_ABY;
-	instr.cycles = 5;
-	InstrTable[0x99] = instr;
-
-	instr.code = &mos6502::Op_STX_ABS;
-	instr.cycles = 4;
-	InstrTable[0x8E] = instr;
-	instr.code = &mos6502::Op_STX_ZER;
-	instr.cycles = 3;
-	InstrTable[0x86] = instr;
-	instr.code = &mos6502::Op_STX_ZEY;
-	instr.cycles = 4;
-	InstrTable[0x96] = instr;
-
-	instr.code = &mos6502::Op_STY_ABS;
-	instr.cycles = 4;
-	InstrTable[0x8C] = instr;
-	instr.code = &mos6502::Op_STY_ZER;
-	instr.cycles = 3;
-	InstrTable[0x84] = instr;
-	instr.code = &mos6502::Op_STY_ZEX;
-	instr.cycles = 4;
-	InstrTable[0x94] = instr;
-
-	instr.code = &mos6502::Op_TAX_IMP;
-	instr.cycles = 2;
-	InstrTable[0xAA] = instr;
-
-	instr.code = &mos6502::Op_TAY_IMP;
-	instr.cycles = 2;
-	InstrTable[0xA8] = instr;
-
-	instr.code = &mos6502::Op_TSX_IMP;
-	instr.cycles = 2;
-	InstrTable[0xBA] = instr;
-
-	instr.code = &mos6502::Op_TXA_IMP;
-	instr.cycles = 2;
-	InstrTable[0x8A] = instr;
-
-	instr.code = &mos6502::Op_TXS_IMP;
-	instr.cycles = 2;
-	InstrTable[0x9A] = instr;
-
-	instr.code = &mos6502::Op_TYA_IMP;
-	instr.cycles = 2;
-	InstrTable[0x98] = instr;
-
-	return;
-}
+	// f0
+	/*f0*/ {&mos6502::Op_BEQ_REL, 2},
+	/*f1*/ {&mos6502::Op_SBC_INY, 5},
+	/*f2*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*f3*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*f4*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*f5*/ {&mos6502::Op_SBC_ZEX, 4},
+	/*f6*/ {&mos6502::Op_INC_ZEX, 6},
+	/*f7*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*f8*/ {&mos6502::Op_SED_IMP, 2},
+	/*f9*/ {&mos6502::Op_SBC_ABY, 4},
+	/*fa*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*fb*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*fc*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+	/*fd*/ {&mos6502::Op_SBC_ABX, 4},
+	/*fe*/ {&mos6502::Op_INC_ABX, 7},
+	/*ff*/ {&mos6502::Op_ILLEGAL_IMP, 0},
+};
 
 uint16_t mos6502::Addr_ACC()
 {

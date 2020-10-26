@@ -83,7 +83,7 @@ private:
 		uint8_t cycles;
 	};
 
-	Instr InstrTable[256];
+	static Instr const InstrTable[256];
 
 	void Exec(Instr i);
 
@@ -340,7 +340,6 @@ public:
 		INST_COUNT,
 		CYCLE_COUNT,
 	};
-	mos6502();
 	void NMI();
 	void IRQ();
 	void Reset(RunContext* context);
