@@ -12,40 +12,21 @@ uint16_t const stop_trigger_addr = 0xffff;
 uint16_t const nes_register_ppustatus = 0x2002;
 
 uint8_t ExternalRead(uint16_t addr, mos6502::RunContext* context) {
-	// RAM
-	if (addr < 0x2000) {
-		addr = addr % 0x0800;
-		return context->ram[addr];
+#ifndef NDEBUG
+	if (addr >= 0x800 && addr < 2000) {
+		throw std::runtime_error("access to RAM mirrors");
 	}
-
-	// ROM
-	if (addr >= 0x8000) {
-		if (addr >= 0xc000) {
-			uint16_t const addr_in_bank = addr - 0xc000;
-			size_t const bank_offset_in_rom = 0x1f * 0x4000;
-			return context->rom[bank_offset_in_rom + addr_in_bank];
-		}else {
-			uint16_t const addr_in_bank = addr - 0x8000;
-			return context->rom[context->bank_offset + addr_in_bank];
-		}
-	}
-
-	// PPUSTATUS register
-	if (addr == nes_register_ppustatus) {
-		return 0x80; // Always set VBI flag, so waits for VBI are immediate
-	}
-
-	// Other
-	//  Warning, the default value must not trigger the netcode. If complexe,
-	//  special registers should be handled before default value is returned.
-	return 0;
+#endif
+	uint16_t const memory_segment = addr / 0x2000;
+	uint16_t const segment_addr = addr % 0x2000;
+	return context->memory_segments[memory_segment][segment_addr];
 }
 
 bool ExternalWrite(uint16_t addr, uint8_t value, mos6502::RunContext* context) {
 	// RAM
 	if (addr < 0x2000) {
 		addr = addr % 0x0800;
-		context->ram[addr] = value;
+		context->memory_segments[0][addr] = value;
 
 		// Stop emulation on gameover (and note that the game is over)
 		if (addr == global_game_state) {
@@ -58,7 +39,10 @@ bool ExternalWrite(uint16_t addr, uint8_t value, mos6502::RunContext* context) {
 
 	// Banking register
 	if (addr == rainbow_prg_banking_1) {
-		context->bank_offset = value * 0x4000;
+		uint8_t* const rom_begin = context->memory_segments[6] - (0x1f * 0x4000); // segment 6 is fixed bank begining, which is bank 0x1f
+		uint8_t* const bank_begin = rom_begin + value * 0x4000;
+		context->memory_segments[4] = bank_begin;
+		context->memory_segments[5] = bank_begin + 0x2000;
 		return false;
 	}
 

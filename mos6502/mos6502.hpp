@@ -44,9 +44,7 @@ class mos6502
 {
 public:
 	struct RunContext {
-		std::array<uint8_t, 0x800> ram;
-		uint8_t const* rom;
-		size_t bank_offset;
+		std::array<uint8_t*, 8> memory_segments;
 		bool gameover;
 	};
 

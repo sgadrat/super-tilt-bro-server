@@ -149,6 +149,8 @@ int main() {
 		gamestate.tick();
 		auto const end = std::chrono::steady_clock::now();
 		total += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+		// gnuplot -e 'plot "cerr_output_file"' --persist
+		std::cerr << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << '\n';
 	}
 
 	// Dump gamestate after the last tick

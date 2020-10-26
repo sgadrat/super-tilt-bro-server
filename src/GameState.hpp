@@ -72,11 +72,27 @@ private:
 	void emulatorDump() const;
 
 private:
-	static std::array<uint8_t, 0x80000> const emulator_rom;
+	static std::array<uint8_t, 0x80000> /*const*/ emulator_rom;
+	static std::array<uint8_t, 0x2000> /*const*/ emulator_registers;
+	std::array<uint8_t, 0x800> emulator_ram;
 	mos6502::RunContext emulator_context = {
-		.ram = {0},
-		.rom = GameState::emulator_rom.data(),
-		.bank_offset = 0,
+		.memory_segments = {
+			// RAM
+			nullptr,
+
+			// Various registers
+			GameState::emulator_registers.data(),
+			GameState::emulator_registers.data(),
+			GameState::emulator_registers.data(),
+
+			// Swappable bank
+			GameState::emulator_rom.data(),
+			GameState::emulator_rom.data() + 0x2000,
+
+			// Fixed bank
+			GameState::emulator_rom.data() + 0x1f * 0x4000,
+			GameState::emulator_rom.data() + 0x1f * 0x4000 + 0x2000,
+		},
 		.gameover = false
 	};
 	mos6502 emulator;
@@ -91,22 +107,22 @@ template <typename SerializationHandler>
 void GameState::serial(SerializationHandler& s) {
 	// Copy gamestate
 	for (size_t i = 0; i < 0x4f; ++i) {
-		s.uint8(this->emulator_context.ram[i]);
+		s.uint8(this->emulator_ram[i]);
 	}
 
 	// Copy hitboxes MSB
 	for (size_t i = 0; i < 0x10; ++i) {
-		s.uint8(this->emulator_context.ram[player_a_hurtbox_left_msb + i]);
+		s.uint8(this->emulator_ram[player_a_hurtbox_left_msb + i]);
 	}
 
 	// Copy special state
-	s.uint8(this->emulator_context.ram[screen_shake_counter]);
+	s.uint8(this->emulator_ram[screen_shake_counter]);
 
 	// Copy controllers state
-	s.uint8(this->emulator_context.ram[controller_a_btns]);
-	s.uint8(this->emulator_context.ram[controller_b_btns]);
-	s.uint8(this->emulator_context.ram[controller_a_last_frame_btns]);
-	s.uint8(this->emulator_context.ram[controller_b_last_frame_btns]);
+	s.uint8(this->emulator_ram[controller_a_btns]);
+	s.uint8(this->emulator_ram[controller_b_btns]);
+	s.uint8(this->emulator_ram[controller_a_last_frame_btns]);
+	s.uint8(this->emulator_ram[controller_b_last_frame_btns]);
 
 	// Copy actually pressed opponent btns (keep_input_dirty may mess with normal values, but not this one)
 	s.flags8({
@@ -132,6 +148,6 @@ void GameState::serial(SerializationHandler& s) {
 
 	// Copy animation states
 	for (size_t i = 0; i < 12*2; ++i) {
-		s.uint8(this->emulator_context.ram[player_a_animation + i]);
+		s.uint8(this->emulator_ram[player_a_animation + i]);
 	}
 }
