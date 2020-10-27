@@ -18,6 +18,11 @@
  * and server.
  */
 
+#define PERF_CYCLES 0
+#define PERF_TIME 1
+
+#define PERF_UNITS PERF_TIME
+
 class HexDumper {
 public:
 	void uint8(uint8_t& v) {
@@ -84,12 +89,51 @@ GameState initial_gamestate() {
 	return GameState(0, [](std::string const & m) {std::cerr << m << '\n';});
 }
 
+#if PERF_UNITS == PERF_TIME
+std::chrono::nanoseconds perf_total;
+std::chrono::steady_clock::time_point perf_measure_begin;
+static void perf_reset() {
+	perf_total = std::chrono::nanoseconds(0);
+}
+static void perf_begin() {
+	perf_measure_begin = std::chrono::steady_clock::now();
+}
+static void perf_end() {
+	auto const tick_time = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - perf_measure_begin);
+	perf_total += tick_time;
+	// gnuplot -e 'plot "cerr_output_file"' --persist
+	std::cerr << tick_time.count() << '\n';
+}
+static void perf_summary(size_t n_ticks) {
+	std::cerr << n_ticks << " ticks in " << (perf_total.count() / 1000) << " us : " << ((perf_total.count()/n_ticks) / 1000) << " us/tick\n";
+}
+#else
+#include <x86intrin.h>
+uint64_t perf_total;
+uint64_t perf_measure_begin;
+static void perf_reset() {
+	perf_total = 0;
+}
+static void perf_begin() {
+	perf_measure_begin = __rdtsc();
+}
+static void perf_end() {
+	auto const tick_time =  __rdtsc()- perf_measure_begin;
+	perf_total += tick_time;
+	// gnuplot -e 'plot "cerr_output_file"' --persist
+	std::cerr << tick_time << '\n';
+}
+static void perf_summary(size_t n_ticks) {
+	std::cerr << n_ticks << " ticks in " << perf_total << " cycles : " << (perf_total / n_ticks) << " cycles/tick\n";
+}
+#endif
+
 int main() {
 	// Parse the movie
 	fm2::Movie movie = fm2::parse_file("/tmp/movie.fm2");
 
 	// Play movie input log
-	std::chrono::nanoseconds total(0);
+	perf_reset();
 	GameState gamestate = initial_gamestate();
 	auto b = [](bool v) {return v ? '1' : '_';};
 	for (size_t frame_cnt = 0; frame_cnt < movie.input_log.size(); ++frame_cnt) {
@@ -145,12 +189,9 @@ int main() {
 		controller_state.right_pressed = port1.right;
 		gamestate.setControllerBState(controller_state);
 
-		auto const begin = std::chrono::steady_clock::now();
+		perf_begin();
 		gamestate.tick();
-		auto const end = std::chrono::steady_clock::now();
-		total += std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-		// gnuplot -e 'plot "cerr_output_file"' --persist
-		std::cerr << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << '\n';
+		perf_end();
 	}
 
 	// Dump gamestate after the last tick
@@ -159,7 +200,7 @@ int main() {
 	std::cout << '\n';
 
 	// Dump performance info
-	std::cerr << movie.input_log.size() << " ticks in " << (total.count() / 1000) << " us : " << ((total.count()/movie.input_log.size()) / 1000) << " us/tick\n";
+	perf_summary(movie.input_log.size());
 
 	return 0;
 }
