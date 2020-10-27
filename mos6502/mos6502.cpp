@@ -1400,7 +1400,7 @@ void mos6502::Run(
 
 	stopped = false;
 	illegalOpcode = false;
-	while(!stopped && cyclesRemaining > 0 && !illegalOpcode)
+	while(!stopped && cyclesRemaining >= 0)
 	{
 		// fetch
 		opcode = Read(pc++);
@@ -1425,6 +1425,7 @@ void mos6502::Exec(Instr i)
 void mos6502::Op_ILLEGAL(uint16_t src)
 {
 	illegalOpcode = true;
+	stopped = true;
 }
 
 void mos6502::Op_ADC(uint16_t src)

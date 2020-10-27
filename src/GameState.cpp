@@ -95,7 +95,7 @@ GameState::GameState(uint8_t stage, GameState::LoggerCallback logger)
 	);
 
 	// Handle emulation errors
-	if (!this->emulator.stopped) {
+	if (!this->emulator.stopped || this->emulator.illegalOpcode) {
 		throw std::runtime_error("init routine failed");
 	}
 }
@@ -127,12 +127,12 @@ bool GameState::tick() {
 	);
 
 	// Handle emulation errors
-	if (!this->emulator.stopped) {
-		if (this->emulator.illegalOpcode) {
-			warn("emulation encountered illegal opcode");
-		}else {
-			warn("emulation hit its time limit");
-		}
+	if (this->emulator.illegalOpcode) {
+		warn("emulation encountered illegal opcode");
+		this->emulatorDump();
+		return false;
+	}else if (!this->emulator.stopped) {
+		warn("emulation hit its time limit");
 		this->emulatorDump();
 		return false;
 	}
