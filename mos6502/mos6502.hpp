@@ -46,6 +46,9 @@ public:
 	struct RunContext {
 		std::array<uint8_t*, 8> memory_segments;
 		bool gameover;
+
+		uint8_t ExternalRead(uint16_t);
+		bool ExternalWrite(uint16_t, uint8_t);
 	};
 
 	// registers
@@ -65,6 +68,8 @@ public:
 	// execution events
 	bool illegalOpcode; // true: Run() stopped because of an illegal opcode was encountered
 	bool stopped; // true: Run() stopped because user callback stopped it
+
+	RunContext run_context;
 
 	// IRQ, reset, NMI vectors
 	static const uint16_t irqVectorH = 0xFFFF;
@@ -329,7 +334,6 @@ private:
 	// read/write callbacks
 	uint8_t Read(uint16_t);
 	void Write(uint16_t, uint8_t);
-	RunContext* run_context;
 
 	// stack operations
 	inline void StackPush(uint8_t byte);
@@ -342,10 +346,9 @@ public:
 	};
 	void NMI();
 	void IRQ();
-	void Reset(RunContext* context);
+	void Reset();
 	void Run(
 		int32_t cycles,
 		uint64_t& cycleCount,
-		RunContext* context,
 		CycleMethod cycleMethod = CYCLE_COUNT);
 };

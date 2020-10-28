@@ -10,8 +10,9 @@ uint16_t const bytecodeVectorTickLow = mos6502::nmiVectorL;
 uint16_t const rainbow_prg_banking_1 = 0x5002;
 uint16_t const stop_trigger_addr = 0xffff;
 uint16_t const nes_register_ppustatus = 0x2002;
+}
 
-uint8_t ExternalRead(uint16_t addr, mos6502::RunContext* context) {
+uint8_t mos6502::RunContext::ExternalRead(uint16_t addr) {
 #ifndef NDEBUG
 	if (addr >= 0x800 && addr < 2000) {
 		throw std::runtime_error("access to RAM mirrors");
@@ -19,18 +20,18 @@ uint8_t ExternalRead(uint16_t addr, mos6502::RunContext* context) {
 #endif
 	uint16_t const memory_segment = addr / 0x2000;
 	uint16_t const segment_addr = addr % 0x2000;
-	return context->memory_segments[memory_segment][segment_addr];
+	return memory_segments[memory_segment][segment_addr];
 }
 
-bool ExternalWrite(uint16_t addr, uint8_t value, mos6502::RunContext* context) {
+bool mos6502::RunContext::ExternalWrite(uint16_t addr, uint8_t value) {
 	// RAM
 	if (addr < 0x2000) {
 		addr = addr % 0x0800;
-		context->memory_segments[0][addr] = value;
+		memory_segments[0][addr] = value;
 
 		// Stop emulation on gameover (and note that the game is over)
 		if (addr == global_game_state) {
-			context->gameover = true;
+			gameover = true;
 			return true;
 		}
 
@@ -39,16 +40,15 @@ bool ExternalWrite(uint16_t addr, uint8_t value, mos6502::RunContext* context) {
 
 	// Banking register
 	if (addr == rainbow_prg_banking_1) {
-		uint8_t* const rom_begin = context->memory_segments[6] - (0x1f * 0x4000); // segment 6 is fixed bank begining, which is bank 0x1f
+		uint8_t* const rom_begin = memory_segments[6] - (0x1f * 0x4000); // segment 6 is fixed bank begining, which is bank 0x1f
 		uint8_t* const bank_begin = rom_begin + value * 0x4000;
-		context->memory_segments[4] = bank_begin;
-		context->memory_segments[5] = bank_begin + 0x2000;
+		memory_segments[4] = bank_begin;
+		memory_segments[5] = bank_begin + 0x2000;
 		return false;
 	}
 
 	// Stop the emulation if emulated code notified its end
 	return addr == stop_trigger_addr;
-}
 }
 
 mos6502::Instr const mos6502::InstrTable[256] = {
@@ -1085,9 +1085,8 @@ uint16_t mos6502::Addr_INY()
 	return addr;
 }
 
-void mos6502::Reset(RunContext* context)
+void mos6502::Reset()
 {
-	this->run_context = context;
 	A = 0x00;
 	Y = 0x00;
 	X = 0x00;
@@ -1105,12 +1104,12 @@ void mos6502::Reset(RunContext* context)
 
 uint8_t mos6502::Read(uint16_t addr)
 {
-	return ExternalRead(addr, this->run_context);
+	return run_context.ExternalRead(addr);
 }
 
 void mos6502::Write(uint16_t addr, uint8_t byte)
 {
-	stopped = ExternalWrite(addr, byte, this->run_context);
+	stopped = run_context.ExternalWrite(addr, byte);
 }
 
 void mos6502::StackPush(uint8_t byte)
@@ -1155,13 +1154,10 @@ void mos6502::NMI()
 void mos6502::Run(
 	int32_t cyclesRemaining,
 	uint64_t& cycleCount,
-	RunContext* context,
 	CycleMethod cycleMethod
 ) {
 	uint8_t opcode;
 	Instr instr;
-
-	this->run_context = context;
 
 	stopped = false;
 	illegalOpcode = false;

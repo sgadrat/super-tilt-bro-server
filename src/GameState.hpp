@@ -57,7 +57,7 @@ public:
 	GameState(uint8_t stage, LoggerCallback logger = nullptr);
 
 	bool tick();
-	bool is_gameover() const {return this->emulator_context.gameover;}
+	bool is_gameover() const {return this->emulator.run_context.gameover;}
 	uint8_t winner() const;
 
 	void setControllerAState(ControllerState state);
@@ -75,26 +75,6 @@ private:
 	static std::array<uint8_t, 0x80000> /*const*/ emulator_rom;
 	static std::array<uint8_t, 0x2000> /*const*/ emulator_registers;
 	std::array<uint8_t, 0x800> emulator_ram;
-	mos6502::RunContext emulator_context = {
-		.memory_segments = {
-			// RAM
-			nullptr,
-
-			// Various registers
-			GameState::emulator_registers.data(),
-			GameState::emulator_registers.data(),
-			GameState::emulator_registers.data(),
-
-			// Swappable bank
-			GameState::emulator_rom.data(),
-			GameState::emulator_rom.data() + 0x2000,
-
-			// Fixed bank
-			GameState::emulator_rom.data() + 0x1f * 0x4000,
-			GameState::emulator_rom.data() + 0x1f * 0x4000 + 0x2000,
-		},
-		.gameover = false
-	};
 	mos6502 emulator;
 
 	ControllerState mControllerA;

@@ -82,15 +82,35 @@ GameState::GameState(uint8_t stage, GameState::LoggerCallback logger)
 	// Init RAM at zero (we do not want random bugs)
 	this->emulator_ram.fill(0);
 
+	// Init emulation context
+	this->emulator.run_context = {
+		.memory_segments = {
+			// RAM
+			this->emulator_ram.data(),
+
+			// Various registers
+			GameState::emulator_registers.data(),
+			GameState::emulator_registers.data(),
+			GameState::emulator_registers.data(),
+
+			// Swappable bank
+			GameState::emulator_rom.data(),
+			GameState::emulator_rom.data() + 0x2000,
+
+			// Fixed bank
+			GameState::emulator_rom.data() + 0x1f * 0x4000,
+			GameState::emulator_rom.data() + 0x1f * 0x4000 + 0x2000,
+		},
+		.gameover = false
+	};
+
 	// Call bytecode initialization routine
 	this->emulator_ram[0] = stage;
-	this->emulator_context.memory_segments[0] = this->emulator_ram.data();
-	this->emulator.Reset(&this->emulator_context);
+	this->emulator.Reset();
 	this->emulator.pc = (uint16_t(emulator_rom[0x1f * 0x4000 + (bytecodeVectorInitHigh % 0x4000)] << 8) + emulator_rom[0x1f * 0x4000 + (bytecodeVectorInitLow % 0x4000)]); //TODO use actual read implementation
 	uint64_t cycles_count = 0;
 	this->emulator.Run(
 		1'000'000, cycles_count,
-		&this->emulator_context,
 		mos6502::INST_COUNT
 	);
 
@@ -104,7 +124,7 @@ bool GameState::tick() {
 	dbgs("===== tick =====");
 
 	// Avoid ticking a terminated game
-	if (this->emulator_context.gameover) {
+	if (this->emulator.run_context.gameover) {
 		dbg("dead tick");
 		return false;
 	}
@@ -116,13 +136,12 @@ bool GameState::tick() {
 	this->emulator_ram[controller_b_btns] = mControllerB.getRaw();
 
 	// Emulate tick routine
-	this->emulator_context.memory_segments[0] = this->emulator_ram.data();
-	this->emulator.Reset(&this->emulator_context);
+	this->emulator.run_context.memory_segments[0] = this->emulator_ram.data(); // Reset this pointer, it may be wrong if current GameState instance is a copy of another one
+	this->emulator.Reset();
 	this->emulator.pc = (uint16_t(emulator_rom[0x1f * 0x4000 + (bytecodeVectorTickHigh % 0x4000)] << 8) + this->emulator_rom[0x1f * 0x4000 + (bytecodeVectorTickLow % 0x4000)]); //TODO use actual read implementation
 	uint64_t cycles_count = 0;
 	this->emulator.Run(
 		1'000'000, cycles_count,
-		&this->emulator_context,
 		mos6502::INST_COUNT
 	);
 
@@ -138,7 +157,7 @@ bool GameState::tick() {
 	}
 
 	// Return true until global game state changes
-	return !this->emulator_context.gameover;
+	return !this->emulator.run_context.gameover;
 }
 
 uint8_t GameState::winner() const {
@@ -163,7 +182,7 @@ void GameState::emulatorDump() const {
 		" SP=$" << hex(this->emulator.sp) <<
 		" PC=$" << hex(this->emulator.pc) <<
 		" STATUS=$" << hex(this->emulator.status) <<
-		" bank=$" << hex(uint16_t((this->emulator_context.memory_segments[4] - emulator_rom.data()) / 0x4000))
+		" bank=$" << hex(uint16_t((this->emulator.run_context.memory_segments[4] - emulator_rom.data()) / 0x4000))
 	);
 	warn(
 		"memories: ram=" << this->emulator_ram.data() <<
@@ -172,16 +191,16 @@ void GameState::emulatorDump() const {
 	);
 	warn(
 		"context: segments={ " <<
-		this->emulator_context.memory_segments[0] << " ; " <<
-		this->emulator_context.memory_segments[1] << " ; " <<
-		this->emulator_context.memory_segments[2] << " ; " <<
-		this->emulator_context.memory_segments[3] << " ; " <<
-		this->emulator_context.memory_segments[4] << " ; " <<
-		this->emulator_context.memory_segments[5] << " ; " <<
-		this->emulator_context.memory_segments[6] << " ; " <<
-		this->emulator_context.memory_segments[7] <<
+		this->emulator.run_context.memory_segments[0] << " ; " <<
+		this->emulator.run_context.memory_segments[1] << " ; " <<
+		this->emulator.run_context.memory_segments[2] << " ; " <<
+		this->emulator.run_context.memory_segments[3] << " ; " <<
+		this->emulator.run_context.memory_segments[4] << " ; " <<
+		this->emulator.run_context.memory_segments[5] << " ; " <<
+		this->emulator.run_context.memory_segments[6] << " ; " <<
+		this->emulator.run_context.memory_segments[7] <<
 		" }" <<
-		" gameover=" << (this->emulator_context.gameover ? "true" : "false")
+		" gameover=" << (this->emulator.run_context.gameover ? "true" : "false")
 	);
 	for (size_t i = 0; i < this->emulator_ram.size(); i += 16) {
 		warn(
