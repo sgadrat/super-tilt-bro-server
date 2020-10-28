@@ -6,6 +6,8 @@
 // Description : A MOS 6502 CPU emulator written in C++
 //============================================================================
 
+#pragma once
+
 #include <array>
 #include <iostream>
 #include <stdint.h>
@@ -45,6 +47,7 @@ class mos6502
 public:
 	struct RunContext {
 		std::array<uint8_t*, 8> memory_segments;
+		std::array<void(*)(mos6502&), 0x4000> const* compiled_segments;
 		bool gameover;
 
 		uint8_t ExternalRead(uint16_t);
@@ -79,7 +82,7 @@ public:
 	static const uint16_t nmiVectorH = 0xFFFB;
 	static const uint16_t nmiVectorL = 0xFFFA;
 
-private:
+public:
 	typedef void (mos6502::*CodeExec)();
 
 	struct Instr

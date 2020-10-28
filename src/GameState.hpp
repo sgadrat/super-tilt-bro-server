@@ -5,6 +5,7 @@
 
 #include <array>
 #include <functional>
+#include <map>
 #include <sstream>
 #include <stdint.h>
 
@@ -73,6 +74,7 @@ private:
 
 private:
 	static std::array<uint8_t, 0x80000> /*const*/ emulator_rom;
+	static std::array<void(*)(mos6502&), 0x4000> emulator_compiled_segments;
 	static std::array<uint8_t, 0x2000> /*const*/ emulator_registers;
 	std::array<uint8_t, 0x800> emulator_ram;
 	mos6502 emulator;

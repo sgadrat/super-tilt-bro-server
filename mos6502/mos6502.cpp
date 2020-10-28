@@ -2,11 +2,6 @@
 #include "src/GameState.bytecodeinfo.hpp"
 
 namespace {
-uint16_t const bytecodeVectorInitHigh = mos6502::rstVectorH;
-uint16_t const bytecodeVectorInitLow = mos6502::rstVectorL;
-uint16_t const bytecodeVectorTickHigh = mos6502::nmiVectorH;
-uint16_t const bytecodeVectorTickLow = mos6502::nmiVectorL;
-
 uint16_t const rainbow_prg_banking_1 = 0x5002;
 uint16_t const stop_trigger_addr = 0xffff;
 uint16_t const nes_register_ppustatus = 0x2002;
@@ -1163,18 +1158,23 @@ void mos6502::Run(
 	illegalOpcode = false;
 	while(!stopped && cyclesRemaining >= 0)
 	{
-		// fetch
-		opcode = Read(pc++);
+		auto const compiled_segment = (pc < 0xc000 ? nullptr : (*run_context.compiled_segments)[pc - 0xc000]);
+		if (compiled_segment != nullptr) {
+			compiled_segment(*this);
+		}else {
+			// fetch
+			opcode = Read(pc++);
 
-		// decode
-		instr = InstrTable[opcode];
+			// decode
+			instr = InstrTable[opcode];
 
-		// execute
-		Exec(instr);
-		cycleCount += instr.cycles;
-		cyclesRemaining -=
-			cycleMethod == CYCLE_COUNT        ? instr.cycles
-			/* cycleMethod == INST_COUNT */   : 1;
+			// execute
+			Exec(instr);
+			cycleCount += instr.cycles;
+			cyclesRemaining -=
+				cycleMethod == CYCLE_COUNT        ? instr.cycles
+				/* cycleMethod == INST_COUNT */   : 1;
+		}
 	}
 }
 

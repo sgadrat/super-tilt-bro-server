@@ -5,15 +5,12 @@
 #include <iomanip>
 
 #include "GameState.bytecodedata.inc.cpp"
+#include "GameState.bytecodecompiled.inc.cpp"
 
 static uint16_t const bytecodeVectorInitHigh = mos6502::rstVectorH;
 static uint16_t const bytecodeVectorInitLow = mos6502::rstVectorL;
 static uint16_t const bytecodeVectorTickHigh = mos6502::nmiVectorH;
 static uint16_t const bytecodeVectorTickLow = mos6502::nmiVectorL;
-
-static uint16_t const rainbow_prg_banking_1 = 0x5002;
-static uint16_t const stop_trigger_addr = 0xffff;
-static uint16_t const nes_register_ppustatus = 0x2002;
 
 #ifdef DEBUG_LOG
 
@@ -101,6 +98,7 @@ GameState::GameState(uint8_t stage, GameState::LoggerCallback logger)
 			GameState::emulator_rom.data() + 0x1f * 0x4000,
 			GameState::emulator_rom.data() + 0x1f * 0x4000 + 0x2000,
 		},
+		.compiled_segments = &GameState::emulator_compiled_segments,
 		.gameover = false
 	};
 
