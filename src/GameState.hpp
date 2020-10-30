@@ -68,16 +68,24 @@ public:
 	void serial(SerializationHandler& s);
 
 private:
-	uint8_t emulatorRead(uint16_t addr);
-	bool emulatorWrite(uint16_t addr, uint8_t value);
 	void emulatorDump() const;
+
+public:
+	struct EmulatorRunContext {
+		std::array<uint8_t*, 8> memory_segments;
+		std::array<void(*)(mos6502<EmulatorRunContext>&), 0x4000> const* compiled_segments;
+		bool gameover;
+
+		uint8_t read(uint16_t);
+		bool write(uint16_t, uint8_t);
+	};
 
 private:
 	static std::array<uint8_t, 0x80000> /*const*/ emulator_rom;
-	static std::array<void(*)(mos6502&), 0x4000> emulator_compiled_segments;
+	static std::array<void(*)(mos6502<EmulatorRunContext>&), 0x4000> emulator_compiled_segments;
 	static std::array<uint8_t, 0x2000> /*const*/ emulator_registers;
 	std::array<uint8_t, 0x800> emulator_ram;
-	mos6502 emulator;
+	mos6502<EmulatorRunContext> emulator;
 
 	ControllerState mControllerA;
 	ControllerState mControllerB;

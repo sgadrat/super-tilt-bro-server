@@ -7,7 +7,7 @@
 #include <iostream>
 #include <sstream>
 
-// g++ -std=c++17 -O3 -DNDEBUG -flto fm2_player.cpp ../src/GameState.cpp ../mos6502/mos6502.cpp -I ../src -I  .. -o fm2_player
+// g++ -std=c++17 -O3 -DNDEBUG -flto fm2_player.cpp ../src/GameState.cpp -I ../src -I  .. -o fm2_player
 
 /*
  * Take inputs from a movie file and run it in a GameState,

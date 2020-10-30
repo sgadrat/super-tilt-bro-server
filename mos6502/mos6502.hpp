@@ -42,18 +42,10 @@ using namespace std;
 
 
 
+template <class RunContext>
 class mos6502
 {
 public:
-	struct RunContext {
-		std::array<uint8_t*, 8> memory_segments;
-		std::array<void(*)(mos6502&), 0x4000> const* compiled_segments;
-		bool gameover;
-
-		uint8_t ExternalRead(uint16_t);
-		bool ExternalWrite(uint16_t, uint8_t);
-	};
-
 	// registers
 	uint8_t A; // accumulator
 	uint8_t X; // X-index
@@ -355,3 +347,5 @@ public:
 		uint64_t& cycleCount,
 		CycleMethod cycleMethod = CYCLE_COUNT);
 };
+
+#include "mos6502.cpp"

@@ -7,10 +7,10 @@
 #include "GameState.bytecodedata.inc.cpp"
 #include "GameState.bytecodecompiled.inc.cpp"
 
-static uint16_t const bytecodeVectorInitHigh = mos6502::rstVectorH;
-static uint16_t const bytecodeVectorInitLow = mos6502::rstVectorL;
-static uint16_t const bytecodeVectorTickHigh = mos6502::nmiVectorH;
-static uint16_t const bytecodeVectorTickLow = mos6502::nmiVectorL;
+static uint16_t const bytecodeVectorInitHigh = mos6502<GameState::EmulatorRunContext>::rstVectorH;
+static uint16_t const bytecodeVectorInitLow = mos6502<GameState::EmulatorRunContext>::rstVectorL;
+static uint16_t const bytecodeVectorTickHigh = mos6502<GameState::EmulatorRunContext>::nmiVectorH;
+static uint16_t const bytecodeVectorTickLow = mos6502<GameState::EmulatorRunContext>::nmiVectorL;
 
 #ifdef DEBUG_LOG
 
@@ -58,14 +58,60 @@ public:
 std::array<uint8_t, 0x2000> /*const*/ GameState::emulator_registers = {0x00, 0x00, 0x80, 0x00};
 
 namespace {
+
 std::string hex(uint16_t v, int width = 4) {
 	std::ostringstream oss;
 	oss << std::setfill('0') << std::setw(width) << std::setbase(16) << uint16_t(v);
 	return oss.str();
 }
+
 std::string hex(uint8_t v) {
 	return hex(uint16_t(v), 2);
 }
+
+uint16_t const rainbow_prg_banking_1 = 0x5002;
+uint16_t const stop_trigger_addr = 0xffff;
+uint16_t const nes_register_ppustatus = 0x2002;
+
+}
+
+uint8_t GameState::EmulatorRunContext::read(uint16_t addr) {
+#ifndef NDEBUG
+	if (addr >= 0x800 && addr < 2000) {
+		throw std::runtime_error("access to RAM mirrors");
+	}
+#endif
+	uint16_t const memory_segment = addr / 0x2000;
+	uint16_t const segment_addr = addr % 0x2000;
+	return memory_segments[memory_segment][segment_addr];
+}
+
+bool GameState::EmulatorRunContext::write(uint16_t addr, uint8_t value) {
+	// RAM
+	if (addr < 0x2000) {
+		addr = addr % 0x0800;
+		memory_segments[0][addr] = value;
+
+		// Stop emulation on gameover (and note that the game is over)
+		if (addr == global_game_state) {
+			gameover = true;
+			return true;
+		}
+
+		return false;
+	}
+
+	// Banking register
+	if (addr == rainbow_prg_banking_1) {
+		uint8_t* const rom_begin = memory_segments[6] - (0x1f * 0x4000); // segment 6 is fixed bank begining, which is bank 0x1f
+		uint8_t* const bank_begin = rom_begin + value * 0x4000;
+		memory_segments[4] = bank_begin;
+		memory_segments[5] = bank_begin + 0x2000;
+		return false;
+	}
+
+	// Stop the emulation if emulated code notified its end
+	return addr == stop_trigger_addr;
 }
 
 GameState::GameState(uint8_t stage, GameState::LoggerCallback logger)
@@ -109,7 +155,7 @@ GameState::GameState(uint8_t stage, GameState::LoggerCallback logger)
 	uint64_t cycles_count = 0;
 	this->emulator.Run(
 		1'000'000, cycles_count,
-		mos6502::INST_COUNT
+		mos6502<EmulatorRunContext>::INST_COUNT
 	);
 
 	// Handle emulation errors
@@ -140,7 +186,7 @@ bool GameState::tick() {
 	uint64_t cycles_count = 0;
 	this->emulator.Run(
 		1'000'000, cycles_count,
-		mos6502::INST_COUNT
+		mos6502<EmulatorRunContext>::INST_COUNT
 	);
 
 	// Handle emulation errors

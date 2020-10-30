@@ -56,7 +56,7 @@ for entry_point in entry_points:
 		code_sections[pc] = section
 
 # Print code sections map
-output_format = 'cpp-flat'
+output_format = 'cpp'
 
 if output_format == 'human':
 	for code_section_addr in code_sections:
@@ -66,22 +66,10 @@ if output_format == 'human':
 			print('\t({:02x}) {}'.format(opcode, known_opcodes[opid(opcode)]['mnemonic']))
 
 if output_format == 'cpp':
-	print('std::map<uint16_t, std::function<void(mos6502&)>> GameState::emulator_compiled_segments = {')
-	for code_section_addr in code_sections:
-		code_section = code_sections[code_section_addr]
-		print('\t{0x%04x, [](mos6502& emu) {' % code_section_addr)
-		for opcode in code_section['opcodes']:
-			print('\t\t++emu.pc; emu.Op_%s();' % known_opcodes[opid(opcode)]['mnemonic'])
-			if known_opcodes[opid(opcode)]['mnemonic'] == 'STA_ABS':
-				print('\t\tif (emu.stopped) { return; }')
-		print('\t}},')
-	print('};')
-
-if output_format == 'cpp-rawptr':
 	print('namespace emulator_compiled_segments_funcs {');
 	for code_section_addr in code_sections:
 		code_section = code_sections[code_section_addr]
-		print('void seg_%04x_%s(mos6502& emu) {' % (code_section_addr, code_section['name']))
+		print('void seg_%04x_%s(mos6502<GameState::EmulatorRunContext>& emu) {' % (code_section_addr, code_section['name']))
 		for opcode in code_section['opcodes']:
 			print('\t++emu.pc; emu.Op_%s();' % known_opcodes[opid(opcode)]['mnemonic'])
 			if known_opcodes[opid(opcode)]['mnemonic'] == 'STA_ABS':
@@ -89,25 +77,7 @@ if output_format == 'cpp-rawptr':
 		print('}')
 	print('}')
 	print('')
-	print('std::map<uint16_t, void(*)(mos6502&)> GameState::emulator_compiled_segments = {')
-	for code_section_addr in code_sections:
-		code_section = code_sections[code_section_addr]
-		print('\t{0x%04x, &emulator_compiled_segments_funcs::seg_%04x_%s},' % (code_section_addr, code_section_addr, code_section['name']))
-	print('};')
-
-if output_format == 'cpp-flat':
-	print('namespace emulator_compiled_segments_funcs {');
-	for code_section_addr in code_sections:
-		code_section = code_sections[code_section_addr]
-		print('void seg_%04x_%s(mos6502& emu) {' % (code_section_addr, code_section['name']))
-		for opcode in code_section['opcodes']:
-			print('\t++emu.pc; emu.Op_%s();' % known_opcodes[opid(opcode)]['mnemonic'])
-			if known_opcodes[opid(opcode)]['mnemonic'] == 'STA_ABS':
-				print('\tif (emu.stopped) { return; }')
-		print('}')
-	print('}')
-	print('')
-	print('std::array<void(*)(mos6502&), 0x4000> GameState::emulator_compiled_segments = {')
+	print('std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::emulator_compiled_segments = {')
 	last_table_pos = 0
 	for code_section_addr, code_section in sorted(code_sections.items(), key=lambda x: x[0]):
 		table_pos = code_section_addr - 0xc000

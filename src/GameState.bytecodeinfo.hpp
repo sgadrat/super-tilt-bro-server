@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 uint16_t const player_a_state = 0x00;
 uint16_t const player_b_state = 0x01;
