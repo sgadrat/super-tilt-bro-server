@@ -104,7 +104,7 @@ std::pair<uint32_t, GameState> compute_game_state_at(
 
 #ifdef LOG_FLOOD
 	// Dump stats
-	srv_dbg(LOG_INFO, "%u ticks in %lu us : %lu us/tick", n_ticks, total_time.count() / 1000, (total_time.count() / 1000) / n_ticks);
+	srv_dbg(LOG_DEBUG, "%u ticks in %lu us : %lu us/tick", n_ticks, total_time.count() / 1000, n_ticks > 0 ? (total_time.count() / 1000) / n_ticks : 0);
 #endif
 
 	// Apply inputs for the final state
@@ -165,8 +165,10 @@ void GameInstance::run(
 		// Variables with lifetime spanning entire run() duration
 		this->keep_running = true;
 		this->over = false;
+
 		std::shared_ptr<network::IncommingUdpMessage> in_message = nullptr;
 		std::vector<boost::asio::ip::udp::endpoint> clients({client_a.endpoint, client_b.endpoint});
+
 		std::map<uint32_t, GameState> gamestate_history{
 			{0, initial_gamestate(stage)}
 		};
@@ -176,7 +178,11 @@ void GameInstance::run(
 		std::map<uint32_t, GameState::ControllerState> controller_b_history{
 			{0, GameState::ControllerState()}
 		};
+
 		uint8_t prediction_id = 0;
+
+		steady_clock::time_point last_input_clock_time = steady_clock::now();
+		uint32_t last_gamestate_sent_time = 0;
 
 		// Variables reset each time a state is sent
 		bool new_input_batch = true;
@@ -191,8 +197,9 @@ void GameInstance::run(
 				// Get next incomming message
 				try {
 					in_message = in_messages->pop_block(microseconds(1'000'000));
+					last_input_clock_time = steady_clock::now();
 					if (new_input_batch) {
-						input_batch_begin = steady_clock::now();
+						input_batch_begin = last_input_clock_time;
 						new_input_batch = false;
 					}
 					handled_message = true;
@@ -202,7 +209,22 @@ void GameInstance::run(
 
 				// Process message
 				if (in_message == nullptr) {
-					break;
+					uint32_t const last_input_time = std::max(controller_a_history.rbegin()->first, controller_b_history.rbegin()->first);
+					uint32_t n_frames_since_last_input = duration_cast<microseconds>(steady_clock::now() - last_input_clock_time).count() / 20'000;
+					uint32_t const current_time = last_input_time + n_frames_since_last_input;
+
+					srv_dbg(LOG_DEBUG, "pred compute: %d", current_time + (antilag_prediction / 2));
+					std::pair<uint32_t, GameState> const computed_gamestate = compute_game_state_at(
+						current_time + (antilag_prediction / 2),
+						gamestate_history, controller_a_history, controller_b_history
+					);
+					if (computed_gamestate.second.is_gameover() && n_frames_since_last_input > 500) {
+						this->keep_running = false;
+						break;
+					}
+					gamestate_history.insert(computed_gamestate);
+
+					break; //TODO simplify uselessly doubled while loop
 				}else {
 					// Print received message
 					debug_log_msg(in_message);
@@ -232,6 +254,7 @@ void GameInstance::run(
 					//  Not keeping it allows to ensure that the last computed gamestate is the one to send in the message (matching delayed frames)
 					std::map<uint32_t, GameState>::iterator first_invalid_gamestate(gamestate_history.lower_bound(message.timestamp));
 					bool const history_rewrite = first_invalid_gamestate != gamestate_history.end();
+					bool const sent_state_rewrite = (history_rewrite && first_invalid_gamestate->first <= last_gamestate_sent_time);
 					if (history_rewrite) {
 						if (first_invalid_gamestate->first == 0) {
 							syslog(LOG_WARNING, "GameInstance: warning: prevented modification of initial gamestate");
@@ -241,7 +264,7 @@ void GameInstance::run(
 					}
 
 					// If history was rewriten, we must refresh sender's state as we may have sent him a misspredicted one last time
-					if (history_rewrite) {
+					if (sent_state_rewrite) {
 						impacted_clients[sender_index] = true;
 					}
 
@@ -291,6 +314,9 @@ void GameInstance::run(
 								out_message->data = serialize_new_game_state_msg(prediction_id, gamestate_time, gamestate, opponent_controller_history);
 								out_messages->push(out_message);
 								srv_dbg(LOG_DEBUG, "send %s to %s:%d", (client_index != sender_index ? "state" : "eratum"), client_endpoint.address().to_string().c_str(), client_endpoint.port());
+
+								// Update info about sends
+								last_gamestate_sent_time = gamestate_time;
 							}
 						}
 
