@@ -72,8 +72,7 @@ if output_format == 'cpp':
 		print('void seg_%04x_%s(mos6502<GameState::EmulatorRunContext>& emu) {' % (code_section_addr, code_section['name']))
 		for opcode in code_section['opcodes']:
 			print('\t++emu.pc; emu.Op_%s();' % known_opcodes[opid(opcode)]['mnemonic'])
-			if known_opcodes[opid(opcode)]['mnemonic'] == 'STA_ABS':
-				print('\tif (emu.stopped) { return; }')
+			print('\tif (emu.stopped) { return; }')
 		print('}')
 	print('}')
 	print('')
@@ -81,13 +80,11 @@ if output_format == 'cpp':
 	last_table_pos = 0
 	for code_section_addr, code_section in sorted(code_sections.items(), key=lambda x: x[0]):
 		table_pos = code_section_addr - 0xc000
-		#print('{} -> {}'.format(last_table_pos, table_pos))
 		assert table_pos >= last_table_pos, "we are iterating on sorted list"
 		for i in range(last_table_pos, table_pos-1):
 			print('\tnullptr,')
 		print('\t&emulator_compiled_segments_funcs::seg_%04x_%s,' % (code_section_addr, code_section['name']))
 		last_table_pos = table_pos
-	#print('{} -> {}'.format(last_table_pos, 0xffff))
 	for i in range(last_table_pos, 0x3fff):
 		print('\tnullptr,')
 	print('};')
