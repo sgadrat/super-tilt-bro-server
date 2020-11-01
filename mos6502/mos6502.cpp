@@ -1209,7 +1209,7 @@ void mos6502<RunContext>::Reset()
 
 	sp = 0xFF;
 
-	status = CONSTANT;
+	status = M6502_CONSTANT;
 
 	illegalOpcode = false;
 
@@ -1459,7 +1459,7 @@ void mos6502<RunContext>::Op_BRK(uint16_t src)
 	pc++;
 	StackPush((pc >> 8) & 0xFF);
 	StackPush(pc & 0xFF);
-	StackPush(status | BREAK);
+	StackPush(status | M6502_BREAK);
 	SET_INTERRUPT(1);
 	pc = (Read(irqVectorH) << 8) + Read(irqVectorL);
 	return;
@@ -1706,7 +1706,7 @@ void mos6502<RunContext>::Op_PHA(uint16_t src)
 template <class RunContext>
 void mos6502<RunContext>::Op_PHP(uint16_t src)
 {
-	StackPush(status | BREAK);
+	StackPush(status | M6502_BREAK);
 	return;
 }
 

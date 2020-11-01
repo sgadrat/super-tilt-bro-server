@@ -13,32 +13,32 @@
 #include <stdint.h>
 using namespace std;
 
-#define NEGATIVE  0x80
-#define OVERFLOW  0x40
-#define CONSTANT  0x20
-#define BREAK     0x10
-#define DECIMAL   0x08
-#define INTERRUPT 0x04
-#define ZERO      0x02
-#define CARRY     0x01
+#define M6502_NEGATIVE  0x80
+#define M6502_OVERFLOW  0x40
+#define M6502_CONSTANT  0x20
+#define M6502_BREAK     0x10
+#define M6502_DECIMAL   0x08
+#define M6502_INTERRUPT 0x04
+#define M6502_ZERO      0x02
+#define M6502_CARRY     0x01
 
-#define SET_NEGATIVE(x) (x ? (status |= NEGATIVE) : (status &= (~NEGATIVE)) )
-#define SET_OVERFLOW(x) (x ? (status |= OVERFLOW) : (status &= (~OVERFLOW)) )
-#define SET_CONSTANT(x) (x ? (status |= CONSTANT) : (status &= (~CONSTANT)) )
-#define SET_BREAK(x) (x ? (status |= BREAK) : (status &= (~BREAK)) )
-#define SET_DECIMAL(x) (x ? (status |= DECIMAL) : (status &= (~DECIMAL)) )
-#define SET_INTERRUPT(x) (x ? (status |= INTERRUPT) : (status &= (~INTERRUPT)) )
-#define SET_ZERO(x) (x ? (status |= ZERO) : (status &= (~ZERO)) )
-#define SET_CARRY(x) (x ? (status |= CARRY) : (status &= (~CARRY)) )
+#define SET_NEGATIVE(x) (x ? (status |= M6502_NEGATIVE) : (status &= (~M6502_NEGATIVE)) )
+#define SET_OVERFLOW(x) (x ? (status |= M6502_OVERFLOW) : (status &= (~M6502_OVERFLOW)) )
+#define SET_CONSTANT(x) (x ? (status |= M6502_CONSTANT) : (status &= (~M6502_CONSTANT)) )
+#define SET_BREAK(x) (x ? (status |= M6502_BREAK) : (status &= (~M6502_BREAK)) )
+#define SET_DECIMAL(x) (x ? (status |= M6502_DECIMAL) : (status &= (~M6502_DECIMAL)) )
+#define SET_INTERRUPT(x) (x ? (status |= M6502_INTERRUPT) : (status &= (~M6502_INTERRUPT)) )
+#define SET_ZERO(x) (x ? (status |= M6502_ZERO) : (status &= (~M6502_ZERO)) )
+#define SET_CARRY(x) (x ? (status |= M6502_CARRY) : (status &= (~M6502_CARRY)) )
 
-#define IF_NEGATIVE() ((status & NEGATIVE) ? true : false)
-#define IF_OVERFLOW() ((status & OVERFLOW) ? true : false)
-#define IF_CONSTANT() ((status & CONSTANT) ? true : false)
-#define IF_BREAK() ((status & BREAK) ? true : false)
-#define IF_DECIMAL() ((status & DECIMAL) ? true : false)
-#define IF_INTERRUPT() ((status & INTERRUPT) ? true : false)
-#define IF_ZERO() ((status & ZERO) ? true : false)
-#define IF_CARRY() ((status & CARRY) ? true : false)
+#define IF_NEGATIVE() ((status & M6502_NEGATIVE) ? true : false)
+#define IF_OVERFLOW() ((status & M6502_OVERFLOW) ? true : false)
+#define IF_CONSTANT() ((status & M6502_CONSTANT) ? true : false)
+#define IF_BREAK() ((status & M6502_BREAK) ? true : false)
+#define IF_DECIMAL() ((status & M6502_DECIMAL) ? true : false)
+#define IF_INTERRUPT() ((status & M6502_INTERRUPT) ? true : false)
+#define IF_ZERO() ((status & M6502_ZERO) ? true : false)
+#define IF_CARRY() ((status & M6502_CARRY) ? true : false)
 
 
 
