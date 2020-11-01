@@ -135,6 +135,7 @@ int main() {
 	// Play movie input log
 	perf_reset();
 	GameState gamestate = initial_gamestate();
+	bool gameover = false;
 	auto b = [](bool v) {return v ? '1' : '_';};
 	for (size_t frame_cnt = 0; frame_cnt < movie.input_log.size(); ++frame_cnt) {
 		fm2::MovieRecord const& inputs = movie.input_log[frame_cnt];
@@ -190,14 +191,19 @@ int main() {
 		gamestate.setControllerBState(controller_state);
 
 		perf_begin();
-		gamestate.tick();
+		gameover = !gamestate.tick();
 		perf_end();
+		if (gameover) {
+			break;
+		}
 	}
 
 	// Dump gamestate after the last tick
-	HexDumper serializer;
-	gamestate.serial(serializer);
-	std::cout << '\n';
+	if (!gameover) {
+		HexDumper serializer;
+		gamestate.serial(serializer);
+		std::cout << '\n';
+	}
 
 	// Dump performance info
 	perf_summary(movie.input_log.size());
