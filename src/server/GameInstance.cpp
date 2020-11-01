@@ -313,7 +313,13 @@ void GameInstance::run(
 								out_message->destination = client_endpoint;
 								out_message->data = serialize_new_game_state_msg(prediction_id, gamestate_time, gamestate, opponent_controller_history);
 								out_messages->push(out_message);
-								srv_dbg(LOG_DEBUG, "send %s to %s:%d", (client_index != sender_index ? "state" : "eratum"), client_endpoint.address().to_string().c_str(), client_endpoint.port());
+								srv_dbg(
+									LOG_DEBUG, "%lu send %s to %s:%d",
+									wall_clock_milli(),
+									client_index != sender_index ? "state" : "eratum",
+									client_endpoint.address().to_string().c_str(),
+									client_endpoint.port()
+								);
 
 								// Update info about sends
 								last_gamestate_sent_time = gamestate_time;
