@@ -77,7 +77,7 @@ if output_format == 'cpp':
 	print('}')
 	print('')
 	print('std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::emulator_compiled_segments = {')
-	last_table_pos = 0
+	last_table_pos = -1
 	for code_section_addr, code_section in sorted(code_sections.items(), key=lambda x: x[0]):
 		table_pos = code_section_addr - 0xc000
 		assert table_pos >= last_table_pos, "we are iterating on sorted list"
