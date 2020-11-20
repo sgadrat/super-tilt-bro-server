@@ -86,7 +86,11 @@ private:
 };
 
 GameState initial_gamestate() {
-	return GameState(0, [](std::string const & m) {std::cerr << m << '\n';});
+	const uint8_t STAGE_FLATLAND = 0;
+	const uint8_t STAGE_THEPIT = 1;
+	const uint8_t STAGE_SKYRIDE = 2;
+	const uint8_t STAGE_THEHUNT = 3;
+	return GameState(STAGE_SKYRIDE, [](std::string const & m) {std::cerr << m << '\n';});
 }
 
 #if PERF_UNITS == PERF_TIME
