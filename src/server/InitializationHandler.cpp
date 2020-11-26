@@ -123,6 +123,10 @@ namespace {
 		oss << uint16_t(message.get_major_version()) << '.' << release_types[release_index] << uint16_t(message.minor_version) << '/' << support_types[support_index] << '(' << (message.is_ntsc()?"NTSC":"PAL") << ')';
 		return oss.str();
 	}
+
+	std::tuple<uint8_t, stnp::message::Connection::ReleaseType, uint8_t> getVersionTuple(stnp::message::Connection const& message) {
+		return std::make_tuple(message.get_major_version(), message.get_release_type(), message.minor_version);
+	}
 }
 
 InitializationHandler::InitializationHandler(
@@ -230,6 +234,20 @@ void InitializationHandler::run() {
 						"                        "
 						"you seem to run an old  "
 						"version of the game     "
+						"                        "
+						"please download latest  "
+						"version                 "
+						"                        ",
+						in_message->sender
+					);
+				}else if (getVersionTuple(connection_request) < std::make_tuple(2, stnp::message::Connection::ReleaseType::ALPHA, 4)) {
+					// Send error
+					syslog(LOG_NOTICE, "InitializationHandler: connection request with old client: client version %s", computeVersionName(connection_request).c_str());
+					this->rejectConnection(
+						"bad version             "
+						"                        "
+						"you run an old version  "
+						"of the game             "
 						"                        "
 						"please download latest  "
 						"version                 "
