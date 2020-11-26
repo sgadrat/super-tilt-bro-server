@@ -93,7 +93,7 @@ Upon reception of this message, the client should display the message and stop s
 * **player_a_connection_quality**: Indicator of the quality level of the connection between player one and the server (0: excellent, 1: good, 2: acceptable)
 * **player_b_connection_quality**: Indicator of the quality level of the connection between player two and the server (0: excellent, 1: good, 2: acceptable)
 
-Uppon reception of this message, clients should immediatly start a game on the selected stage.
+Uppon reception of this message, clients should start a game on the selected stage. The game should start within a fixed timeframe shared by both clients (eg. the game starts 120 frames after message's reception).
 
 The value of *player_number* must not be the same for Client1 and Client2.
 
