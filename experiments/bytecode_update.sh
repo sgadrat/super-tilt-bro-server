@@ -4,7 +4,7 @@ set -e
 
 # Input files (must exists)
 BYTECODE_PATH=~/workspace/nes/tilt/server_bytecode.nes
-XA_LISTING_PATH=/tmp/bytecode.lst
+XA_LISTING_PATH=/tmp/server_bytecode.lst
 KNOWN_OPCODES_PATH=compile_bytecode/known_opcodes.json
 
 # Ouptput/intermediate files (will be overwriten)
