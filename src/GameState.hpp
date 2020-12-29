@@ -137,7 +137,17 @@ void GameState::serial(SerializationHandler& s) {
 	});
 
 	// Copy animation states
-	for (size_t i = 0; i < 12*2; ++i) {
-		s.uint8(this->emulator_ram[player_a_animation + i]);
+	std::array<uint8_t, 6> const serialized_animation_fields = {
+		4, // ANIMATION_STATE_OFFSET_DATA_VECTOR_LSB
+		5, // ANIMATION_STATE_OFFSET_DATA_VECTOR_MSB
+		6, // ANIMATION_STATE_OFFSET_DIRECTION
+		7, // ANIMATION_STATE_OFFSET_CLOCK
+		10, // ANIMATION_STATE_OFFSET_FRAME_VECTOR_LSB
+		11, // ANIMATION_STATE_OFFSET_FRAME_VECTOR_MSB
+	};
+	for (size_t anim_offset = 0; anim_offset <= 12; anim_offset += 12) {
+		for (uint8_t const prop: serialized_animation_fields) {
+			s.uint8(this->emulator_ram[player_a_animation + anim_offset + prop]);
+		}
 	}
 }
