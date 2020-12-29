@@ -34,17 +34,23 @@ At any time during the initialization phase, the server may send a Disconnected 
 		uint2 release_type;
 		uint3 version_major;
 		uint8 version_minor;
+		uint8 selected_character;
+		uint8 selected_palette;
+		uint8 selected_stage;
 	}
 
 * **client_id**: Identifier unique to this client.
 * **ping_min**: Minimal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_min=3 means 12ms of ping.)
-* **protocol_version**: Expected version of this protocol. This document describes version 2.
+* **protocol_version**: Expected version of this protocol. This document describes version 3.
 * **ping_max**: Maximal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_max=3 means 12ms of ping.)
 * **framerate**: 0: 50Hz, 1: 60Hz.
 * **support**: 0: physical cartridge, 1: native emulator, 2: web emulator, 3: unknown/other
 * **release_type**: 0: alpha, 1: beta, 2: release candidate, 3: release
 * **version_major**: version's major number
 * **version_minor**: version's minor number
+* **selected_character**: Character that the player wants to play
+* **selected_palette**: Color variant that the player wants to play
+* **selected_stage**: Stage on which the player wants to play
 
 .. note::
 	Bytes 8 and 9 may be refered as flags and version.
@@ -85,6 +91,10 @@ Upon reception of this message, the client should display the message and stop s
 		uint8 player_number;
 		uint4 player_a_connection_quality;
 		uint4 player_b_connection_quality;
+		uint8 player_a_character;
+		uint8 player_b_character;
+		uint8 player_a_palette;
+		uint8 player_b_palette;
 	}
 
 * **stage**: Stage on which the game will be played. 0 for Flatland, 1 for The Pit, 2 for Skyride or 3 for The Hunt.
@@ -92,10 +102,16 @@ Upon reception of this message, the client should display the message and stop s
 * **player_number**: Indicates the avatar that this client will control. 0 for player one, 1 for player two.
 * **player_a_connection_quality**: Indicator of the quality level of the connection between player one and the server (0: excellent, 1: good, 2: acceptable)
 * **player_b_connection_quality**: Indicator of the quality level of the connection between player two and the server (0: excellent, 1: good, 2: acceptable)
+* **player_a_character**: Character played by player one.
+* **player_b_character**: Character played by player two.
+* **player_a_palette**: Color variant of the character played by player one.
+* **player_b_palette**: Color variant of the character played by player two.
 
 Uppon reception of this message, clients should start a game on the selected stage. The game should start within a fixed timeframe shared by both clients (eg. the game starts 120 frames after message's reception).
 
 The value of *player_number* must not be the same for Client1 and Client2.
+
+If ``stage``, ``player_*_character`` or ``player_*_palette`` differ from what is requested by clients, info in this message takes precedence. The server may no honor players choices. The client must be able to start the game with configuration from this message.
 
 In-Game
 -------

@@ -16,7 +16,7 @@
 #include <utility>
 
 namespace {
-	constexpr uint8_t STNP_VERSION = 2;
+	constexpr uint8_t STNP_VERSION = 3;
 
 	class GameInstanceThread {
 		public:
@@ -369,6 +369,10 @@ void InitializationHandler::run() {
 							start_signal.player_number = client_index;
 							start_signal.player_a_connection_quality(player_a_connection);
 							start_signal.player_b_connection_quality(player_b_connection);
+							start_signal.player_a_character = 0;
+							start_signal.player_b_character = 0;
+							start_signal.player_a_palette = 1;
+							start_signal.player_b_palette = 2;
 							serializer.clear();
 							start_signal.serial(serializer, STNP_VERSION);
 

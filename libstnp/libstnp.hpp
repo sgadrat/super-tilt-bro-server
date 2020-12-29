@@ -179,6 +179,9 @@ struct Connection {
 	uint8_t ping_max;
 	uint8_t flags_and_major_version;
 	uint8_t minor_version;
+	uint8_t selected_character;
+	uint8_t selected_palette;
+	uint8_t selected_stage;
 
 	enum class SupportType {
 		CARTRIDGE = 0,
@@ -227,6 +230,11 @@ struct Connection {
 			s.uint8(this->flags_and_major_version);
 			s.uint8(this->minor_version);
 		}
+		if (this->protocol_version >= 3) {
+			s.uint8(this->selected_character);
+			s.uint8(this->selected_palette);
+			s.uint8(this->selected_stage);
+		}
 	}
 };
 
@@ -242,6 +250,10 @@ struct StartGame {
 	uint8_t stocks;
 	uint8_t player_number;
 	uint8_t connections_quality = 0;
+	uint8_t player_a_character;
+	uint8_t player_b_character;
+	uint8_t player_a_palette;
+	uint8_t player_b_palette;
 
 	uint8_t player_a_connection_quality() const {
 		return this->connections_quality >> 4;
@@ -275,6 +287,12 @@ struct StartGame {
 		s.uint8(this->player_number);
 		if (protocol_version >= 1) {
 			s.uint8(this->connections_quality);
+		}
+		if (protocol_version >= 3) {
+			s.uint8(this->player_a_character);
+			s.uint8(this->player_b_character);
+			s.uint8(this->player_a_palette);
+			s.uint8(this->player_b_palette);
 		}
 	}
 };
