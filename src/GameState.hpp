@@ -55,7 +55,7 @@ public:
 		}
 	};
 
-	GameState(uint8_t stage, LoggerCallback logger = nullptr);
+	GameState(uint8_t stage, std::array<uint8_t, 2> characters, LoggerCallback logger = nullptr);
 
 	bool tick();
 	bool is_gameover() const {return this->emulator.run_context.gameover;}
@@ -148,6 +148,32 @@ void GameState::serial(SerializationHandler& s) {
 	for (size_t anim_offset = 0; anim_offset <= 12; anim_offset += 12) {
 		for (uint8_t const prop: serialized_animation_fields) {
 			s.uint8(this->emulator_ram[player_a_animation + anim_offset + prop]);
+		}
+	}
+
+	// Copy characters state
+	for (size_t char_num = 0; char_num < 2; ++char_num) {
+		size_t const character_objects = (char_num == 0 ? player_a_objects : player_b_objects);
+
+		switch (this->emulator_ram[config_player_a_character + char_num]) {
+			case 0: // Sinbad
+				break;
+
+			case 1: // Kiki
+				// Platform stage-element
+				for (size_t i = 0; i < 9; ++i) {
+					s.uint8(this->emulator_ram[character_objects + i]);
+				}
+
+				// Y pos of the platform
+				for (size_t i = 10; i < 12; ++i) {
+					s.uint8(this->emulator_ram[character_objects + i]);
+				}
+
+				break;
+
+			default:
+				throw std::runtime_error("tried to serialize unknown character");
 		}
 	}
 }

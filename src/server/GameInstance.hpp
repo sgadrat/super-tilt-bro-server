@@ -3,6 +3,7 @@
 #include "network.hpp"
 #include "utils.hpp"
 
+#include <array>
 #include <atomic>
 
 /** Instance of a game match between two players */
@@ -18,6 +19,12 @@ public:
 	struct ClientInfo {
 		boost::asio::ip::udp::endpoint endpoint;
 		uint32_t id;
+	};
+
+	/** Info about the game to be played */
+	struct GameSettings {
+		uint8_t stage_id;
+		std::array<uint8_t, 2> characters;
 	};
 
 	/** Information about a finished game */
@@ -39,7 +46,7 @@ public:
 		uint32_t antilag_prediction,
 		ClientInfo client_a,
 		ClientInfo client_b,
-		uint8_t stage_id
+		GameSettings game_settings
 	);
 
 	/** Abort the game */

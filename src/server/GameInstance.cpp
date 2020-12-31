@@ -13,8 +13,8 @@ namespace  {
 
 uint32_t constexpr INPUT_LAG = 4;
 
-GameState initial_gamestate(uint8_t stage_id) {
-	return GameState(stage_id, [](std::string const& m) {syslog(LOG_WARNING, "GameState: %s", m.c_str());});
+GameState initial_gamestate(GameInstance::GameSettings const& settings) {
+	return GameState(settings.stage_id, settings.characters, [](std::string const& m) {syslog(LOG_WARNING, "GameState: %s", m.c_str());});
 }
 
 GameState::ControllerState controller_state_from_message(stnp::message::ControllerState const& message) {
@@ -154,7 +154,7 @@ void GameInstance::run(
 	uint32_t antilag_prediction,
 	ClientInfo client_a,
 	ClientInfo client_b,
-	uint8_t stage
+	GameSettings game_settings
 )
 {
 	using std::chrono::duration_cast;
@@ -170,7 +170,7 @@ void GameInstance::run(
 		std::vector<boost::asio::ip::udp::endpoint> clients({client_a.endpoint, client_b.endpoint});
 
 		std::map<uint32_t, GameState> gamestate_history{
-			{0, initial_gamestate(stage)}
+			{0, initial_gamestate(game_settings)}
 		};
 		std::map<uint32_t, GameState::ControllerState> controller_a_history{
 			{0, GameState::ControllerState()}

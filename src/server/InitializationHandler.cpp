@@ -36,10 +36,10 @@ namespace {
 				uint32_t antilag_prediction,
 				GameInstance::ClientInfo client_a,
 				GameInstance::ClientInfo client_b,
-				uint8_t stage
+				GameInstance::GameSettings game_settings
 			)
 			: instance()
-			, thread(&GameInstance::run, &instance, in_messages, out_messages, game_info_queue, antilag_prediction, client_a, client_b, stage)
+			, thread(&GameInstance::run, &instance, in_messages, out_messages, game_info_queue, antilag_prediction, client_a, client_b, game_settings)
 			, creation_time(std::chrono::steady_clock::now())
 			, clients(client_a, client_b)
 			{
@@ -342,7 +342,10 @@ void InitializationHandler::run() {
 						);
 
 						// Prepare game instance
-						uint8_t const stage_id = allowed_game_stages.at(next_game_stage);
+						GameInstance::GameSettings game_settings = {
+							.stage_id = allowed_game_stages.at(next_game_stage),
+							.characters = {0, 1}
+						};
 						next_game_stage = (next_game_stage + 1) % allowed_game_stages.size();
 						std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> game_in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
 						game_instances.emplace_back(
@@ -352,7 +355,7 @@ void InitializationHandler::run() {
 							antilag_prediction,
 							matched_clients.at(0)->client,
 							matched_clients.at(1)->client,
-							stage_id
+							game_settings
 						);
 
 						// Adapt message routing
@@ -364,13 +367,13 @@ void InitializationHandler::run() {
 						uint8_t const player_b_connection = compute_connection_indicator(matched_clients.at(1)->ping_min, matched_clients.at(1)->ping_max);
 						for (size_t client_index = 0; client_index <= 1; ++client_index) {
 							stnp::message::StartGame start_signal;
-							start_signal.stage = stage_id;
+							start_signal.stage = game_settings.stage_id;
 							start_signal.stocks = 3;
 							start_signal.player_number = client_index;
 							start_signal.player_a_connection_quality(player_a_connection);
 							start_signal.player_b_connection_quality(player_b_connection);
-							start_signal.player_a_character = 0;
-							start_signal.player_b_character = 0;
+							start_signal.player_a_character = game_settings.characters[0];
+							start_signal.player_b_character = game_settings.characters[1];
 							start_signal.player_a_palette = 1;
 							start_signal.player_b_palette = 2;
 							serializer.clear();
