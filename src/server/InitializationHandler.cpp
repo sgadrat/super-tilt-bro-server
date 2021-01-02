@@ -66,6 +66,9 @@ namespace {
 		GameInstance::ClientInfo client;
 		uint_fast8_t ping_min; // Timescale 4ms (4 is an NTSC frame, 5 is a PAL frame)
 		uint_fast8_t ping_max;
+		uint_fast8_t selected_character;
+		uint_fast8_t selected_palette;
+		uint_fast8_t selected_stage;
 		std::chrono::time_point<std::chrono::steady_clock> last_heartbeat;
 	};
 
@@ -144,8 +147,7 @@ void InitializationHandler::run() {
 	std::list<ClientData> clients;
 	std::list<GameInstanceThread> game_instances;
 
-	std::vector<uint8_t> allowed_game_stages = {0, 2};
-	size_t next_game_stage = 0;
+	size_t client_with_stage_selection = 0;
 
 	while (true) {
 		try {
@@ -278,6 +280,9 @@ void InitializationHandler::run() {
 						},
 						.ping_min = connection_request.ping_min,
 						.ping_max = connection_request.ping_max,
+						.selected_character = connection_request.selected_character,
+						.selected_palette = connection_request.selected_palette,
+						.selected_stage = connection_request.selected_stage,
 						.last_heartbeat = now
 					};
 					for (ClientData& existing_client: clients) {
@@ -343,10 +348,10 @@ void InitializationHandler::run() {
 
 						// Prepare game instance
 						GameInstance::GameSettings game_settings = {
-							.stage_id = allowed_game_stages.at(next_game_stage),
-							.characters = {0, 1}
+							.stage_id = matched_clients.at(client_with_stage_selection)->selected_stage,
+							.characters = {matched_clients.at(0)->selected_character, matched_clients.at(1)->selected_character}
 						};
-						next_game_stage = (next_game_stage + 1) % allowed_game_stages.size();
+						client_with_stage_selection = (client_with_stage_selection + 1) % 2;
 						std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> game_in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
 						game_instances.emplace_back(
 							game_in_messages,
@@ -374,8 +379,8 @@ void InitializationHandler::run() {
 							start_signal.player_b_connection_quality(player_b_connection);
 							start_signal.player_a_character = game_settings.characters[0];
 							start_signal.player_b_character = game_settings.characters[1];
-							start_signal.player_a_palette = 1;
-							start_signal.player_b_palette = 2;
+							start_signal.player_a_palette = matched_clients.at(0)->selected_palette;
+							start_signal.player_b_palette = matched_clients.at(1)->selected_palette;
 							serializer.clear();
 							start_signal.serial(serializer, STNP_VERSION);
 
