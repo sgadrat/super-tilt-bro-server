@@ -151,15 +151,17 @@ void GameState::serial(SerializationHandler& s) {
 		}
 	}
 
-	// Copy characters state
+	// Copy character specific data
 	for (size_t char_num = 0; char_num < 2; ++char_num) {
 		size_t const character_objects = (char_num == 0 ? player_a_objects : player_b_objects);
 
 		switch (this->emulator_ram[config_player_a_character + char_num]) {
-			case 0: // Sinbad
+			// Sinbad
+			case 0:
 				break;
 
-			case 1: // Kiki
+			// Kiki
+			case 1:
 				// Platform stage-element
 				for (size_t i = 0; i < 9; ++i) {
 					s.uint8(this->emulator_ram[character_objects + i]);
@@ -175,5 +177,81 @@ void GameState::serial(SerializationHandler& s) {
 			default:
 				throw std::runtime_error("tried to serialize unknown character");
 		}
+	}
+
+	// Copy stage specific data
+	switch (this->emulator_ram[config_selected_stage]) {
+		// Flatland
+		case 0:
+			break;
+
+		// The Pit
+		case 1: {
+			s.uint8(this->emulator_ram[stage_pit_platform1_direction_v]);
+			s.uint8(this->emulator_ram[stage_pit_platform2_direction_v]);
+			s.uint8(this->emulator_ram[stage_pit_platform1_direction_h]);
+			s.uint8(this->emulator_ram[stage_pit_platform2_direction_h]);
+
+			size_t const STAGE_OFFSET_ELEMENTS = 12;
+			size_t const STAGE_ELEMENT_SIZE = 9;
+			size_t const STAGE_PIT_MOVING_PLATFORM_1_OFFSET = STAGE_ELEMENT_SIZE * 2;
+			size_t const STAGE_PIT_MOVING_PLATFORM_2_OFFSET = STAGE_PIT_MOVING_PLATFORM_1_OFFSET + STAGE_ELEMENT_SIZE;
+			size_t const STAGE_PLATFORM_OFFSET_TOP = 3;
+			size_t const STAGE_PLATFORM_OFFSET_LEFT = 1;
+			s.uint8(this->emulator_ram[stage_data+STAGE_OFFSET_ELEMENTS+STAGE_PIT_MOVING_PLATFORM_1_OFFSET+STAGE_PLATFORM_OFFSET_TOP]);
+			s.uint8(this->emulator_ram[stage_data+STAGE_OFFSET_ELEMENTS+STAGE_PIT_MOVING_PLATFORM_1_OFFSET+STAGE_PLATFORM_OFFSET_LEFT]);
+			s.uint8(this->emulator_ram[stage_data+STAGE_OFFSET_ELEMENTS+STAGE_PIT_MOVING_PLATFORM_2_OFFSET+STAGE_PLATFORM_OFFSET_TOP]);
+			s.uint8(this->emulator_ram[stage_data+STAGE_OFFSET_ELEMENTS+STAGE_PIT_MOVING_PLATFORM_2_OFFSET+STAGE_PLATFORM_OFFSET_LEFT]);
+			break;
+		}
+
+		// Skyride
+		case 2:
+			break;
+
+		// The Hunt
+		case 3: {
+			uint8_t const STAGE_GEM_GEM_STATE_COOLDOWN = 0;
+			uint8_t const STAGE_GEM_GEM_STATE_ACTIVE = 1;
+			uint8_t const STAGE_GEM_GEM_STATE_BREAKING = 2;
+			uint8_t const STAGE_GEM_GEM_STATE_BUFF = 3;
+
+			s.uint8(this->emulator_ram[stage_gem_gem_state]);
+			switch (this->emulator_ram[stage_gem_gem_state]) {
+				case STAGE_GEM_GEM_STATE_COOLDOWN:
+					s.uint8(this->emulator_ram[stage_gem_gem_cooldown_low]);
+					s.uint8(this->emulator_ram[stage_gem_gem_cooldown_high]);
+					break;
+
+				case STAGE_GEM_GEM_STATE_ACTIVE:
+					s.uint8(this->emulator_ram[stage_gem_gem_position_x_low]);
+					s.uint8(this->emulator_ram[stage_gem_gem_position_x_high]);
+					s.uint8(this->emulator_ram[stage_gem_gem_position_y_low]);
+					s.uint8(this->emulator_ram[stage_gem_gem_position_y_high]);
+					s.uint8(this->emulator_ram[stage_gem_gem_velocity_h_low]);
+					s.uint8(this->emulator_ram[stage_gem_gem_velocity_h_high]);
+					s.uint8(this->emulator_ram[stage_gem_gem_velocity_v_low]);
+					s.uint8(this->emulator_ram[stage_gem_gem_velocity_v_high]);
+					break;
+
+				case STAGE_GEM_GEM_STATE_BREAKING:
+					s.uint8(this->emulator_ram[stage_gem_buffed_player]);
+					break;
+
+				case STAGE_GEM_GEM_STATE_BUFF:
+					s.uint8(this->emulator_ram[stage_gem_gem_cooldown_low]);
+					s.uint8(this->emulator_ram[stage_gem_gem_cooldown_high]);
+					s.uint8(this->emulator_ram[stage_gem_last_opponent_state]);
+					s.uint8(this->emulator_ram[stage_gem_buffed_player]);
+					break;
+
+				default:
+					throw std::runtime_error("tried to serialize unknown gem state");
+			}
+			break;
+		}
+
+		default:
+			throw std::runtime_error("tried to serialize unknown stage");
 	}
 }
