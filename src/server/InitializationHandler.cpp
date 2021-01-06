@@ -242,7 +242,7 @@ void InitializationHandler::run() {
 						"                        ",
 						in_message->sender
 					);
-				}else if (getVersionTuple(connection_request) < std::make_tuple(2, stnp::message::Connection::ReleaseType::ALPHA, 4)) {
+				}else if (getVersionTuple(connection_request) < std::make_tuple(2, stnp::message::Connection::ReleaseType::ALPHA, 5)) {
 					// Send error
 					syslog(LOG_NOTICE, "InitializationHandler: connection request with old client: client version %s", computeVersionName(connection_request).c_str());
 					this->rejectConnection(
