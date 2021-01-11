@@ -32,7 +32,7 @@ namespace {
 			GameInstanceThread(
 				std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages,
 				std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages,
-				std::shared_ptr<ThreadSafeFifo<GameInstance::GameInfo>> game_info_queue,
+				std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameSummary>> game_info_queue,
 				uint32_t antilag_prediction,
 				GameInstance::ClientInfo client_a,
 				GameInstance::ClientInfo client_b,
@@ -135,9 +135,11 @@ namespace {
 InitializationHandler::InitializationHandler(
 	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages,
 	std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages,
-	std::shared_ptr<ClientsDatagramRouting> clients_routing
+	std::shared_ptr<ClientsDatagramRouting> clients_routing,
+	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameSummary>> game_info_messages
 )
 : in_messages(in_messages), out_messages(out_messages), clients_routing(clients_routing)
+, game_info_messages(game_info_messages)
 {}
 
 void InitializationHandler::run() {
@@ -356,7 +358,7 @@ void InitializationHandler::run() {
 						game_instances.emplace_back(
 							game_in_messages,
 							this->out_messages,
-							nullptr, //TODO use it to gather statistics (and maybe destroy instance once terminated)
+							this->game_info_messages,
 							antilag_prediction,
 							matched_clients.at(0)->client,
 							matched_clients.at(1)->client,

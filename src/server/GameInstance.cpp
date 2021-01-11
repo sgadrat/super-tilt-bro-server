@@ -150,7 +150,7 @@ std::vector<uint8_t> serialize_new_game_state_msg(
 void GameInstance::run(
 	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages,
 	std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages,
-	std::shared_ptr<ThreadSafeFifo<GameInfo>> game_info_queue,
+	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameSummary>> game_info_queue,
 	uint32_t antilag_prediction,
 	ClientInfo client_a,
 	ClientInfo client_b,
@@ -165,6 +165,17 @@ void GameInstance::run(
 		// Variables with lifetime spanning entire run() duration
 		this->keep_running = true;
 		this->over = false;
+
+		std::shared_ptr<StatisticsSink::GameSummary> game_info(new StatisticsSink::GameSummary);
+		::uuid_generate(game_info->game_id);
+		game_info->game_begin = std::chrono::system_clock::now();
+		game_info->game_end = game_info->game_begin;
+		game_info->client_a_id = client_a.id;
+		game_info->client_b_id = client_b.id;
+		game_info->character_a = game_settings.characters.at(0);
+		game_info->character_b = game_settings.characters.at(1);
+		game_info->stage = game_settings.stage_id;
+		game_info->winner = 255;
 
 		std::shared_ptr<network::IncommingUdpMessage> in_message = nullptr;
 		std::vector<boost::asio::ip::udp::endpoint> clients({client_a.endpoint, client_b.endpoint});
@@ -344,10 +355,8 @@ void GameInstance::run(
 		// Send game's result
 		syslog(LOG_INFO, "GameInstance: game over");
 		if (game_info_queue) {
-			std::shared_ptr<GameInfo> game_info;
-			game_info->player_a_id = client_a.id;
-			game_info->player_b_id = client_b.id;
-			game_info->winner = (clients.at(gamestate_history.rbegin()->second.winner()) == client_a.endpoint ? client_a.id : client_b.id);
+			game_info->game_end = std::chrono::system_clock::now();
+			game_info->winner = gamestate_history.rbegin()->second.winner();
 			game_info_queue->push(game_info);
 		}
 	}catch(std::exception const& e) {

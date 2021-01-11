@@ -17,5 +17,7 @@ g++ \
 	ClientsDatagramRouting.cpp \
 	InitializationHandler.cpp \
 	GameInstance.cpp \
+	StatisticsSink.cpp \
 	-lpthread \
+	-luuid \
 	-lboost_system
