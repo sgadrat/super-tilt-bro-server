@@ -5,17 +5,53 @@
 
 #include "network.hpp"
 
+#include <cstdlib>
 #include <chrono> //TODO remove, just a temporary hack before handling signals
+#include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <syslog.h>
 #include <thread>
 
+namespace {
+
+template<typename T, typename U>
+T lex_cast(U orig) {
+	std::istringstream iss{std::string(orig)};
+	T dest;
+	iss >> dest;
+	return dest;
+}
+
+}
+
 int main(int argc, char** argv) {
-	// Parse command line
-	//TODO
+	// Parse options
 	uint16_t port = 3000;
-	std::string game_summaries_path = "/tmp/stb_game_summaries.txt";
+	std::string game_summaries_path;
+
+	if (argc > 1) {
+		std::cerr <<
+			"usage: STB_PORT=port STB_GAME_SUMMARIES=game_summaries " << argv[0] << '\n' <<
+			'\n' <<
+			"\tport ............ the port to listen (default: " << port << ")\n"
+			"\tgame_summaries .. file on which played games will be logged, empty to disable (default: '" << game_summaries_path << "')\n" <<
+		'\n';
+		syslog(LOG_ERR, "invalid command line options");
+		return 1;
+	}
+
+	char* port_env = getenv("STB_PORT");
+	if (port_env != NULL) {
+		port = lex_cast<uint16_t>(port_env);
+	}
+
+	char* game_summaries_path_env = getenv("STB_GAME_SUMMARIES");
+	if (game_summaries_path_env != NULL) {
+		game_summaries_path = game_summaries_path_env;
+	}
+
 	syslog(LOG_INFO, "starting stb server, listening on port %d, logging games in '%s'", port, game_summaries_path.c_str());
 
 	// Prepare components
