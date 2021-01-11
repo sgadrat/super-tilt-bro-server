@@ -90,7 +90,11 @@ GameState initial_gamestate() {
 	const uint8_t STAGE_THEPIT = 1;
 	const uint8_t STAGE_SKYRIDE = 2;
 	const uint8_t STAGE_THEHUNT = 3;
-	return GameState(STAGE_SKYRIDE, [](std::string const & m) {std::cerr << m << '\n';});
+
+	const uint8_t CHAR_SINBAD = 0;
+	const uint8_t CHAR_KIKI = 1;
+
+	return GameState(STAGE_FLATLAND, std::array<uint8_t, 2>{CHAR_SINBAD, CHAR_SINBAD}, [](std::string const & m) {std::cerr << m << '\n';});
 }
 
 #if PERF_UNITS == PERF_TIME
