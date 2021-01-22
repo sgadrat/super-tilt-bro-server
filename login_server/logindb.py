@@ -1,6 +1,11 @@
+import json
+import os.path
+
 #
 # Working structures
 #
+
+_db_file = None
 
 user_db = {
 	'registered_logins': {},
@@ -21,16 +26,24 @@ def _new_registered_client_id():
 	return new_id
 
 def _sync_db():
-	#TODO
-	pass
+	global _db_file, user_db
+	if _db_file is not None:
+		tmp_db_path = '{}.tmp'.format(_db_file)
+		with open(tmp_db_path, 'w') as tmp_db:
+			json.dump(user_db, tmp_db)
+		os.replace(tmp_db_path, _db_file)
 
 #
 # Public API
 #
 
 def load(db_file):
-	#TODO
-	pass
+	global _db_file, user_db
+	_db_file = db_file
+
+	if db_file is not None and os.path.isfile(db_file):
+		with open(db_file, 'r') as f:
+			user_db = json.load(f)
 
 def get_anonymous_id():
 	global user_db
