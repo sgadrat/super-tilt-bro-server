@@ -182,6 +182,7 @@ struct Connection {
 	uint8_t selected_character;
 	uint8_t selected_palette;
 	uint8_t selected_stage;
+	bool ranked_play;
 
 	enum class SupportType {
 		CARTRIDGE = 0,
@@ -234,6 +235,11 @@ struct Connection {
 			s.uint8(this->selected_character);
 			s.uint8(this->selected_palette);
 			s.uint8(this->selected_stage);
+		}
+		if (this->protocol_version >= 4) {
+			uint8_t ranked = this->ranked_play;
+			s.uint8(ranked);
+			this->ranked_play = ranked;
 		}
 	}
 };

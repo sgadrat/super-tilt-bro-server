@@ -16,7 +16,7 @@
 #include <utility>
 
 namespace {
-	constexpr uint8_t STNP_VERSION = 3;
+	constexpr uint8_t STNP_VERSION = 4;
 
 	class GameInstanceThread {
 		public:
@@ -297,13 +297,14 @@ void InitializationHandler::run() {
 					if (!found) {
 						syslog(
 							LOG_INFO,
-							"InitializationHandler: new client: %s:%d id=%08x ping_min=%dms ping_max=%dms version=%s",
+							"InitializationHandler: new client: %s:%d id=%08x ping_min=%dms ping_max=%dms version=%s ranked=%s",
 							in_message->sender.address().to_string().c_str(),
 							in_message->sender.port(),
 							connection_request.client_id,
 							connection_request.ping_min * 4,
 							connection_request.ping_max * 4,
-							computeVersionName(connection_request).c_str()
+							computeVersionName(connection_request).c_str(),
+							connection_request.ranked_play ? "true" : "false"
 						);
 						clients.push_back(client);
 					}

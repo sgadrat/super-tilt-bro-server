@@ -37,11 +37,12 @@ At any time during the initialization phase, the server may send a Disconnected 
 		uint8 selected_character;
 		uint8 selected_palette;
 		uint8 selected_stage;
+		uint8 ranked_play;
 	}
 
 * **client_id**: Identifier unique to this client.
 * **ping_min**: Minimal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_min=3 means 12ms of ping.)
-* **protocol_version**: Expected version of this protocol. This document describes version 3.
+* **protocol_version**: Expected version of this protocol. This document describes version 4.
 * **ping_max**: Maximal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_max=3 means 12ms of ping.)
 * **framerate**: 0: 50Hz, 1: 60Hz.
 * **support**: 0: physical cartridge, 1: native emulator, 2: web emulator, 3: unknown/other
@@ -51,6 +52,7 @@ At any time during the initialization phase, the server may send a Disconnected 
 * **selected_character**: Character that the player wants to play
 * **selected_palette**: Color variant that the player wants to play
 * **selected_stage**: Stage on which the player wants to play
+* **ranked_play**: 0: non-ranked, 1: ranked
 
 .. note::
 	Bytes 8 and 9 may be refered as flags and version.
