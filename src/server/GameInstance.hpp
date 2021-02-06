@@ -26,6 +26,7 @@ public:
 	struct GameSettings {
 		uint8_t stage_id;
 		std::array<uint8_t, 2> characters;
+		std::array<bool, 2> ranked;
 	};
 
 	/**

@@ -176,6 +176,8 @@ void GameInstance::run(
 		game_info->character_b = game_settings.characters.at(1);
 		game_info->stage = game_settings.stage_id;
 		game_info->winner = 255;
+		game_info->player_a_ranked = game_settings.ranked.at(0);
+		game_info->player_b_ranked = game_settings.ranked.at(1);
 
 		std::shared_ptr<network::IncommingUdpMessage> in_message = nullptr;
 		std::vector<boost::asio::ip::udp::endpoint> clients({client_a.endpoint, client_b.endpoint});

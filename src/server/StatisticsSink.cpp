@@ -21,6 +21,10 @@ std::string client_id(uint32_t id) {
 	return std::string(buffer);
 }
 
+char pbool(bool value) {
+	return value ? '1' : '0';
+}
+
 }
 
 StatisticsSink::StatisticsSink(
@@ -49,6 +53,8 @@ void StatisticsSink::run() {
 				"end=" << iso8601(game_summary->game_end) << '\t' <<
 				"client_a=" << client_id(game_summary->client_a_id) << '\t' <<
 				"client_b=" << client_id(game_summary->client_b_id) << '\t' <<
+				"player_a_ranked=" << pbool(game_summary->player_a_ranked) << '\t' <<
+				"player_b_ranked=" << pbool(game_summary->player_b_ranked) << '\t' <<
 				"character_a=" << uint16_t(game_summary->character_a) << '\t' <<
 				"character_b=" << uint16_t(game_summary->character_b) << '\t' <<
 				"stage=" << uint16_t(game_summary->stage) << '\t' <<

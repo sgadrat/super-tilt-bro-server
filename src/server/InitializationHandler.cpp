@@ -69,6 +69,7 @@ namespace {
 		uint_fast8_t selected_character;
 		uint_fast8_t selected_palette;
 		uint_fast8_t selected_stage;
+		bool ranked;
 		std::chrono::time_point<std::chrono::steady_clock> last_heartbeat;
 	};
 
@@ -285,6 +286,7 @@ void InitializationHandler::run() {
 						.selected_character = connection_request.selected_character,
 						.selected_palette = connection_request.selected_palette,
 						.selected_stage = connection_request.selected_stage,
+						.ranked = connection_request.ranked_play,
 						.last_heartbeat = now
 					};
 					for (ClientData& existing_client: clients) {
@@ -352,7 +354,8 @@ void InitializationHandler::run() {
 						// Prepare game instance
 						GameInstance::GameSettings game_settings = {
 							.stage_id = matched_clients.at(client_with_stage_selection)->selected_stage,
-							.characters = {matched_clients.at(0)->selected_character, matched_clients.at(1)->selected_character}
+							.characters = {matched_clients.at(0)->selected_character, matched_clients.at(1)->selected_character},
+							.ranked = {matched_clients.at(0)->ranked, matched_clients.at(1)->ranked}
 						};
 						client_with_stage_selection = (client_with_stage_selection + 1) % 2;
 						std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> game_in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(5));

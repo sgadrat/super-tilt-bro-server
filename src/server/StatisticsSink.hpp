@@ -16,6 +16,8 @@ public:
 		std::chrono::system_clock::time_point game_end;
 		uint32_t client_a_id;
 		uint32_t client_b_id;
+		bool player_a_ranked;
+		bool player_b_ranked;
 		uint8_t character_a;
 		uint8_t character_b;
 		uint8_t stage;
