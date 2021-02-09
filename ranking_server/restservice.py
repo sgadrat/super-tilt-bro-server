@@ -3,8 +3,6 @@ import json
 import rankingdb
 import sys
 
-ADDR_WHITE_LIST = ['127.0.0.1']
-
 class AuthError(Exception):
 	pass
 
@@ -13,7 +11,7 @@ def log(m):
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
 	def _check_addr(self):
-		if self.client_address[0] not in ADDR_WHITE_LIST:
+		if self.client_address[0] not in self.server._addr_white_list:
 			raise AuthError()
 
 	def log_request(code='-', size='-'):
@@ -45,8 +43,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 		except AuthError:
 			pass
 
-def serve(port):
+def serve(port, whitelist):
 	server_address = ('', port)
 	httpd = http.server.ThreadingHTTPServer(server_address, RequestHandler)
-	httpd._addr_white_list = ADDR_WHITE_LIST
+	httpd._addr_white_list = whitelist
 	httpd.serve_forever()
