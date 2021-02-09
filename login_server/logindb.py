@@ -18,7 +18,7 @@ user_db = {
 # Internal utilities
 #
 
-def _new_registered_client_id():
+def _new_registered_user_id():
 	global user_db
 	new_id = user_db['next_registered_id']
 	assert new_id < 0x100000000
@@ -62,6 +62,6 @@ def register_user(user_name, password):
 	assert get_user_info(user_name) is None
 	user_db['registered_logins'][user_name] = {
 		'password': password,
-		'client_id': _new_registered_client_id()
+		'user_id': _new_registered_user_id()
 	}
 	_sync_db()

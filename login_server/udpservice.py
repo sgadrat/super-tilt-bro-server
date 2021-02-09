@@ -119,7 +119,7 @@ def serve(listen_port):
 					# Send response
 					if client_info is not None and client_info['password'] == client_credential['password']:
 						# Password match, send the ID
-						sock.sendto(logged_in_msg(client_info['client_id'], STNP_LOGIN_PASSWORD), client_addr)
+						sock.sendto(logged_in_msg(client_info['user_id'], STNP_LOGIN_PASSWORD), client_addr)
 					else:
 						# Password mismatch, send access denied
 						sock.sendto(
