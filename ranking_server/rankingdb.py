@@ -26,7 +26,9 @@ def _sync_db():
 def _get_user_id(timepoint, connection_id):
 	#TODO should ask the login server for the association timepoint+connection_id to user_id
 	#     For now user_id == connection_id, let's assume it
-	return connection_id
+	#     just convert it to hex string type (to be a valid json property name)
+	return '{:08x}'.format(int(connection_id))
+
 
 #
 # Public API
@@ -85,7 +87,7 @@ def push_games(games_info):
 def get_ladder():
 	global ranking_db
 	return sorted(
-		[{'mmr': ranking_db['users'][u]['ranked_mmr'], 'user_id': u} for u in ranking_db['users']],
+		[{'mmr': ranking_db['users'][u]['ranked_mmr'], 'user_id': int(u, 16)} for u in ranking_db['users']],
 		key=lambda x: (x['mmr'], x['user_id']),
 		reverse=True
 	)
