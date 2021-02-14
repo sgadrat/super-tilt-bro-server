@@ -1,15 +1,26 @@
+import copy
 import json
 import os.path
+import requests
+import sys
 
 #
 # Working structures
 #
 
 _db_file = None
+_login_server = None
 
 ranking_db = {
 	'users': {},
 }
+
+#
+# Utils
+#
+
+def log(m):
+	sys.stderr.write('[{}] {}\n'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()), m))
 
 #
 # Internal utilities
@@ -29,18 +40,35 @@ def _get_user_id(timepoint, connection_id):
 	#     just convert it to hex string type (to be a valid json property name)
 	return '{:08x}'.format(int(connection_id))
 
+def _get_user_name(user_id):
+	user_id_int = int(user_id, 16)
+	resp = requests.get('http://{}:{}/api/login/user_name/{}'.format(_login_server['addr'], _login_server['port'], user_id_int))
+	if resp.status_code != 200:
+		log('bad status code for resoultion of user {}: {}'.format(user_id, resp.status_code))
+		return None
+	user_name = json.loads(resp.text)
+
+	if user_name is None:
+		return None
+	if not isinstance(user_name, str):
+		raise Exception('bad response type: {}'.format(user_name))
+	if len(user_name) < 3 or len(user_name) > 16:
+		raise Exception('unvalid name: "{}"'.format(user_name))
+	return user_name
 
 #
 # Public API
 #
 
-def load(db_file):
-	global _db_file, ranking_db
-	_db_file = db_file
+def load(db_file, login_server):
+	global _db_file, _login_server, ranking_db
 
+	_db_file = db_file
 	if db_file is not None and os.path.isfile(db_file):
 		with open(db_file, 'r') as f:
 			ranking_db = json.load(f)
+
+	_login_server = copy.deepcopy(login_server)
 
 def push_games(games_info):
 	global ranking_db
@@ -63,6 +91,7 @@ def push_games(games_info):
 				ranking_db['users'][user_id] = {
 					'ranked_mmr': 1000,
 					'unranked_mmr': 1000,
+					'name': None,
 				}
 
 		# Apply MMR change
@@ -86,8 +115,24 @@ def push_games(games_info):
 
 def get_ladder():
 	global ranking_db
+	users = ranking_db['users']
+
+	# Update names of ranked players
+	try:
+		for user_id in users:
+			user_info = users[user_id]
+			if user_info['name'] is None:
+				user_info['name'] = _get_user_name(user_id)
+	except Exception as e:
+		log('Failed to retrieve new ranked players names: {}'.format(e))
+
+	# Generate sorted array of player
 	return sorted(
-		[{'mmr': ranking_db['users'][u]['ranked_mmr'], 'user_id': int(u, 16)} for u in ranking_db['users']],
-		key=lambda x: (x['mmr'], x['user_id']),
+		[
+			{'mmr': users[u]['ranked_mmr'], 'user_name': users[u]['name']}
+			for u in users
+			if users[u]['name'] is not None
+		],
+		key=lambda x: (x['mmr'], x['user_name']),
 		reverse=True
 	)

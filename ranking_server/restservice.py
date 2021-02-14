@@ -2,12 +2,13 @@ import http.server
 import json
 import rankingdb
 import sys
+import time
 
 class AuthError(Exception):
 	pass
 
 def log(m):
-	sys.stderr.write('{}\n'.format(m))
+	sys.stderr.write('[{}] {}\n'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()), m))
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
 	def _check_addr(self):

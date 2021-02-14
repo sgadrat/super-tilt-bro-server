@@ -1,11 +1,13 @@
 import json
 import os.path
+import threading
 
 #
 # Working structures
 #
 
 _db_file = None
+_db_mutex = threading.Lock()
 
 user_db = {
 	'registered_logins': {},
@@ -38,30 +40,42 @@ def _sync_db():
 #
 
 def load(db_file):
-	global _db_file, user_db
-	_db_file = db_file
+	global _db_file, _db_mutex, user_db
+	with _db_mutex:
+		_db_file = db_file
 
-	if db_file is not None and os.path.isfile(db_file):
-		with open(db_file, 'r') as f:
-			user_db = json.load(f)
+		if db_file is not None and os.path.isfile(db_file):
+			with open(db_file, 'r') as f:
+				user_db = json.load(f)
 
 def get_anonymous_id():
-	global user_db
-	new_id = user_db['next_anonymous_id']
-	user_db['next_anonymous_id'] = (user_db['next_anonymous_id'] + 1) % 0x80000000
-	_sync_db()
-	return new_id
+	global _db_mutex, user_db
+	with _db_mutex:
+		new_id = user_db['next_anonymous_id']
+		user_db['next_anonymous_id'] = (user_db['next_anonymous_id'] + 1) % 0x80000000
+		_sync_db()
+		return new_id
 
 def get_user_info(user_name):
-	global user_db
-	_sync_db()
-	return user_db['registered_logins'].get(user_name)
+	global _dbg_mutex, user_db
+	with _db_mutex:
+		_sync_db()
+		return user_db['registered_logins'].get(user_name)
+
+def get_user_name(user_id):
+	global _db_mutex, user_db
+	with _db_mutex:
+		for user_name, user_info in user_db['registered_logins'].items():
+			if user_info['user_id'] == user_id:
+				return user_name
+		return None
 
 def register_user(user_name, password):
-	global user_db
-	assert get_user_info(user_name) is None
-	user_db['registered_logins'][user_name] = {
-		'password': password,
-		'user_id': _new_registered_user_id()
-	}
-	_sync_db()
+	global _db_mutex, user_db
+	with _db_mutex:
+		assert user_name not in user_db['registered_logins']
+		user_db['registered_logins'][user_name] = {
+			'password': password,
+			'user_id': _new_registered_user_id()
+		}
+		_sync_db()
