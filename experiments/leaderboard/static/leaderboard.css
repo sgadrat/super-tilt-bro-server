@@ -1,0 +1,31 @@
+.title {
+	text-align: center;
+}
+table {
+	width: 80%;
+	margin: auto;
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+tr {
+	margin: 0px;
+}
+td {
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+	margin: 0px;
+	padding: 1em;
+}
+th.big {
+	width: 100%;
+}
+img.region_flag {
+	width: 2em;
+	margin-right: 0.5em;
+	vertical-align: middle;
+}
+img.medal {
+	width: 2em;
+	margin-right: 0.5em;
+	vertical-align: middle;
+}
