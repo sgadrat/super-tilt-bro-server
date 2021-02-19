@@ -1,0 +1,18 @@
+[Unit]
+Description=Super Tilt Bro. login server
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=debian
+ExecStartPre=
+ExecStart=/usr/bin/python3 PATH_TO/login_server/login_server.py
+ExecStartPost=
+ExecStop=
+ExecReload=
+
+[Install]
+WantedBy=multi-user.target
