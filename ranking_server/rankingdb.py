@@ -118,13 +118,18 @@ def get_ladder():
 	users = ranking_db['users']
 
 	# Update names of ranked players
+	db_updated = False
 	try:
 		for user_id in users:
 			user_info = users[user_id]
 			if user_info['name'] is None:
 				user_info['name'] = _get_user_name(user_id)
+				db_updated = True
 	except Exception as e:
 		log('Failed to retrieve new ranked players names: {}'.format(e))
+
+	if db_updated:
+		_sync_db()
 
 	# Generate sorted array of player
 	return sorted(
