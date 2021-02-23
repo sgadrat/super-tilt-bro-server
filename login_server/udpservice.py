@@ -108,6 +108,16 @@ def serve(listen_port):
 						),
 						client_addr
 					)
+				elif len(client_credential['password']) < 1:
+					sock.sendto(
+						login_failed_msg(
+							"password shall    "+
+							"not be empty      "+
+							"                  "+
+							"                  "
+						),
+						client_addr
+					)
 				else:
 					# Get client info from DB (register the user if needed)
 					client_info = logindb.get_user_info(client_credential['user'])
