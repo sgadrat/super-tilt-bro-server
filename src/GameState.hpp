@@ -154,6 +154,10 @@ void GameState::serial(SerializationHandler& s) {
 	// Copy character specific data
 	for (size_t char_num = 0; char_num < 2; ++char_num) {
 		size_t const character_objects = (char_num == 0 ? player_a_objects : player_b_objects);
+		size_t const kiki_first_wall_sprite_per_player[] = {
+			15 - 1, // INGAME_PLAYER_A_LAST_SPRITE - 1
+			31 - 1, // INGAME_PLAYER_B_LAST_SPRITE - 1
+		};
 
 		switch (this->emulator_ram[config_player_a_character + char_num]) {
 			// Sinbad
@@ -170,6 +174,16 @@ void GameState::serial(SerializationHandler& s) {
 				// Y pos of the platform
 				for (size_t i = 10; i < 12; ++i) {
 					s.uint8(this->emulator_ram[character_objects + i]);
+				}
+
+				// X pos of the platform tiles
+				for (size_t i = 0; i < 2; ++i) {
+					s.uint8(this->emulator_ram[oam_mirror + (kiki_first_wall_sprite_per_player[char_num] * 4) + (i * 4) + 3]);
+				}
+
+				// Platform tiles
+				for (size_t i = 0; i < 2; ++i) {
+					s.uint8(this->emulator_ram[oam_mirror + (kiki_first_wall_sprite_per_player[char_num] * 4) + (i * 4) + 1]);
 				}
 
 				break;
