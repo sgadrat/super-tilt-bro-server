@@ -1,9 +1,9 @@
 import http.server
 import json
+from logging import debug, error
 import logindb
 import re
 import sys
-import time
 
 #
 # Configurable constants
@@ -21,9 +21,6 @@ class AuthError(Exception):
 class InvalidRequest(Exception):
 	pass
 
-def log(m):
-	sys.stderr.write('[{}] {}\n'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()), m))
-
 def answer(request, message, code = 200):
 	request.send_response(code)
 	request.end_headers()
@@ -38,7 +35,7 @@ def success(request, message):
 #
 
 def get_user_name(request, url_params):
-	log('get_user_name: "{}"'.format(url_params))
+	debug('get_user_name: "{}"'.format(url_params))
 	if len(url_params) == 1:
 		user_id = int(url_params[0])
 		user_name = logindb.get_user_name(user_id)
@@ -86,7 +83,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 		except AuthError:
 			pass
 		except Exception as e:
-			log('failed handling request on "{}": {}'.format(self.path, e))
+			error('failed handling request on "{}": {}'.format(self.path, e))
 
 	def do_GET(self):
 		try:

@@ -1,14 +1,11 @@
 import http.server
 import json
+from logging import error
 import rankingdb
 import sys
-import time
 
 class AuthError(Exception):
 	pass
-
-def log(m):
-	sys.stderr.write('[{}] {}\n'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()), m))
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
 	def _check_addr(self):
@@ -32,7 +29,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 		except AuthError:
 			pass
 		except Exception as e:
-			log('failed handling request on "{}": {}'.format(self.path, e))
+			error('failed handling request on "{}": {}'.format(self.path, e))
 
 	def do_GET(self):
 		try:

@@ -1,5 +1,6 @@
 import socket
 import logindb
+from logging import debug, info, warning
 
 #
 # STNP, login extension
@@ -54,7 +55,7 @@ def parse_login_request(message):
 		for i in range(offset, offset+16):
 			c = message[i]
 			if c >= len(STNP_LOGIN_CHARSET):
-				print('ill formated login request: invalid character at byte {}'.format(i))
+				warning('ill formated login request: invalid character at byte {}'.format(i))
 				return None
 			if c == 0:
 				break
@@ -62,7 +63,7 @@ def parse_login_request(message):
 		return value
 
 	if len(message) != 34 or message[0] != STNP_LOGIN_MSG_TYPE or message[1] != STNP_LOGIN_PASSWORD:
-		print('ill formated login request')
+		warning('ill formated login request')
 		return None
 
 	user = parse_stnp_str(2)
@@ -77,9 +78,9 @@ def serve(listen_port):
 	sock.bind(('', listen_port))
 	while True:
 		message, client_addr = sock.recvfrom(1024) #TODO better max size than 1024 (which is copy/pasted for an example)
-		print('got message from {}: {}'.format(client_addr, message))
+		debug('got message from {}: {}'.format(client_addr, message))
 		if message[0] == STNP_LOGIN_MSG_TYPE:
-			print('login message')
+			debug('login message')
 			if message[1] == STNP_LOGIN_ANONYMOUS:
 				# Log the user with a fresh anonymous ID
 				client_id = logindb.get_anonymous_id()
@@ -122,7 +123,7 @@ def serve(listen_port):
 					# Get client info from DB (register the user if needed)
 					client_info = logindb.get_user_info(client_credential['user'])
 					if client_info is None:
-						print('new user: "{}"'.format(client_credential['user']))
+						info('new user: "{}"'.format(client_credential['user']))
 						logindb.register_user(client_credential['user'], client_credential['password'])
 						client_info = logindb.get_user_info(client_credential['user'])
 

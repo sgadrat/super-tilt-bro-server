@@ -1,9 +1,9 @@
 import copy
 import json
+from logging import error
 import os.path
 import requests
 import sys
-import time
 
 #
 # Working structures
@@ -15,13 +15,6 @@ _login_server = None
 ranking_db = {
 	'users': {},
 }
-
-#
-# Utils
-#
-
-def log(m):
-	sys.stderr.write('[{}] {}\n'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()), m))
 
 #
 # Internal utilities
@@ -45,7 +38,7 @@ def _get_user_name(user_id):
 	user_id_int = int(user_id, 16)
 	resp = requests.get('http://{}:{}/api/login/user_name/{}'.format(_login_server['addr'], _login_server['port'], user_id_int))
 	if resp.status_code != 200:
-		log('bad status code for resoultion of user {}: {}'.format(user_id, resp.status_code))
+		error('bad status code for resoultion of user {}: {}'.format(user_id, resp.status_code))
 		return None
 	user_name = json.loads(resp.text)
 
@@ -127,7 +120,7 @@ def get_ladder():
 				user_info['name'] = _get_user_name(user_id)
 				db_updated = True
 	except Exception as e:
-		log('Failed to retrieve new ranked players names: {}'.format(e))
+		error('Failed to retrieve new ranked players names: {}'.format(e))
 
 	if db_updated:
 		_sync_db()
