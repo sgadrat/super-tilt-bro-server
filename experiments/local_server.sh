@@ -7,7 +7,7 @@ login_pid=$!
 ../ranking_server/ranking_server.py --db-file /tmp/stb_ranking.json --log-file /tmp/stb_ranking.log &
 ranking_pid=$!
 sleep 5
-tail -F /tmp/stb_games.log | ./game_ranking_pusher.py &
+tail -n0 -F /tmp/stb_games.log | ./game_ranking_pusher.py &
 pusher_pid=$!
 
 watch curl -s http://127.0.0.1:8123/api/rankings
