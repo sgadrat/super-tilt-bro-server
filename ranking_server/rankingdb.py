@@ -1,6 +1,6 @@
 import copy
 import json
-from logging import error
+import logging as log
 import os.path
 import requests
 import sys
@@ -15,6 +15,33 @@ _login_server = None
 ranking_db = {
 	'users': {},
 }
+
+#
+# Utilities
+#
+
+def _elo(player_mmr, opponent_mmr, score):
+	"""
+	Compute player's updated mmr after an event.
+
+	>>> _elo(1000, 1000, 1)
+	1016
+	>>> _elo(1000, 1000, 0)
+	984
+	>>> _elo(1000, 1200, 0)
+	992
+	>>> _elo(1000, 1200, 1)
+	1024
+	>>> _elo(1200, 1000, 1)
+	1208
+	>>> _elo(1200, 1000, 0)
+	1176
+	"""
+	K = 32       # Maximum change in score
+	SPREAD = 400 # A difference of SPREAD/2 MMR points, means the highest ranked player should have ~75% winrate
+	expected_score = 1 / (1 + 10 ** ((opponent_mmr - player_mmr) / SPREAD))
+	new_mmr = player_mmr + K * (score - expected_score)
+	return max(0, round(new_mmr))
 
 #
 # Internal utilities
@@ -38,7 +65,7 @@ def _get_user_name(user_id):
 	user_id_int = int(user_id, 16)
 	resp = requests.get('http://{}:{}/api/login/user_name/{}'.format(_login_server['addr'], _login_server['port'], user_id_int))
 	if resp.status_code != 200:
-		error('bad status code for resoultion of user {}: {}'.format(user_id, resp.status_code))
+		log.error('bad status code for resoultion of user {}: {}'.format(user_id, resp.status_code))
 		return None
 	user_name = json.loads(resp.text)
 
@@ -89,7 +116,6 @@ def push_games(games_info):
 				}
 
 		# Apply MMR change
-		#TODO actual Elo
 		if game_info['winner'] == 0:
 			winner = user_a
 			loser = user_b
@@ -101,8 +127,13 @@ def push_games(games_info):
 			winner_mmr_key = 'ranked_mmr' if game_info['player_b_ranked'] == 1 else 'unranked_mmr'
 			loser_mmr_key = 'ranked_mmr' if game_info['player_a_ranked'] == 1 else 'unranked_mmr'
 
-		ranking_db['users'][winner][winner_mmr_key] += 10
-		ranking_db['users'][loser][loser_mmr_key] = max(0, ranking_db['users'][loser][loser_mmr_key] - 10)
+		winner = ranking_db['users'][winner]
+		loser = ranking_db['users'][loser]
+		winner_mmr = winner[winner_mmr_key]
+		loser_mmr = loser[loser_mmr_key]
+
+		winner[winner_mmr_key] = _elo(winner_mmr, loser_mmr, 1)
+		loser[loser_mmr_key] = _elo(loser_mmr, winner_mmr, 0)
 
 	# Update DB file
 	_sync_db()
@@ -120,7 +151,7 @@ def get_ladder():
 				user_info['name'] = _get_user_name(user_id)
 				db_updated = True
 	except Exception as e:
-		error('Failed to retrieve new ranked players names: {}'.format(e))
+		log.error('Failed to retrieve new ranked players names: {}'.format(e))
 
 	if db_updated:
 		_sync_db()
