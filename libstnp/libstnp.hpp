@@ -1,11 +1,12 @@
 #pragma once
 
-#include <stdint.h>
+#include <array>
 #include <cassert>
-#include <endian.h>
 #include <cstring>
+#include <endian.h>
 #include <vector>
 #include <stdexcept>
+#include <stdint.h>
 
 namespace stnp {
 
@@ -183,6 +184,7 @@ struct Connection {
 	uint8_t selected_palette;
 	uint8_t selected_stage;
 	bool ranked_play;
+	std::array<uint8_t, 16> password;
 
 	enum class SupportType {
 		CARTRIDGE = 0,
@@ -240,6 +242,13 @@ struct Connection {
 			uint8_t ranked = this->ranked_play;
 			s.uint8(ranked);
 			this->ranked_play = ranked;
+			try {
+				for (size_t i = 0; i < this->password.size(); ++i) {
+					s.uint8(this->password[i]);
+				}
+			}catch (std::out_of_range const&) {
+				::bzero((void*)this->password.data(), this->password.size());
+			}
 		}
 	}
 };

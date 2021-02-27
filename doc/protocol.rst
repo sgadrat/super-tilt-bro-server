@@ -38,6 +38,7 @@ At any time during the initialization phase, the server may send a Disconnected 
 		uint8 selected_palette;
 		uint8 selected_stage;
 		uint8 ranked_play;
+		uint8[16] password; /* Optional */
 	}
 
 * **client_id**: Identifier unique to this client.
@@ -53,6 +54,7 @@ At any time during the initialization phase, the server may send a Disconnected 
 * **selected_palette**: Color variant that the player wants to play
 * **selected_stage**: Stage on which the player wants to play
 * **ranked_play**: 0: non-ranked, 1: ranked
+* **password**: only players with the same password can be matched together. If absent, should be infered to be zero-filled
 
 .. note::
 	Bytes 8 and 9 may be refered as flags and version.

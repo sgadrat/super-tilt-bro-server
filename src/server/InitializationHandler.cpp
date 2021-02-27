@@ -70,6 +70,7 @@ namespace {
 		uint_fast8_t selected_palette;
 		uint_fast8_t selected_stage;
 		bool ranked;
+		std::array<uint8_t, 16> password;
 		std::chrono::time_point<std::chrono::steady_clock> last_heartbeat;
 	};
 
@@ -291,6 +292,7 @@ void InitializationHandler::run() {
 						.selected_palette = connection_request.selected_palette,
 						.selected_stage = connection_request.selected_stage,
 						.ranked = connection_request.ranked_play,
+						.password = connection_request.password,
 						.last_heartbeat = now
 					};
 					for (ClientData& existing_client: clients) {
@@ -303,14 +305,15 @@ void InitializationHandler::run() {
 					if (!found) {
 						syslog(
 							LOG_INFO,
-							"InitializationHandler: new client: %s:%d id=%08x ping_min=%dms ping_max=%dms version=%s ranked=%s",
+							"InitializationHandler: new client: %s:%d id=%08x ping_min=%dms ping_max=%dms version=%s ranked=%s password=%s",
 							in_message->sender.address().to_string().c_str(),
 							in_message->sender.port(),
 							connection_request.client_id,
 							connection_request.ping_min * 4,
 							connection_request.ping_max * 4,
 							computeVersionName(connection_request).c_str(),
-							connection_request.ranked_play ? "true" : "false"
+							connection_request.ranked_play ? "true" : "false",
+							connection_request.password == std::array<uint8_t, 16>{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} ? "no" : "yes"
 						);
 						clients.push_back(client);
 					}
@@ -333,15 +336,44 @@ void InitializationHandler::run() {
 						}
 					}
 
-					// Start a match if there is enough clients
-					std::this_thread::sleep_for(std::chrono::milliseconds(200)); //HACK avoid spamming messages. It would be better to handle matchmaking independently of messages reception
-					while (clients.size() >= 2) {
-						// Select clients to match
-						std::array<std::list<ClientData>::iterator, 2> const matched_clients = {
-							clients.begin(),
-							++clients.begin()
-						};
+					//
+					// Start a match if there are enough clients
+					//
 
+					std::this_thread::sleep_for(std::chrono::milliseconds(200)); //HACK avoid spamming messages. It would be better to handle matchmaking independently of messages reception
+
+					// Select clients to match
+					std::vector<std::array<std::list<ClientData>::iterator, 2>> const match_list = [&]() {
+						std::vector<std::array<std::list<ClientData>::iterator, 2>> match_list;
+
+						for (std::list<ClientData>::iterator client = clients.begin(); client != clients.end(); ++client) {
+							// Search a possible match with a previous client
+							bool matched = false;
+							for (std::array<std::list<ClientData>::iterator, 2>& match: match_list) {
+								if (match[1] == clients.end() && match[0]->password == client->password) {
+									match[1] = client;
+									matched = true;
+									break;
+								}
+							}
+
+							if (matched) {
+								continue;
+							}
+
+							// Create a match for this client, with room for a rival
+							match_list.push_back({client, clients.end()});
+						}
+
+						// Remove match not fully filled
+						prune_if(match_list, [&](std::array<std::list<ClientData>::iterator, 2> const& match) {
+							return match[1] == clients.end();
+						});
+
+						return match_list;
+					}();
+
+					for (std::array<std::list<ClientData>::iterator, 2> const& matched_clients: match_list) {
 						// Compute antilag prediction
 						//   total_ping / 2 = transmission time from one client to another ; 5 = frame duration (PAL)
 						uint32_t const antilag_prediction =
@@ -400,10 +432,13 @@ void InitializationHandler::run() {
 							srv_dbg(LOG_DEBUG, "send StartGame to %s:%d", start_signal_udp->destination.address().to_string().c_str(), start_signal_udp->destination.port());
 							this->out_messages->push(start_signal_udp);
 						}
+					}
 
-						// Forget these clients
-						clients.pop_front();
-						clients.pop_front();
+					// Forget matched clients
+					//NOTE expects that clients.erase() does not invalidate other iterators. Works while clients is a list, may segfault with other containers
+					for (std::array<std::list<ClientData>::iterator, 2> const& matched_clients: match_list) {
+						clients.erase(matched_clients[0]);
+						clients.erase(matched_clients[1]);
 					}
 				}
 			}

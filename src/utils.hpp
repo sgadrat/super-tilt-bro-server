@@ -1,11 +1,34 @@
 #pragma once
 
+#include <algorithm>
 #include <chrono>
 #include <condition_variable>
 #include <deque>
+//#include <functional>
 #include <memory>
 #include <mutex>
 #include <thread>
+
+//
+// Easier remove_if
+//
+
+//prune_if(T& container, std::function<bool(T::value_type const&)> predicate) {
+template<typename T, typename P>
+void prune_if(T& container, P predicate) {
+	container.erase(
+		std::remove_if(
+			container.begin(),
+			container.end(),
+			predicate
+		),
+		container.end()
+	);
+}
+
+//
+// Thread safe FIFOs
+//
 
 template <typename T>
 class ThreadSafeFifo {
