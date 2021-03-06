@@ -32,7 +32,7 @@ namespace {
 			GameInstanceThread(
 				std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages,
 				std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages,
-				std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameSummary>> game_info_queue,
+				std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> game_info_queue,
 				uint32_t antilag_prediction,
 				GameInstance::ClientInfo client_a,
 				GameInstance::ClientInfo client_b,
@@ -138,7 +138,7 @@ InitializationHandler::InitializationHandler(
 	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages,
 	std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages,
 	std::shared_ptr<ClientsDatagramRouting> clients_routing,
-	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameSummary>> game_info_messages
+	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> game_info_messages
 )
 : in_messages(in_messages), out_messages(out_messages), clients_routing(clients_routing)
 , game_info_messages(game_info_messages)

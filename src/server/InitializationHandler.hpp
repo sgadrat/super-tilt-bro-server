@@ -16,7 +16,7 @@ public:
 		std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages,
 		std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages,
 		std::shared_ptr<ClientsDatagramRouting> clients_routing,
-		std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameSummary>> game_info_messages
+		std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> game_info_messages
 	);
 
 	void run();
@@ -27,6 +27,6 @@ private:
 
 	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages;
 	std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages;
-	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameSummary>> game_info_messages;
+	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> game_info_messages;
 	std::shared_ptr<ClientsDatagramRouting> clients_routing;
 };

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-STB_GAME_SUMMARIES=/tmp/stb_games.log ../src/server/stb_server &
+mkdir -p /tmp/stb_games
+STB_GAME_SUMMARIES=/tmp/stb_games ../src/server/stb_server &
 server_pid=$!
 ../login_server/login_server.py --db-file /tmp/stb_login.json --log-file /tmp/stb_login.log &
 login_pid=$!

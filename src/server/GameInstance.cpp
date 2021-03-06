@@ -102,6 +102,7 @@ std::pair<uint32_t, GameState> compute_game_state_at(
 		++gamestate_time;
 	}
 
+//TODO find a way to have info about n ticks simulated in input messages lateness
 #ifdef LOG_FLOOD
 	// Dump stats
 	srv_dbg(LOG_DEBUG, "%u ticks in %lu us : %lu us/tick", n_ticks, total_time.count() / 1000, n_ticks > 0 ? (total_time.count() / 1000) / n_ticks : 0);
@@ -150,7 +151,7 @@ std::vector<uint8_t> serialize_new_game_state_msg(
 void GameInstance::run(
 	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages,
 	std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages,
-	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameSummary>> game_info_queue,
+	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> game_info_queue,
 	uint32_t antilag_prediction,
 	ClientInfo client_a,
 	ClientInfo client_b,
@@ -166,7 +167,7 @@ void GameInstance::run(
 		this->keep_running = true;
 		this->over = false;
 
-		std::shared_ptr<StatisticsSink::GameSummary> game_info(new StatisticsSink::GameSummary);
+		std::shared_ptr<StatisticsSink::GameInfo> game_info(new StatisticsSink::GameInfo);
 		::uuid_generate(game_info->game_id);
 		game_info->game_begin = std::chrono::system_clock::now();
 		game_info->game_end = game_info->game_begin;
@@ -221,6 +222,8 @@ void GameInstance::run(
 				}catch(std::exception const& e) {
 					in_message = nullptr;
 				}
+
+				game_info->game_log.new_net_message(last_input_clock_time, in_message, batch_size == 1);
 
 				// Process message
 				if (in_message == nullptr) {

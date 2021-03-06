@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
 	std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages(new ThreadSafeFifo<network::OutgoingUdpMessage>(5));
 	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(50));
 	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> new_clients_queue(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
-	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameSummary>> statistics_event_queue(new ThreadSafeFifo<StatisticsSink::GameSummary>(5));
+	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> statistics_event_queue(new ThreadSafeFifo<StatisticsSink::GameInfo>(5));
 	std::shared_ptr<ClientsDatagramRouting> clients_queues(new ClientsDatagramRouting);
 
 	network::SocketPool socket_pool;
