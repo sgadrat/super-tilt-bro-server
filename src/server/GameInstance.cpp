@@ -59,9 +59,11 @@ std::pair<uint32_t, GameState> compute_game_state_at(
 )
 {
 	using std::chrono::duration_cast;
+	using std::chrono::microseconds;
 	using std::chrono::nanoseconds;
 	using std::chrono::steady_clock;
 
+	// Compute game state at target time
 	std::map<uint32_t, GameState>::const_iterator gamestate_history_entry = gamestate_history.upper_bound(target_time);
 	assert(gamestate_history_entry != gamestate_history.begin()); // Upper bound, and gamestate history must not be empty (initial gamestate is here)
 	--gamestate_history_entry;
@@ -72,10 +74,11 @@ std::pair<uint32_t, GameState> compute_game_state_at(
 	bool gameover = false;
 
 #ifdef LOG_FLOOD
-	nanoseconds total_time(0);
-	uint32_t const n_ticks = target_time - gamestate_time;
+	nanoseconds ticks_time(0);
 #endif
+	uint32_t const n_ticks = target_time - gamestate_time;
 
+	steady_clock::time_point const loop_begin = steady_clock::now();
 	while (!gameover && gamestate_time < target_time) {
 		// Apply inputs
 		std::map<uint32_t, GameState::ControllerState>::const_iterator controller_history_entry(controller_a_history.find(gamestate_time));
@@ -97,16 +100,26 @@ std::pair<uint32_t, GameState> compute_game_state_at(
 		}
 #ifdef LOG_FLOOD
 		auto const tick_end = steady_clock::now();
-		total_time += duration_cast<nanoseconds>(tick_end - tick_begin);
+		ticks_time += duration_cast<nanoseconds>(tick_end - tick_begin);
 #endif
 		++gamestate_time;
 	}
 
-//TODO find a way to have info about n ticks simulated in input messages lateness
-#ifdef LOG_FLOOD
 	// Dump stats
-	srv_dbg(LOG_DEBUG, "%u ticks in %lu us : %lu us/tick", n_ticks, total_time.count() / 1000, n_ticks > 0 ? (total_time.count() / 1000) / n_ticks : 0);
+#ifdef LOG_FLOOD
+	srv_dbg(
+		LOG_DEBUG, "%u ticks in %lu us : %lu us/tick",
+		n_ticks, ticks_time.count() / 1000, n_ticks > 0 ? (ticks_time.count() / 1000) / n_ticks : 0
+	);
 #endif
+
+	microseconds loop_time = duration_cast<microseconds>(steady_clock::now() - loop_begin);
+	if (loop_time > microseconds(10'000)) {
+		syslog(
+			LOG_WARNING, "GameInstance: long time spent emulating frames: %u ticks in %lu us (%lu us/tick)",
+			n_ticks, loop_time.count(), n_ticks > 0 ? loop_time.count() / n_ticks : 0
+		);
+	}
 
 	// Apply inputs for the final state
 	std::map<uint32_t, GameState::ControllerState>::const_iterator controller_history_entry(controller_a_history.find(gamestate_time));
