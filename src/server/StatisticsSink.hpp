@@ -1,9 +1,12 @@
 #pragma once
 
+#include "GameState.hpp"
 #include "network.hpp"
 #include "src/utils.hpp"
 
 #include <chrono>
+#include <stdint.h>
+#include <map>
 #include <memory>
 #include <string>
 #include <uuid/uuid.h>
@@ -32,6 +35,9 @@ public:
 		GameLog game_log;
 		std::chrono::system_clock::time_point game_begin;
 		std::chrono::system_clock::time_point game_end;
+		std::shared_ptr<std::map<uint32_t, GameState::ControllerState>> controller_a_history;
+		std::shared_ptr<std::map<uint32_t, GameState::ControllerState>> controller_b_history;
+		size_t num_ticks_in_game;
 		uint32_t client_a_id;
 		uint32_t client_b_id;
 		bool player_a_ranked;

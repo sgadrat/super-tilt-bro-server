@@ -106,6 +106,60 @@ void StatisticsSink::run() {
 					file_stream << serialize_game_log_entry(entry, game_summary->game_log.log[0].time) << '\n';
 				}
 			}
+
+			// Serialize the replay
+			{
+				std::string const replay_path(game_info_dir + "/replay.bmov"); // "bmov" like "Binary MOVie"
+
+				// Serialize replay
+				std::vector<uint8_t> serialized_replay;
+				serialized_replay.reserve(
+					// Header: version + num frames + stage + character_a + character_b + client_a + client_b
+					1 + 4 + 1 + 1 + 1 + 4 + 4 +
+
+					// Controller A
+					4 + game_summary->controller_a_history->size() * (4 + 1) +
+
+					// Controller B
+					4 + game_summary->controller_b_history->size() * (4 + 1)
+				);
+
+				auto u32 = [&](uint32_t v) {
+					serialized_replay.push_back((v & 0xff000000) >> 24);
+					serialized_replay.push_back((v & 0x00ff0000) >> 16);
+					serialized_replay.push_back((v & 0x0000ff00) >>  8);
+					serialized_replay.push_back((v & 0x000000ff) >>  0);
+				};
+				auto u8 = [&](uint8_t v) {
+					serialized_replay.push_back(v);
+				};
+				auto controller = [&](std::map<uint32_t, GameState::ControllerState> const& controller) {
+					u32(controller.size());
+					for (auto const& entry: controller) {
+						u32(entry.first);
+						u8(entry.second.getRaw());
+					}
+				};
+
+				// Header
+				u8(0);
+				u32(game_summary->num_ticks_in_game);
+				u8(game_summary->stage);
+				u8(game_summary->character_a);
+				u8(game_summary->character_b);
+				u32(game_summary->client_a_id);
+				u32(game_summary->client_b_id);
+
+				// Controller A
+				controller(*game_summary->controller_a_history);
+
+				// Controller B
+				controller(*game_summary->controller_b_history);
+
+				// Write replay in file
+				std::ofstream replay_file(replay_path);
+				replay_file.write((char const*)serialized_replay.data(), serialized_replay.size());
+			}
 		}
 	}
 }

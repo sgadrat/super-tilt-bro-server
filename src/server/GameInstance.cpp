@@ -199,12 +199,14 @@ void GameInstance::run(
 		std::map<uint32_t, GameState> gamestate_history{
 			{0, initial_gamestate(game_settings)}
 		};
-		std::map<uint32_t, GameState::ControllerState> controller_a_history{
+		std::shared_ptr<std::map<uint32_t, GameState::ControllerState>> controller_a_history_ptr(new std::map<uint32_t, GameState::ControllerState>{
 			{0, GameState::ControllerState()}
-		};
-		std::map<uint32_t, GameState::ControllerState> controller_b_history{
+		});
+		std::shared_ptr<std::map<uint32_t, GameState::ControllerState>> controller_b_history_ptr(new std::map<uint32_t, GameState::ControllerState>{
 			{0, GameState::ControllerState()}
-		};
+		});
+		std::map<uint32_t, GameState::ControllerState>& controller_a_history = *controller_a_history_ptr;
+		std::map<uint32_t, GameState::ControllerState>& controller_b_history = *controller_b_history_ptr;
 
 		uint8_t prediction_id = 0;
 
@@ -386,6 +388,16 @@ void GameInstance::run(
 		if (game_info_queue) {
 			game_info->game_end = std::chrono::system_clock::now();
 			game_info->winner = gamestate_history.rbegin()->second.winner();
+			game_info->controller_a_history = controller_a_history_ptr;
+			game_info->controller_b_history = controller_b_history_ptr;
+			//HACK
+			// 50 is a teribly hardcoded worst case, it comes from the fact that
+			//  - message pop timeouts every second
+			//  - on timeout, frames are emulated to avoid being too late from clients' time
+			//  - game runs at 50 fps
+			//  - if one of these maintenance simulation tick is a gameover, the simulation ends
+			//  - we ignore the fact that a client can send inputs far in the past
+			game_info->num_ticks_in_game = gamestate_history.rbegin()->first + 50;
 			game_info_queue->push(game_info);
 		}
 	}catch(std::exception const& e) {
