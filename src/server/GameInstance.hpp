@@ -38,7 +38,7 @@ public:
 		std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages,
 		std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages,
 		std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> game_info_queue,
-		uint32_t antilag_prediction,
+		std::array<std::array<uint32_t, 2>, 2> transit_time,
 		ClientInfo client_a,
 		ClientInfo client_b,
 		GameSettings game_settings

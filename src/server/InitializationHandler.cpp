@@ -33,13 +33,13 @@ namespace {
 				std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages,
 				std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages,
 				std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> game_info_queue,
-				uint32_t antilag_prediction,
+				std::array<std::array<uint32_t, 2>, 2> transit_time,
 				GameInstance::ClientInfo client_a,
 				GameInstance::ClientInfo client_b,
 				GameInstance::GameSettings game_settings
 			)
 			: instance()
-			, thread(&GameInstance::run, &instance, in_messages, out_messages, game_info_queue, antilag_prediction, client_a, client_b, game_settings)
+			, thread(&GameInstance::run, &instance, in_messages, out_messages, game_info_queue, transit_time, client_a, client_b, game_settings)
 			, creation_time(std::chrono::steady_clock::now())
 			, clients(client_a, client_b)
 			{
@@ -376,15 +376,19 @@ void InitializationHandler::run() {
 					for (std::array<std::list<ClientData>::iterator, 2> const& matched_clients: match_list) {
 						// Compute antilag prediction
 						//   total_ping / 2 = transmission time from one client to another ; 5 = frame duration (PAL)
-						uint32_t const antilag_prediction =
-							((matched_clients.at(0)->ping_min + matched_clients.at(1)->ping_min) / 2) / 5
-						;
+						auto ttime = [&](size_t client_a, size_t client_b) -> uint32_t {
+							return ((matched_clients.at(client_a)->ping_min + matched_clients.at(client_b)->ping_min) / 2) / 5;
+						};
+						std::array<std::array<uint32_t, 2>, 2> const transit_time = {{
+							{ttime(0, 0), ttime(0, 1)},
+							{ttime(1, 0), ttime(1, 1)}
+						}};
 						syslog(
 							LOG_NOTICE,
-							"starting a game between %08x and %08x (%d antilag)",
+							"starting a game between %08x and %08x (%d/%d/%d/%d antilag)",
 							matched_clients.at(0)->client.id,
 							matched_clients.at(1)->client.id,
-							antilag_prediction
+							transit_time[0][0], transit_time[0][1], transit_time[1][0], transit_time[1][1]
 						);
 
 						// Prepare game instance
@@ -399,7 +403,7 @@ void InitializationHandler::run() {
 							game_in_messages,
 							this->out_messages,
 							this->game_info_messages,
-							antilag_prediction,
+							transit_time,
 							matched_clients.at(0)->client,
 							matched_clients.at(1)->client,
 							game_settings

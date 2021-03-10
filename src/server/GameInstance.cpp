@@ -136,6 +136,24 @@ std::pair<uint32_t, GameState> compute_game_state_at(
 	return result;
 }
 
+/** Return an iterator on the gamestate history entry at specified time, compute it if necessary */
+std::map<uint32_t, GameState>::iterator get_game_state_at(
+	uint32_t target_time,
+	std::map<uint32_t, GameState>& gamestate_history,
+	std::map<uint32_t, GameState::ControllerState> const& controller_a_history,
+	std::map<uint32_t, GameState::ControllerState> const& controller_b_history
+)
+{
+	std::map<uint32_t, GameState>::iterator gamestate = gamestate_history.find(target_time);
+	if (gamestate == gamestate_history.end()) {
+		std::pair<uint32_t, GameState> new_entry = compute_game_state_at(target_time, gamestate_history, controller_a_history, controller_b_history);
+		std::pair<std::map<uint32_t, GameState>::iterator, bool> insert_info = gamestate_history.insert(new_entry);
+		assert(insert_info.second == true); /* We checked that there was no element for this time, it must be inserted successfuly */
+		gamestate = insert_info.first;
+	}
+	return gamestate;
+}
+
 std::vector<uint8_t> serialize_new_game_state_msg(
 	uint8_t prediction_id,
 	uint32_t gamestate_time,
@@ -165,7 +183,7 @@ void GameInstance::run(
 	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages,
 	std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages,
 	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> game_info_queue,
-	uint32_t antilag_prediction,
+	std::array<std::array<uint32_t, 2>, 2> transit_time,
 	ClientInfo client_a,
 	ClientInfo client_b,
 	GameSettings game_settings
@@ -211,7 +229,7 @@ void GameInstance::run(
 		uint8_t prediction_id = 0;
 
 		steady_clock::time_point last_input_clock_time = steady_clock::now();
-		uint32_t last_gamestate_sent_time = 0;
+		std::array<uint32_t, 2> last_gamestate_sent_time = {0, 0}; // For each client, timestamp of the last gamestate sent
 
 		// Variables reset each time a state is sent
 		bool new_input_batch = true;
@@ -246,12 +264,13 @@ void GameInstance::run(
 					uint32_t n_frames_since_last_input = duration_cast<microseconds>(steady_clock::now() - last_input_clock_time).count() / 20'000;
 					uint32_t const current_time = last_input_time + n_frames_since_last_input;
 
-					srv_dbg(LOG_DEBUG, "pred compute: %d", current_time + (antilag_prediction / 2));
+					srv_dbg(LOG_DEBUG, "pred compute: %d", current_time);
 					std::pair<uint32_t, GameState> const computed_gamestate = compute_game_state_at(
-						current_time + (antilag_prediction / 2),
+						current_time,
 						gamestate_history, controller_a_history, controller_b_history
 					);
 					if (computed_gamestate.second.is_gameover() && n_frames_since_last_input > 500) {
+						syslog(LOG_INFO, "GameInstance: gameover found while emulating inactivity");
 						this->keep_running = false;
 						break;
 					}
@@ -285,13 +304,20 @@ void GameInstance::run(
 					// Invalidate gamestate history from message's timestamp
 					//  Note we don't want to keep states after that, even if still valid because of input delay.
 					//  Not keeping it allows to ensure that the last computed gamestate is the one to send in the message (matching delayed frames)
+					//  TODO this note is no more valid, we compute per-client state. Investigate if we should avoid invalidating states before input lag.
+					//       Food for though: as we send input history in states, it may be nice to resend it
 					std::map<uint32_t, GameState>::iterator first_invalid_gamestate(gamestate_history.lower_bound(message.timestamp));
 					bool const history_rewrite = first_invalid_gamestate != gamestate_history.end();
-					bool const sent_state_rewrite = (history_rewrite && first_invalid_gamestate->first <= last_gamestate_sent_time);
+					bool const sent_state_rewrite = (history_rewrite && first_invalid_gamestate->first <= last_gamestate_sent_time[sender_index]);
 					if (history_rewrite) {
 						if (first_invalid_gamestate->first == 0) {
 							syslog(LOG_WARNING, "GameInstance: warning: prevented modification of initial gamestate");
 						}else {
+							srv_dbg(
+								LOG_DEBUG, "GameInstance: history rewrite: message_time=%u, last_sent=%u, first_invalid=%u, rewrite=%s, erratum=%s",
+								message.timestamp, last_gamestate_sent_time[sender_index], first_invalid_gamestate->first,
+								history_rewrite?"true":"false", sent_state_rewrite?"true":"false"
+							);
 							gamestate_history.erase(first_invalid_gamestate, gamestate_history.end());
 						}
 					}
@@ -306,39 +332,53 @@ void GameInstance::run(
 						continue;
 					}
 
-					// Compute gamestate at the last input in history (minus delayed frames)
-					{
-						uint32_t const last_input_time = std::max(controller_a_history.rbegin()->first, controller_b_history.rbegin()->first);
-						assert(last_input_time >= INPUT_LAG);
-						uint32_t const current_gamestate_time = last_input_time - INPUT_LAG;
-
-						std::pair<uint32_t, GameState> const computed_gamestate = compute_game_state_at(
-							current_gamestate_time + antilag_prediction,
-							gamestate_history, controller_a_history, controller_b_history
-						);
-
-						// Stop procesing if the game is over (we don't want to send this state, better send a GameOver message)
-						if (computed_gamestate.second.is_gameover()) {
-							this->keep_running = false;
-							break;
-						}
-
-						gamestate_history.insert(computed_gamestate);
-					}
-
 					// Increment prediction ID
 					++prediction_id;
 
 					// Send current state to clients when there is no more message waiting to be processed
 					if (in_messages->empty()) {
+						// Compute current gamestate time (estimated as "higest received timestamp")
+						uint32_t const last_input_time = std::max(controller_a_history.rbegin()->first, controller_b_history.rbegin()->first);
+						assert(last_input_time >= INPUT_LAG);
+						uint32_t const current_gamestate_time = last_input_time - INPUT_LAG;
+						uint32_t const last_input_client = [&]() {
+							uint32_t const client_a_input_time = controller_a_history.rbegin()->first;
+							uint32_t const client_b_input_time = controller_b_history.rbegin()->first;
+							// Return the client that has the last registered input
+							if (client_a_input_time > client_b_input_time) {
+								return 0;
+							}else if (client_b_input_time > client_a_input_time) {
+								return 1;
+							}
+							// In case of equality use the one with lowest transit time (to minimise over-prediction)
+							if (transit_time[0][0] < transit_time[1][1]) {
+								return 0;
+							}else {
+								return 1;
+							}
+						}();
+
 						// Send the new game state to impacted clients
 						for (size_t client_index = 0; client_index < clients.size(); ++client_index) {
 							if (impacted_clients[client_index]) {
+								// Estimate client's local timestamp when it will receive this message
+								uint32_t const client_time = current_gamestate_time + transit_time[last_input_client][client_index];
+
 								// Get gamestate
-								// TODO messages to sender should use a specific antilag derived only from its ping (full rational: git blame this line)
-								GameState& gamestate = gamestate_history.rbegin()->second;
-								uint32_t const gamestate_time = gamestate_history.rbegin()->first;
+								std::map<uint32_t, GameState>::iterator gamestate_it = get_game_state_at(
+									client_time,
+									gamestate_history, controller_a_history, controller_b_history
+								);
+								GameState& gamestate = gamestate_it->second;
+								uint32_t const gamestate_time = gamestate_it->first;
 								std::map<uint32_t, GameState::ControllerState>& opponent_controller_history = (client_index == 0 ? controller_b_history : controller_a_history);
+
+								// Stop procesing if the game is over (we don't want to send this state, better send a GameOver message)
+								if (gamestate.is_gameover()) {
+									syslog(LOG_INFO, "GameInstance: gameover found while emulating client #%lu state", client_index);
+									this->keep_running = false;
+									continue;
+								}
 
 								// Send message
 								boost::asio::ip::udp::endpoint const& client_endpoint = clients.at(client_index);
@@ -347,15 +387,17 @@ void GameInstance::run(
 								out_message->data = serialize_new_game_state_msg(prediction_id, gamestate_time, gamestate, opponent_controller_history);
 								out_messages->push(out_message);
 								srv_dbg(
-									LOG_DEBUG, "%lu send %s to %s:%d",
+									LOG_DEBUG, "%lu send %s to %s:%d (client_time=%u, gamestate_time=%u)",
 									wall_clock_milli(),
 									client_index != sender_index ? "state" : "eratum",
 									client_endpoint.address().to_string().c_str(),
-									client_endpoint.port()
+									client_endpoint.port(),
+									client_time,
+									gamestate_time
 								);
 
 								// Update info about sends
-								last_gamestate_sent_time = gamestate_time;
+								last_gamestate_sent_time[client_index] = gamestate_time;
 							}
 						}
 
