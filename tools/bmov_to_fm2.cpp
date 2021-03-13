@@ -14,6 +14,9 @@ int main() {
 	std::map<uint32_t, GameState::ControllerState> controller_a_history;
 	std::map<uint32_t, GameState::ControllerState> controller_b_history;
 	uint32_t num_ticks_in_game = 0;
+	uint8_t stage = 255;
+	uint8_t character_1 = 255;
+	uint8_t character_2 = 255;
 	{
 		std::ifstream bmov_file("/tmp/replay.bmov");
 
@@ -42,20 +45,29 @@ int main() {
 		};
 
 		// Header
-		//TODO actually set an initial state from it
-		u8();
+		u8(); /* bmov version */
 		num_ticks_in_game = u32();
-		u8();
-		u8();
-		u8();
-		u32();
-		u32();
+		stage = u8();
+		character_1 = u8();
+		character_2 = u8();
+		u32(); /* ID player A */
+		u32(); /* ID player B */
 
 		// Controller A
 		controller_a_history = controller();
 
 		// Controller B
 		controller_b_history = controller();
+	}
+
+	// Dump header information
+	//TODO actually set an initial state from it
+	{
+		std::cerr <<
+			"# stage=" << uint16_t(stage) << ' ' <<
+			"char_1=" << uint16_t(character_1) << ' ' <<
+			"char_2=" << uint16_t(character_2) << ' ' <<
+		'\n';
 	}
 
 	// Write fm2 input log
