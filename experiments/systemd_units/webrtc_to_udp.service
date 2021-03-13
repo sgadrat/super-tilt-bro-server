@@ -1,0 +1,18 @@
+[Unit]
+Description=WebRTC and UDP cross communication server
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+User=debian
+ExecStartPre=
+ExecStart=/usr/bin/node PATH_TO/server.js
+ExecStartPost=
+ExecStop=
+ExecReload=
+
+[Install]
+WantedBy=multi-user.target

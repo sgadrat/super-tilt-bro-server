@@ -1,0 +1,18 @@
+[Unit]
+Description=Super Tilt Bro. game ranking pusher
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=60
+User=debian
+ExecStartPre=
+ExecStart=PATH_TO/game_ranking_pusher
+ExecStartPost=
+ExecStop=
+ExecReload=
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,19 @@
+[Unit]
+Description=Super Tilt Bro. game server
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+User=debian
+Environment="STB_GAME_SUMMARIES=/usr/share/stb/games"
+ExecStartPre=
+ExecStart=PATH_TO/stb_server
+ExecStartPost=
+ExecStop=
+ExecReload=
+
+[Install]
+WantedBy=multi-user.target
