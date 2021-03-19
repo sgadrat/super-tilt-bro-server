@@ -43,7 +43,7 @@ At any time during the initialization phase, the server may send a Disconnected 
 
 * **client_id**: Identifier unique to this client.
 * **ping_min**: Minimal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_min=3 means 12ms of ping.)
-* **protocol_version**: Expected version of this protocol. This document describes version 4.
+* **protocol_version**: Expected version of this protocol. This document describes version 5.
 * **ping_max**: Maximal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_max=3 means 12ms of ping.)
 * **framerate**: 0: 50Hz, 1: 60Hz.
 * **support**: 0: physical cartridge, 1: native emulator, 2: web emulator, 3: unknown/other
@@ -145,13 +145,13 @@ Each time the server receives a ControllerState message, it registers it to be c
 		uint8     message_type = 2;
 		uint8     prediction_id;
 		uint32    timestamp;
-		uint8[4]  next_opponent_inputs;
+		uint8[8]  next_inputs;
 		GameState state;
 	}
 
 * **prediction_id**: Indicate if this gamestate is derived from the previous one or uses new inputs. This number should be incremented each time the state is computed because of some inputs. It may loop from 255 to 0.
 * **timestamp**: Frame number on which this state is associated.
-* **next_opponent_inputs**: List of inputs registered for delayed execution.
+* **next_inputs**: List of inputs registered for delayed execution. Inputs are interleaved for local client and remote client.
 * **state**: The new state.
 
 NewGameState messages can be periodically updated then resent. In such case, the server should not change the *prediction_id*, set *timestamp* to an estimate of the current frame number being displayed on devices and *state* to an updated state to this timestamp. Clients may discard NewGameState messages when the *prediction_id* match the last one received.
@@ -165,8 +165,8 @@ NewGameState messages can be periodically updated then resent. In such case, the
 	before table's begining.
 
 	Case 1: The message is more than four frames in the past
-		copy next_opponent_inputs in opponent's input table at message timestamp
-		re-predict inputs between the end of next_opponent_inputs and now
+		copy next_inputs in players' input table at message timestamp
+		re-predict inputs between the end of next_inputs and now
 		rollback until now
 
 	Case 2: The message is less than four frames in the past

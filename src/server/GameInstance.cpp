@@ -158,7 +158,8 @@ std::vector<uint8_t> serialize_new_game_state_msg(
 	uint8_t prediction_id,
 	uint32_t gamestate_time,
 	GameState& gamestate,
-	std::map<uint32_t, GameState::ControllerState> const& controller_history
+	std::map<uint32_t, GameState::ControllerState> const& client_controller_history,
+	std::map<uint32_t, GameState::ControllerState> const& opponent_controller_history
 )
 {
 	stnp::message::NewGameState new_gamestate_msg;
@@ -170,11 +171,12 @@ std::vector<uint8_t> serialize_new_game_state_msg(
 
 	new_gamestate_msg.next_opponent_inputs.reserve(INPUT_LAG);
 	for (uint32_t i = gamestate_time + 1; i <= gamestate_time + INPUT_LAG; ++i) {
-		new_gamestate_msg.next_opponent_inputs.push_back(get_history_value_at(controller_history, i).getRaw());
+		new_gamestate_msg.next_local_inputs.push_back(get_history_value_at(client_controller_history, i).getRaw());
+		new_gamestate_msg.next_opponent_inputs.push_back(get_history_value_at(opponent_controller_history, i).getRaw());
 	}
 
 	stnp::message::MessageSerializer serializer;
-	new_gamestate_msg.serial(serializer);
+	new_gamestate_msg.serial(serializer, stnp::LAST_VERSION);
 	return serializer.serialized();
 }
 }
@@ -372,6 +374,7 @@ void GameInstance::run(
 								GameState& gamestate = gamestate_it->second;
 								uint32_t const gamestate_time = gamestate_it->first;
 								std::map<uint32_t, GameState::ControllerState>& opponent_controller_history = (client_index == 0 ? controller_b_history : controller_a_history);
+								std::map<uint32_t, GameState::ControllerState>& client_controller_history = (client_index == 0 ? controller_a_history : controller_b_history);
 
 								// Stop procesing if the game is over (we don't want to send this state, better send a GameOver message)
 								if (gamestate.is_gameover()) {
@@ -384,7 +387,10 @@ void GameInstance::run(
 								boost::asio::ip::udp::endpoint const& client_endpoint = clients.at(client_index);
 								std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
 								out_message->destination = client_endpoint;
-								out_message->data = serialize_new_game_state_msg(prediction_id, gamestate_time, gamestate, opponent_controller_history);
+								out_message->data = serialize_new_game_state_msg(
+									prediction_id, gamestate_time, gamestate,
+									client_controller_history, opponent_controller_history
+								);
 								out_messages->push(out_message);
 								srv_dbg(
 									LOG_DEBUG, "%lu send %s to %s:%d (client_time=%u, gamestate_time=%u)",

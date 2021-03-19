@@ -10,6 +10,8 @@
 
 namespace stnp {
 
+constexpr uint8_t LAST_VERSION = 5;
+
 namespace message {
 
 enum class ClientMessageType : uint8_t {
@@ -343,17 +345,29 @@ struct ControllerState {
 };
 
 struct NewGameState {
+	std::vector<uint8_t> next_local_inputs;
 	std::vector<uint8_t> next_opponent_inputs;
 	std::vector<uint8_t> state;
 	uint32_t timestamp;
 	uint8_t prediction_id;
 
 	template <typename SerializationHandler>
-	void serial(SerializationHandler& s) {
+	void serial(SerializationHandler& s, uint8_t protocol_version) {
+		if (next_local_inputs.size() != next_opponent_inputs.size()) {
+			throw std::logic_error("input buffers size missmatch");
+		}
+
 		s.type(ServerMessageType::NewGameState);
 		s.uint8(this->prediction_id);
 		s.uint32(this->timestamp);
-		s.dataFill(this->next_opponent_inputs);
+		if (protocol_version <= 4) {
+			s.dataFill(this->next_opponent_inputs);
+		}else {
+			for (size_t i = 0; i < next_local_inputs.size(); ++i) {
+				s.uint8(next_local_inputs[i]);
+				s.uint8(next_opponent_inputs[i]);
+			}
+		}
 		s.dataFill(this->state);
 	}
 };

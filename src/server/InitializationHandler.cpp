@@ -16,7 +16,7 @@
 #include <utility>
 
 namespace {
-	constexpr uint8_t STNP_VERSION = 4;
+	constexpr uint8_t STNP_VERSION = stnp::LAST_VERSION;
 
 	class GameInstanceThread {
 		public:
