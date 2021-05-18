@@ -188,6 +188,22 @@ void GameState::serial(SerializationHandler& s) {
 
 				break;
 
+			// Pepper
+			case 2:
+				s.uint8(this->emulator_ram[character_objects + 1 + 0]); // ANIMATION_STATE_OFFSET_X_LSB
+				s.uint8(this->emulator_ram[character_objects + 1 + 1]); // ANIMATION_STATE_OFFSET_X_MSB
+				s.uint8(this->emulator_ram[character_objects + 1 + 2]); // ANIMATION_STATE_OFFSET_Y_LSB
+				s.uint8(this->emulator_ram[character_objects + 1 + 3]); // ANIMATION_STATE_OFFSET_Y_MSB
+				s.uint8(this->emulator_ram[character_objects + 1 + 4]); // ANIMATION_STATE_OFFSET_DATA_VECTOR_LSB
+				s.uint8(this->emulator_ram[character_objects + 1 + 5]); // ANIMATION_STATE_OFFSET_DATA_VECTOR_MSB
+				s.uint8(this->emulator_ram[character_objects + 1 + 6]); // ANIMATION_STATE_OFFSET_DIRECTION
+				s.uint8(this->emulator_ram[character_objects + 1 + 7]); // ANIMATION_STATE_OFFSET_CLOCK
+				//s.uint8(this->emulator_ram[character_objects + 1 + 8]); // ANIMATION_STATE_OFFSET_FIRST_SPRITE_NUM ; Never change
+				//s.uint8(this->emulator_ram[character_objects + 1 + 9]); // ANIMATION_STATE_OFFSET_LAST_SPRITE_NUM ; Never change
+				s.uint8(this->emulator_ram[character_objects + 1 + 10]); // ANIMATION_STATE_OFFSET_FRAME_VECTOR_LSB
+				s.uint8(this->emulator_ram[character_objects + 1 + 11]); // ANIMATION_STATE_OFFSET_FRAME_VECTOR_MSB
+				break;
+
 			default:
 				throw std::runtime_error("tried to serialize unknown character");
 		}
