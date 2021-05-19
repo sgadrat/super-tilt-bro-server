@@ -247,7 +247,7 @@ void InitializationHandler::run() {
 						in_message->sender
 					);
 #ifndef BETA_SERVER
-				}else if (getVersionTuple(connection_request) < std::make_tuple(2, stnp::message::Connection::ReleaseType::ALPHA, 6)) {
+				}else if (getVersionTuple(connection_request) < std::make_tuple(2, stnp::message::Connection::ReleaseType::ALPHA, 7)) {
 #else
 				}else if (getVersionTuple(connection_request) > std::make_tuple(0, stnp::message::Connection::ReleaseType::ALPHA, 0)) {
 #endif
