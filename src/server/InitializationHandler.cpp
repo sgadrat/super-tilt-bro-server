@@ -395,6 +395,7 @@ void InitializationHandler::run() {
 						GameInstance::GameSettings game_settings = {
 							.stage_id = matched_clients.at(client_with_stage_selection)->selected_stage,
 							.characters = {matched_clients.at(0)->selected_character, matched_clients.at(1)->selected_character},
+							.character_palettes = {matched_clients.at(0)->selected_palette, matched_clients.at(1)->selected_palette},
 							.ranked = {matched_clients.at(0)->ranked, matched_clients.at(1)->ranked}
 						};
 						client_with_stage_selection = (client_with_stage_selection + 1) % 2;

@@ -44,6 +44,8 @@ public:
 		bool player_b_ranked;
 		uint8_t character_a;
 		uint8_t character_b;
+		uint8_t character_a_palette;
+		uint8_t character_b_palette;
 		uint8_t stage;
 		uint8_t winner;
 	};

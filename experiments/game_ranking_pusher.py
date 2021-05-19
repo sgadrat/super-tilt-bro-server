@@ -18,6 +18,8 @@ field_desc = {
 	'player_b_ranked': {'type': 'bool'},
 	'character_a': {'type': 'int'},
 	'character_b': {'type': 'int'},
+	'character_a_palette': {'type': 'int'},
+	'character_b_palette': {'type': 'int'},
 	'stage': {'type': 'int'},
 	'winner': {'type': 'int'},
 }

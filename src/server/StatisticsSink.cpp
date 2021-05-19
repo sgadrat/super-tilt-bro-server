@@ -89,6 +89,8 @@ void StatisticsSink::run() {
 					"player_b_ranked=" << pbool(game_summary->player_b_ranked) << '\t' <<
 					"character_a=" << uint16_t(game_summary->character_a) << '\t' <<
 					"character_b=" << uint16_t(game_summary->character_b) << '\t' <<
+					"character_a_palette=" << uint16_t(game_summary->character_a_palette) << '\t' <<
+					"character_b_palette=" << uint16_t(game_summary->character_b_palette) << '\t' <<
 					"stage=" << uint16_t(game_summary->stage) << '\t' <<
 					"winner=" << uint16_t(game_summary->winner) << '\t' <<
 				'\n';

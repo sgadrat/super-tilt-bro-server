@@ -208,6 +208,8 @@ void GameInstance::run(
 		game_info->client_b_id = client_b.id;
 		game_info->character_a = game_settings.characters.at(0);
 		game_info->character_b = game_settings.characters.at(1);
+		game_info->character_a_palette = game_settings.character_palettes.at(0);
+		game_info->character_b_palette = game_settings.character_palettes.at(1);
 		game_info->stage = game_settings.stage_id;
 		game_info->winner = 255;
 		game_info->player_a_ranked = game_settings.ranked.at(0);
