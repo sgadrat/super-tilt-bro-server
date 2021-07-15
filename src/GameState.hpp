@@ -67,6 +67,10 @@ public:
 	template <typename SerializationHandler>
 	void serial(SerializationHandler& s);
 
+	std::array<uint8_t, 0x800> get_ram_dump() {
+		return emulator_ram;
+	}
+
 private:
 	void emulatorDump() const;
 
