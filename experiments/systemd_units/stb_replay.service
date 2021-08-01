@@ -1,0 +1,18 @@
+[Unit]
+Description=Super Tilt Bro. replay server
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=debian
+ExecStartPre=
+ExecStart=/usr/bin/python3 PATH_TO/replay_server/replay_server.py --white-list 127.0.0.1
+ExecStartPost=
+ExecStop=
+ExecReload=
+
+[Install]
+WantedBy=multi-user.target

@@ -2,39 +2,49 @@
 
 import argparse
 import logging
-import rankingdb
+import os.path
+import replaydb
 import restservice
 import sys
 
 # Parameters' default
-LISTEN_PORT_REST = 8123
-RANKING_DB_FILE = '/var/lib/stb/ranking_server_db.json'
-LOG_FILE = '/var/log/stb/ranking_server.log'
+LISTEN_PORT_REST = 8125
+DB_FILE = '/var/lib/stb/replay_server/db.json'
+REPLAY_DIR = '/var/lib/stb/replay_server'
+BMOV_TO_FM2 = 'bmov_to_fm2'
+LOG_FILE = '/var/log/stb/replay_server.log'
 LOG_LEVEL = 'info'
 CLIENTS_WHITE_LIST = '127.0.0.1'
-LOGIN_SERVER_ADDR = '127.0.0.1'
-LOGIN_SERVER_PORT = 8124
 
 # Parse command line
-parser = argparse.ArgumentParser(description='Ranking server for Super Tilt Bro.')
+parser = argparse.ArgumentParser(description='Replay server for Super Tilt Bro.')
 parser.add_argument('--rest-port', type=int, default=LISTEN_PORT_REST, help='port listening for REST requests (default: {})'.format(LISTEN_PORT_REST))
-parser.add_argument('--db-file', type=str, default=RANKING_DB_FILE, help='file storing persistant ranking info, empty for no file (default: {})'.format(RANKING_DB_FILE))
+parser.add_argument('--db-file', type=str, default=DB_FILE, help='file storing persistant info, empty for no file (default: {})'.format(DB_FILE))
+parser.add_argument('--replay-dir', type=str, default=REPLAY_DIR, help='directory to store replay files (default: {})'.format(REPLAY_DIR))
+parser.add_argument('--bmov-to-fm2', type=str, default=BMOV_TO_FM2, help='replay conversion utility, absolute or in PATH (default: {})'.format(BMOV_TO_FM2))
 parser.add_argument('--white-list', type=str, default=CLIENTS_WHITE_LIST, help='comma-separated list of IP addresses of authorised clients (default: {})'.format(CLIENTS_WHITE_LIST))
-parser.add_argument('--login-srv-addr', type=str, default=LOGIN_SERVER_ADDR, help='address of the login server (default: {})'.format(LOGIN_SERVER_ADDR))
-parser.add_argument('--login-srv-port', type=int, default=LOGIN_SERVER_PORT, help='port of the login server\'s REST API  (default: {})'.format(LOGIN_SERVER_PORT))
 parser.add_argument('--log-file', type=str, default=LOG_FILE, help='logs destination, empty for stderr (default: {})'.format(LOG_FILE))
 parser.add_argument('--log-level', type=str, default=LOG_LEVEL, help='minimal severity of logs [debug, info, warning, error, critical] (default: {})'.format(LOG_LEVEL))
 args = parser.parse_args()
 
-login_server = {
-	'addr': args.login_srv_addr,
-	'port': args.login_srv_port,
-}
 db_file = args.db_file if args.db_file != '' else None
+replay_dir = args.replay_dir
+bmov_to_fm2 = args.bmov_to_fm2
 clients_white_list = args.white_list.split(',')
 
 if args.log_level not in ['debug', 'info', 'warning', 'error', 'critical']:
 	sys.stderr.write('invalid debug level\n')
+	sys.exit(1)
+
+if not os.path.isfile(bmov_to_fm2):
+	res = subprocess.run(['which', bmov_to_fm2], encoding='utf-8')
+	if res.returncode != 0:
+		logging.error('unable to find replay converter "{}"'.format(bmov_to_fm2))
+		sys.exit(1)
+	bmov_to_fm2 = res.stdout.rstrip('\r\n')
+
+if not os.path.isdir(replay_dir):
+	logging.error('invalid replay directory: "{}"'.format(replay_dir))
 	sys.exit(1)
 
 # Configure logging
@@ -44,8 +54,8 @@ logging.basicConfig(
 	level = getattr(logging, args.log_level.upper())
 )
 
-# Initialize ranking database
-rankingdb.load(db_file, login_server)
+# Initialize database
+replaydb.load(db_file, replay_dir, bmov_to_fm2)
 
 # Start serving REST requests
 restservice.serve(args.rest_port, whitelist=clients_white_list)

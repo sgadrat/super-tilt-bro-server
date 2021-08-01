@@ -348,6 +348,15 @@ std::vector<uint8_t> generate_savestate(uint8_t stage, uint8_t character_1, uint
 }
 
 int main(int argc, char** argv) {
+	// Parse command line
+	std::string bmov_path = "/tmp/replay.bmov";
+	if (argc > 1) {
+		bmov_path = argv[1];
+	}
+
+	std::filesystem::path savestate_data_dir(argv[0]);
+	savestate_data_dir = savestate_data_dir.remove_filename() / "bmov_to_fm2_data";
+
 	// Parse bmov file
 	std::map<uint32_t, GameState::ControllerState> controller_a_history;
 	std::map<uint32_t, GameState::ControllerState> controller_b_history;
@@ -356,7 +365,7 @@ int main(int argc, char** argv) {
 	uint8_t character_1 = 255;
 	uint8_t character_2 = 255;
 	{
-		std::ifstream bmov_file("/tmp/replay.bmov");
+		std::ifstream bmov_file(bmov_path);
 
 		auto u8 = [&]() {
 			uint8_t res;
@@ -429,8 +438,6 @@ int main(int argc, char** argv) {
 		std::cout << "guid " << generate_guid() << "\n";
 		std::cout << "romChecksum " << roms_checksum.at("2.0-alpha8-unrom") << "\n";
 
-		std::filesystem::path savestate_data_dir(argv[0]);
-		savestate_data_dir = savestate_data_dir.remove_filename() / "bmov_to_fm2_data";
 		std::cout << "savestate base64:"+ base64_encode(generate_savestate(stage, character_1, character_2, savestate_data_dir.native())) +"\n";
 	}
 
