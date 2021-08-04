@@ -17,6 +17,7 @@
 #include <vector>
 
 // g++ -std=c++17 -O3 -DNDEBUG -flto bmov_to_fm2.cpp ../src/GameState.cpp -I ../src -I .. -luuid -lz -o bmov_to_fm2
+// # May need -lstdc++fs on older distribs
 
 const std::map<std::string, std::string> roms_checksum{
 	{"2.0-alpha8-unrom", "base64:npc22x82bJ+GEfIeZEq/cQ=="},

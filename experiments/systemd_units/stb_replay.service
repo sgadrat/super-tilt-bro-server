@@ -6,7 +6,7 @@ StartLimitIntervalSec=0
 [Service]
 Type=simple
 Restart=always
-RestartSec=1
+RestartSec=60
 User=debian
 ExecStartPre=
 ExecStart=/usr/bin/python3 PATH_TO/replay_server/replay_server.py --white-list 127.0.0.1

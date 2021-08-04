@@ -1,3 +1,3 @@
 #!/bin/bash
 bin_dir="`dirname $0`"
-tail -n0 -F /usr/share/stb/games/games.log | python3 "${bin_dir}/game_ranking_pusher.py"
+tail -n0 -F /usr/share/stb/games/games.log | python3 "${bin_dir}/game_ranking_pusher.py" "$@"
