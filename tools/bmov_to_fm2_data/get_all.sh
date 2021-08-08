@@ -23,4 +23,5 @@ xa -DCURRENT_BANK_NUMBER=0 -DCHARACTERS_END_TILES_OFFSET=2*96*16 "$tilt_dir"/gam
 for char in sinbad kiki pepper; do
 	./get_tileset.sh "$tilt_dir"/game/data/characters/characters-data/$char/chr_tiles.asm ${char}_tiles.dat
 	./get_tileset.sh "$tilt_dir"/game/data/characters/characters-data/$char/chr_illustrations.asm ${char}_illustrations.dat
+	./get_character_palettes.sh "$tilt_dir" "$char"
 done

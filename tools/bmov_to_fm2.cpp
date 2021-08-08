@@ -3,6 +3,7 @@
  *
  * Useful read: http://fceux.com/web/FM2.html
  */
+#include "argparse.hpp"
 #include "fcs_writer.hpp"
 
 #include <algorithm>
@@ -119,7 +120,13 @@ void read_nametable_file(std::vector<uint8_t>& palettes, std::vector<uint8_t>& n
 	::memset(nametable.data() + 0x400, 0, 0x400);
 }
 
-std::vector<uint8_t> generate_savestate(uint8_t stage, uint8_t character_1, uint8_t character_2, std::string data_dir) {
+std::vector<uint8_t> generate_savestate(
+	uint8_t stage,
+	uint8_t character_1, uint8_t character_1_palette,
+	uint8_t character_2, uint8_t character_2_palette,
+	std::string data_dir
+)
+{
 	uint8_t const N_FLAG = 0x80;
 	uint8_t const V_FLAG = 0x40;
 	uint8_t const U_FLAG = 0x20;
@@ -160,11 +167,54 @@ std::vector<uint8_t> generate_savestate(uint8_t stage, uint8_t character_1, uint
 	uint16_t const network_rollback_mode = 0xb5;
 	ram[audio_music_enabled] = 0;
 	ram[audio_fx_noise_current_opcode_bank] = 0xff;
+	ram[config_player_a_character_palette] = character_1_palette;
+	ram[config_player_a_weapon_palette] = character_1_palette;
+	ram[config_player_b_character_palette] = character_2_palette;
+	ram[config_player_b_weapon_palette] = character_2_palette;
 	ram[network_rollback_mode] = 0;
 	ram[ppuctrl_val] = ppu_ctrl;
 	for (size_t i = 0; i < 0x100; i += 4) {
 		ram[0x200 + i] = 0xfe;
 	}
+
+	std::vector<uint8_t>::iterator players_palettes_cursor = ram.begin() + players_palettes;
+	std::vector<uint8_t> character_1_palette_data(63, 0);
+	std::vector<uint8_t> character_2_palette_data(63, 0);
+	read_raw_file(character_1_palette_data.begin(), data_dir+"/"+ char_names[character_1] +"_palettes.dat");
+	read_raw_file(character_2_palette_data.begin(), data_dir+"/"+ char_names[character_2] +"_palettes.dat");
+	auto place_player_header = [&](size_t char_num) {
+		std::array<std::array<uint8_t, 4>, 2> const nt_headers = {{
+			{0x01, 0x3f, 0x11, 0x03},
+			{0x01, 0x3f, 0x19, 0x03}
+		}};
+		std::copy(nt_headers[char_num].begin(), nt_headers[char_num].end(), players_palettes_cursor);
+		players_palettes_cursor += 4;
+	};
+	auto place_character_normal_palette = [&](uint8_t char_num) {
+		std::vector<uint8_t>& palette_data = (char_num == 0 ? character_1_palette_data : character_2_palette_data);
+		size_t const palette_num = (char_num == 0 ? character_1_palette : character_2_palette);
+		size_t const palette_data_index = 3 * palette_num;
+		std::copy(palette_data.begin() + palette_data_index, palette_data.begin() + palette_data_index + 3, players_palettes_cursor);
+		players_palettes_cursor += 3;
+		*players_palettes_cursor = 0;
+		++players_palettes_cursor;
+	};
+	auto place_character_alternate_palette = [&](uint8_t char_num) {
+		std::vector<uint8_t>& palette_data = (char_num == 0 ? character_1_palette_data : character_2_palette_data);
+		size_t const palette_num = (char_num == 0 ? character_1_palette : character_2_palette);
+		size_t const palette_data_index = 21 + 3 * palette_num;
+		std::copy(palette_data.begin() + palette_data_index, palette_data.begin() + palette_data_index + 3, players_palettes_cursor);
+		players_palettes_cursor += 3;
+		*players_palettes_cursor = 0;
+		++players_palettes_cursor;
+	};
+	for (size_t char_num = 0; char_num < 2; ++char_num) {
+		place_player_header(char_num);
+		place_character_normal_palette(char_num);
+		place_player_header(char_num);
+		place_character_alternate_palette(char_num);
+	}
+	assert(players_palettes_cursor == ram.begin() + players_palettes + 4 * 8);
 
 	// Construct CHR-RAM
 	std::vector<uint8_t> chrr(8192, 0xff);
@@ -186,6 +236,16 @@ std::vector<uint8_t> generate_savestate(uint8_t stage, uint8_t character_1, uint
 	std::vector<uint8_t> ntar(2048, 0);
 	std::vector<uint8_t> pram(32, 0);
 	read_nametable_file(pram, ntar, data_dir+"/nt_"+ stage_names[stage] +".dat");
+
+	for (size_t char_num = 0; char_num < 2; ++char_num) {
+		std::vector<uint8_t>::iterator ram_palette = pram.begin() + 16 + 4 + char_num * 8 + 1;
+
+		std::vector<uint8_t>& palette_data = (char_num == 0 ? character_1_palette_data : character_2_palette_data);
+		size_t const palette_num = (char_num == 0 ? character_1_palette : character_2_palette);
+		std::vector<uint8_t>::const_iterator data_palette = palette_data.begin() + 42 + palette_num * 3;
+
+		std::copy(data_palette, data_palette + 3, ram_palette);
+	}
 
 	// I guess it is OAM, don't really care, it will be reconstructed on first tick
 	std::vector<uint8_t> spra(256, 0xfe);
@@ -348,15 +408,48 @@ std::vector<uint8_t> generate_savestate(uint8_t stage, uint8_t character_1, uint
 	return fcs::serialize_fcsx(save);
 }
 
+std::string usage() {
+	return
+		"usage: bmov_to_fm2 [options] [BMOV_PATH]\n"
+		"\n"
+		"\tBMOV_PATH\tPath to the bmov file to convert (default: /tmp/replay.bmov)\n"
+		"\n"
+		"\t--palette-a\tSkin number for player A (default: 0)\n"
+		"\t--palette-b\tSkin number for player B (default: 1)\n"
+	;
+}
+
 int main(int argc, char** argv) {
 	// Parse command line
+	std::filesystem::path savestate_data_dir;
 	std::string bmov_path = "/tmp/replay.bmov";
-	if (argc > 1) {
-		bmov_path = argv[1];
-	}
+	uint8_t character_1_palette = 0;
+	uint8_t character_2_palette = 1;
+	{
+		args::Args params = args::parse(argc, argv, {"--palette-a", "--palette-b"});
+		if (params.flags.count("-h") || params.flags.count("--help")) {
+			std::cout << usage();
+			return 0;
+		}
+		if (params.positional.size() > 1) {
+			std::cerr << usage();
+			return 1;
+		}
 
-	std::filesystem::path savestate_data_dir(argv[0]);
-	savestate_data_dir = savestate_data_dir.remove_filename() / "bmov_to_fm2_data";
+		savestate_data_dir = std::filesystem::path(argv[0]);
+		savestate_data_dir = savestate_data_dir.remove_filename() / "bmov_to_fm2_data";
+
+		if (params.positional.size() > 0) {
+			bmov_path = params.positional[0];
+		}
+
+		if (params.values.count("--palette-a")) {
+			character_1_palette = args::lex_cast<unsigned int>(params.values.at("--palette-a"));
+		}
+		if (params.values.count("--palette-b")) {
+			character_2_palette = args::lex_cast<unsigned int>(params.values.at("--palette-b"));
+		}
+	}
 
 	// Parse bmov file
 	std::map<uint32_t, GameState::ControllerState> controller_a_history;
@@ -411,7 +504,12 @@ int main(int argc, char** argv) {
 	// Debug - write standalone savestate
 #ifdef DEBUG_SAVESTATE
 	{
-		std::vector<uint8_t> save = generate_savestate(stage, character_1, character_2);
+		std::vector<uint8_t> save = generate_savestate(
+			stage,
+			character_1, character_1_palette,
+			character_2, character_2_palette,
+			savestate_data_dir.native()
+		);
 		std::ofstream ofs("/tmp/test.fcs");
 		ofs.write(reinterpret_cast<char*>(save.data()), save.size());
 	}
@@ -439,7 +537,12 @@ int main(int argc, char** argv) {
 		std::cout << "guid " << generate_guid() << "\n";
 		std::cout << "romChecksum " << roms_checksum.at("2.0-alpha8-unrom") << "\n";
 
-		std::cout << "savestate base64:"+ base64_encode(generate_savestate(stage, character_1, character_2, savestate_data_dir.native())) +"\n";
+		std::cout << "savestate base64:"+ base64_encode(generate_savestate(
+			stage,
+			character_1, character_1_palette,
+			character_2, character_2_palette,
+			savestate_data_dir.native()
+		)) +"\n";
 	}
 
 	// Write fm2 input log
