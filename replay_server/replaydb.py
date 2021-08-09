@@ -58,7 +58,7 @@ def push_games(games_info):
 	# Record games
 	for game_info in games_info:
 		# Check game consistency
-		mandatory_fields = ['bmov', 'game', 'begin', 'character_a', 'character_b', 'character_a_palette', 'character_b_palette']
+		mandatory_fields = ['bmov', 'game_server', 'game', 'begin', 'character_a', 'character_b', 'character_a_palette', 'character_b_palette']
 		for field in mandatory_fields:
 			if field not in game_info:
 				raise Exception('invalid game info format, missing "{}" field'.format(field))
@@ -95,7 +95,8 @@ def push_games(games_info):
 			'character_b': game_info['character_b'],
 			'character_a_palette': game_info['character_a_palette'],
 			'character_b_palette': game_info['character_b_palette'],
-			'stage': game_info['stage']
+			'stage': game_info['stage'],
+			'game_server': game_info['game_server']
 		}
 
 	# Update DB file

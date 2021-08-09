@@ -14,6 +14,7 @@ RANKING_SERVER_PORT = 8123
 REPLAY_SERVER_ADDR = '127.0.0.1'
 REPLAY_SERVER_PORT = 8125
 BMOV_DIR = ''
+GAME_SERVER_NAME = ''
 
 parser = argparse.ArgumentParser(description='Pusher for Super Tilt Bro.\'s server games')
 parser.add_argument('--ranking-server-addr', type=str, default=RANKING_SERVER_ADDR, help='ranking server address (default: "{}")'.format(RANKING_SERVER_ADDR))
@@ -21,6 +22,7 @@ parser.add_argument('--ranking-server-port', type=int, default=RANKING_SERVER_PO
 parser.add_argument('--replay-server-addr', type=str, default=REPLAY_SERVER_ADDR, help='replay server address (default: "{}")'.format(REPLAY_SERVER_ADDR))
 parser.add_argument('--replay-server-port', type=int, default=REPLAY_SERVER_PORT, help='replay server REST port (default: {})'.format(REPLAY_SERVER_PORT))
 parser.add_argument('--bmov-dir', type=str, default=BMOV_DIR, help='path to stb_server\'s bmov replays, empty to disable (default: "{}")'.format(BMOV_DIR))
+parser.add_argument('--game-server-name', type=str, default=GAME_SERVER_NAME, help='name of the server on which games ared played (default: "{}")'.format(GAME_SERVER_NAME))
 args = parser.parse_args()
 
 ranking_server = {
@@ -32,6 +34,7 @@ replay_server = {
 	'port': args.replay_server_port
 }
 bmov_dir = args.bmov_dir
+game_server_name = args.game_server_name
 
 # Parse input
 field_desc = {
@@ -84,11 +87,16 @@ for line in sys.stdin:
 
 		# Send replay to the replay server
 		if bmov_dir != '':
+			# Add replay data to game's summary
 			bmov_data = None
 			with open('{}/{}/replay.bmov'.format(bmov_dir, game_summary['game']), 'rb') as bmov_file:
 				bmov_data = bmov_file.read()
 			game_summary['bmov'] = base64.b64encode(bmov_data).decode('utf-8')
 
+			# Add game server to game's summary
+			game_summary['game_server'] = game_server_name
+
+			# Send game's summary
 			resp = requests.post('http://{}:{}/api/replay/games/'.format(replay_server['addr'], replay_server['port']), json=[game_summary])
 			if resp.status_code != 200:
 				log('replay server rejected game "{}"'.format(line))
