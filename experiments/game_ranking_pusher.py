@@ -83,7 +83,7 @@ for line in sys.stdin:
 		# Send game summary to the ranking server
 		resp = requests.post('http://{}:{}/api/rankings'.format(ranking_server['addr'], ranking_server['port']), json=[game_summary])
 		if resp.status_code != 200:
-			log('ranginf_server rejected game "{}"'.format(line))
+			log('ranking_server rejected game "{}"'.format(line))
 
 		# Send replay to the replay server
 		if bmov_dir != '':
