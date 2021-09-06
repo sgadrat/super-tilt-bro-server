@@ -100,7 +100,7 @@ private:
 template <typename SerializationHandler>
 void GameState::serial(SerializationHandler& s) {
 	// Copy gamestate
-	for (size_t i = 0; i < 0x50; ++i) {
+	for (size_t i = 0; i < 0x52; ++i) {
 		s.uint8(this->emulator_ram[i]);
 	}
 
@@ -141,15 +141,17 @@ void GameState::serial(SerializationHandler& s) {
 	});
 
 	// Copy animation states
-	std::array<uint8_t, 6> const serialized_animation_fields = {
+	std::array<uint8_t, 7> const serialized_animation_fields = {
 		4, // ANIMATION_STATE_OFFSET_DATA_VECTOR_LSB
 		5, // ANIMATION_STATE_OFFSET_DATA_VECTOR_MSB
 		6, // ANIMATION_STATE_OFFSET_DIRECTION
 		7, // ANIMATION_STATE_OFFSET_CLOCK
 		10, // ANIMATION_STATE_OFFSET_FRAME_VECTOR_LSB
 		11, // ANIMATION_STATE_OFFSET_FRAME_VECTOR_MSB
+		12, // ANIMATION_STATE_OFFSET_NTSC_CNT
 	};
-	for (size_t anim_offset = 0; anim_offset <= 12; anim_offset += 12) {
+	size_t const animation_size = player_b_animation - player_a_animation;
+	for (size_t anim_offset = 0; anim_offset <= animation_size; anim_offset += animation_size) {
 		for (uint8_t const prop: serialized_animation_fields) {
 			s.uint8(this->emulator_ram[player_a_animation + anim_offset + prop]);
 		}
