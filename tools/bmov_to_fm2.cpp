@@ -22,6 +22,7 @@
 
 const std::map<std::string, std::string> roms_checksum{
 	{"2.0-alpha8-unrom", "base64:npc22x82bJ+GEfIeZEq/cQ=="},
+	{"2.0-alpha9-unrom", "base64:/wQ5QXbvWmziKHsuVvVFug=="},
 };
 
 std::string generate_guid() {
@@ -162,9 +163,6 @@ std::vector<uint8_t> generate_savestate(
 	ram.insert(ram.end(), ram_array.begin(), ram_array.end());
 
 	// Adapt memory to our needs
-	uint16_t const audio_music_enabled = 0xc0;
-	uint16_t const audio_fx_noise_current_opcode_bank = 0x062b;
-	uint16_t const network_rollback_mode = 0xb5;
 	ram[audio_music_enabled] = 0;
 	ram[audio_fx_noise_current_opcode_bank] = 0xff;
 	ram[config_player_a_character_palette] = character_1_palette;
@@ -535,7 +533,7 @@ int main(int argc, char** argv) {
 		std::cout << "port2 0\n";
 		std::cout << "romFilename tilt_no_network_unrom_(E)\n";
 		std::cout << "guid " << generate_guid() << "\n";
-		std::cout << "romChecksum " << roms_checksum.at("2.0-alpha8-unrom") << "\n";
+		std::cout << "romChecksum " << roms_checksum.at("2.0-alpha9-unrom") << "\n";
 
 		std::cout << "savestate base64:"+ base64_encode(generate_savestate(
 			stage,
