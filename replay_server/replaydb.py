@@ -107,7 +107,7 @@ def get_games_list():
 	return sorted(
 		[replay_db['replays'][game] for game in replay_db['replays']],
 		key=lambda x: x['begin']
-	)[-100:]
+	)[-50:]
 
 def get_fm2(game):
 	with open(get_fm2_path(game), 'r') as fm2_file:
