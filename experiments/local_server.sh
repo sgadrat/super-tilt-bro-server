@@ -18,7 +18,7 @@ echo "  ranking $ranking_pid"
 echo "  replay  $replay_pid"
 
 sleep 5
-tail -n0 -F /tmp/stb_games/games.log | ./game_ranking_pusher.py --bmov-dir=/tmp/stb_games &
+tail -n0 -F /tmp/stb_games/games.log 2> /dev/null | ./game_ranking_pusher.py --bmov-dir=/tmp/stb_games &
 pusher_pid=$!
 
 watch "echo 'ranking:' ; curl -s http://127.0.0.1:8123/api/rankings ; echo ; echo 'replays:' ; curl -s http://127.0.0.1:8125/api/replay/games/"
