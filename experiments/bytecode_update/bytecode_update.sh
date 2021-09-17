@@ -9,6 +9,7 @@ tilt_dir=~/workspace/nes/tilt
 # Input files (must exists)
 BYTECODE_PATH="$tilt_dir/server_bytecode.nes"
 MEM_LABELS_PATH="$tilt_dir/game/mem_labels.asm"
+RAINBOW_LABELS_PATH="$tilt_dir/game/logic/rainbow_lib.asm"
 XA_LISTING_PATH=/tmp/server_bytecode.lst
 KNOWN_OPCODES_PATH="$base/compile_bytecode/known_opcodes.json"
 
@@ -22,7 +23,7 @@ CPP_MEM_LABELS_PATH="$src_dir/GameState.bytecodeinfo.hpp"
 "$base/convert_bytecode.sh" "$BYTECODE_PATH" > "$CPP_BYTECODE_PATH"
 
 # Get memory locations info
-"$base/extract_mem_labels.py" "$MEM_LABELS_PATH" > "$CPP_MEM_LABELS_PATH"
+"$base/extract_mem_labels.py" "$MEM_LABELS_PATH" "$RAINBOW_LABELS_PATH" > "$CPP_MEM_LABELS_PATH"
 
 # Get pre-filled JIT structure
 "$base/compile_bytecode/extract_entry_points.py" "$XA_LISTING_PATH" > "$ENTRY_POINTS_PATH"

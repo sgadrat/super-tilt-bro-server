@@ -69,7 +69,6 @@ std::string hex(uint8_t v) {
 	return hex(uint16_t(v), 2);
 }
 
-uint16_t const rainbow_prg_banking_1 = 0x5002;
 uint16_t const stop_trigger_addr = 0xffff;
 uint16_t const nes_register_ppustatus = 0x2002;
 
@@ -102,7 +101,7 @@ bool GameState::EmulatorRunContext::write(uint16_t addr, uint8_t value) {
 	}
 
 	// Banking register
-	if (addr == rainbow_prg_banking_1) {
+	if (addr == RAINBOW_PRG_BANKING_1) {
 		uint8_t* const rom_begin = memory_segments[6] - (0x1f * 0x4000); // segment 6 is fixed bank begining, which is bank 0x1f
 		uint8_t* const bank_begin = rom_begin + value * 0x4000;
 		memory_segments[4] = bank_begin;
