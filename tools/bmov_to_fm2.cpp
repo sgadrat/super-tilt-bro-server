@@ -20,9 +20,16 @@
 // g++ -std=c++17 -O3 -DNDEBUG -flto bmov_to_fm2.cpp ../src/GameState.cpp -I ../src -I .. -luuid -lz -o bmov_to_fm2
 // # May need -lstdc++fs on older distribs
 
-const std::map<std::string, std::string> roms_checksum{
+std::string const CURRENT_ROM_VERSION = "2.0-alpha9-unrom";
+
+std::map<std::string, std::string> const roms_checksum{
 	{"2.0-alpha8-unrom", "base64:npc22x82bJ+GEfIeZEq/cQ=="},
 	{"2.0-alpha9-unrom", "base64:/wQ5QXbvWmziKHsuVvVFug=="},
+};
+
+std::map<std::string, uint16_t> const roms_entry_point{
+	{"2.0-alpha8-unrom", 0xc07f},
+	{"2.0-alpha9-unrom", 0xc07e},
 };
 
 std::string generate_guid() {
@@ -125,7 +132,8 @@ std::vector<uint8_t> generate_savestate(
 	uint8_t stage,
 	uint8_t character_1, uint8_t character_1_palette,
 	uint8_t character_2, uint8_t character_2_palette,
-	std::string data_dir
+	std::string data_dir,
+	std::string rom_version
 )
 {
 	uint8_t const N_FLAG = 0x80;
@@ -145,7 +153,7 @@ std::vector<uint8_t> generate_savestate(
 	uint32_t const version = 22020; ///< Version of the savestate format
 
 	// CPU
-	uint16_t const entry_point = 0xc07f; ///< PC value, where execution will resume (should be the start of the game loop)
+	uint16_t const entry_point = roms_entry_point.at(rom_version); ///< PC value, where execution will resume (should be the start of the game loop)
 	uint8_t const cpu_flags = I_FLAG;
 
 	// PPU
@@ -256,7 +264,7 @@ std::vector<uint8_t> generate_savestate(
 
 	save.body.insert({
 		"CPU", {
-			{"PC", {entry_point & 0xff, entry_point >> 8}},
+			{"PC", {uint8_t(entry_point & 0xff), uint8_t(entry_point >> 8)}},
 			{"A", {0x00}},
 			{"X", {0x00}},
 			{"Y", {0x00}},
@@ -414,6 +422,7 @@ std::string usage() {
 		"\n"
 		"\t--palette-a\tSkin number for player A (default: 0)\n"
 		"\t--palette-b\tSkin number for player B (default: 1)\n"
+		"\t--rom-version\tVersion of the game to generate the movie for (default: "+ CURRENT_ROM_VERSION +")\n"
 	;
 }
 
@@ -421,10 +430,11 @@ int main(int argc, char** argv) {
 	// Parse command line
 	std::filesystem::path savestate_data_dir;
 	std::string bmov_path = "/tmp/replay.bmov";
+	std::string rom_version = CURRENT_ROM_VERSION;
 	uint8_t character_1_palette = 0;
 	uint8_t character_2_palette = 1;
 	{
-		args::Args params = args::parse(argc, argv, {"--palette-a", "--palette-b"});
+		args::Args params = args::parse(argc, argv, {"--palette-a", "--palette-b", "--rom-version"});
 		if (params.flags.count("-h") || params.flags.count("--help")) {
 			std::cout << usage();
 			return 0;
@@ -447,6 +457,14 @@ int main(int argc, char** argv) {
 		if (params.values.count("--palette-b")) {
 			character_2_palette = args::lex_cast<unsigned int>(params.values.at("--palette-b"));
 		}
+		if (params.values.count("--rom-version")) {
+			rom_version = params.values.at("--rom-version");
+		}
+	}
+
+	if (roms_checksum.find(rom_version) == roms_checksum.end()) {
+		std::cerr << "unknown rom version '" << rom_version << "'\n";
+		return 1;
 	}
 
 	// Parse bmov file
@@ -533,13 +551,14 @@ int main(int argc, char** argv) {
 		std::cout << "port2 0\n";
 		std::cout << "romFilename tilt_no_network_unrom_(E)\n";
 		std::cout << "guid " << generate_guid() << "\n";
-		std::cout << "romChecksum " << roms_checksum.at("2.0-alpha9-unrom") << "\n";
+		std::cout << "romChecksum " << roms_checksum.at(rom_version) << "\n";
 
 		std::cout << "savestate base64:"+ base64_encode(generate_savestate(
 			stage,
 			character_1, character_1_palette,
 			character_2, character_2_palette,
-			savestate_data_dir.native()
+			savestate_data_dir.native(),
+			rom_version
 		)) +"\n";
 	}
 
