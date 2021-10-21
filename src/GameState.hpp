@@ -208,6 +208,7 @@ void GameState::serial(SerializationHandler& s) {
 				//s.uint8(this->emulator_ram[character_objects + 1 + 9]); // ANIMATION_STATE_OFFSET_LAST_SPRITE_NUM ; Never change
 				s.uint8(this->emulator_ram[character_objects + 1 + 10]); // ANIMATION_STATE_OFFSET_FRAME_VECTOR_LSB
 				s.uint8(this->emulator_ram[character_objects + 1 + 11]); // ANIMATION_STATE_OFFSET_FRAME_VECTOR_MSB
+				//s.uint8(this->emulator_ram[character_objects + 1 + 12]); // ANIMATION_STATE_OFFSET_NTSC_CNT ; Actually should be serialized, forgot it in the NTSC adaptation of the protocol
 				break;
 
 			default:
