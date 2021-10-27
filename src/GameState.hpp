@@ -100,7 +100,7 @@ private:
 template <typename SerializationHandler>
 void GameState::serial(SerializationHandler& s) {
 	// Copy gamestate
-	for (size_t i = 0; i < 0x52; ++i) {
+	for (size_t i = 0; i < 0x58; ++i) {
 		s.uint8(this->emulator_ram[i]);
 	}
 
