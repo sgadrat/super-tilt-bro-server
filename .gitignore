@@ -9,6 +9,7 @@ tools/bmov_to_fm2
 tools/bmov_to_fm2_data/*.dat
 tools/fm2_dumper
 tools/fm2_player
+tools/initial_state_dumper
 src/server/stb_server
 src/server/stb_server_beta
 __pycache__
