@@ -100,13 +100,8 @@ private:
 template <typename SerializationHandler>
 void GameState::serial(SerializationHandler& s) {
 	// Copy gamestate
-	for (size_t i = 0; i < 0x58; ++i) {
+	for (size_t i = 0; i < 0x68; ++i) {
 		s.uint8(this->emulator_ram[i]);
-	}
-
-	// Copy hitboxes MSB
-	for (size_t i = 0; i < 0x10; ++i) {
-		s.uint8(this->emulator_ram[player_a_hurtbox_left_msb + i]);
 	}
 
 	// Copy special state
@@ -115,8 +110,6 @@ void GameState::serial(SerializationHandler& s) {
 	// Copy controllers state
 	s.uint8(this->emulator_ram[controller_a_btns]);
 	s.uint8(this->emulator_ram[controller_b_btns]);
-	s.uint8(this->emulator_ram[controller_a_last_frame_btns]);
-	s.uint8(this->emulator_ram[controller_b_last_frame_btns]);
 
 	// Copy actually pressed opponent btns (keep_input_dirty may mess with normal values, but not this one)
 	s.flags8({
