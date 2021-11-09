@@ -14,7 +14,12 @@ namespace  {
 uint32_t constexpr INPUT_LAG = 4;
 
 GameState initial_gamestate(GameInstance::GameSettings const& settings) {
-	return GameState(settings.stage_id, settings.characters, [](std::string const& m) {syslog(LOG_WARNING, "GameState: %s", m.c_str());});
+	return GameState(
+		settings.stage_id,
+		settings.characters,
+		static_cast<GameState::VideoSystem>(settings.video_system),
+		[](std::string const& m) {syslog(LOG_WARNING, "GameState: %s", m.c_str());}
+	);
 }
 
 GameState::ControllerState controller_state_from_message(stnp::message::ControllerState const& message) {
@@ -211,6 +216,7 @@ void GameInstance::run(
 		game_info->character_a_palette = game_settings.character_palettes.at(0);
 		game_info->character_b_palette = game_settings.character_palettes.at(1);
 		game_info->stage = game_settings.stage_id;
+		game_info->video_system = game_settings.video_system;
 		game_info->winner = 255;
 		game_info->player_a_ranked = game_settings.ranked.at(0);
 		game_info->player_b_ranked = game_settings.ranked.at(1);
@@ -234,6 +240,12 @@ void GameInstance::run(
 
 		steady_clock::time_point last_input_clock_time = steady_clock::now();
 		std::array<uint32_t, 2> last_gamestate_sent_time = {0, 0}; // For each client, timestamp of the last gamestate sent
+
+		uint8_t const frame_rate = (
+			static_cast<GameState::VideoSystem>(game_settings.video_system) == GameState::VideoSystem::NTSC ?
+			60 :
+			50
+		);
 
 		// Variables reset each time a state is sent
 		bool new_input_batch = true;
@@ -264,8 +276,10 @@ void GameInstance::run(
 
 				// Process message
 				if (in_message == nullptr) {
+					// No message received, compute some frames in the history to have it at hand when a message finally comes.
+					microseconds const frame_duration((1'000'000 + frame_rate/2) / frame_rate);
 					uint32_t const last_input_time = std::max(controller_a_history.rbegin()->first, controller_b_history.rbegin()->first);
-					uint32_t n_frames_since_last_input = duration_cast<microseconds>(steady_clock::now() - last_input_clock_time).count() / 20'000;
+					uint32_t n_frames_since_last_input = duration_cast<microseconds>(steady_clock::now() - last_input_clock_time).count() / frame_duration.count();
 					uint32_t const current_time = last_input_time + n_frames_since_last_input;
 
 					srv_dbg(LOG_DEBUG, "pred compute: %d", current_time);
@@ -441,13 +455,12 @@ void GameInstance::run(
 			game_info->controller_a_history = controller_a_history_ptr;
 			game_info->controller_b_history = controller_b_history_ptr;
 			//HACK
-			// 50 is a teribly hardcoded worst case, it comes from the fact that
+			// Adding frame_rate is a teribly hardcoded worst case, it comes from the fact that
 			//  - message pop timeouts every second
 			//  - on timeout, frames are emulated to avoid being too late from clients' time
-			//  - game runs at 50 fps
 			//  - if one of these maintenance simulation tick is a gameover, the simulation ends
 			//  - we ignore the fact that a client can send inputs far in the past
-			game_info->num_ticks_in_game = gamestate_history.rbegin()->first + 50;
+			game_info->num_ticks_in_game = gamestate_history.rbegin()->first + frame_rate;
 			game_info_queue->push(game_info);
 		}
 	}catch(std::exception const& e) {

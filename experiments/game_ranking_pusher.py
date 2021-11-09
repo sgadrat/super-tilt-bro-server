@@ -51,6 +51,7 @@ field_desc = {
 	'character_b_palette': {'type': 'int'},
 	'stage': {'type': 'int'},
 	'winner': {'type': 'int'},
+	'video_system': {'type': 'int'},
 }
 
 for line in sys.stdin:

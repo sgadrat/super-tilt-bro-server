@@ -24,10 +24,11 @@ public:
 
 	/** Info about the game to be played */
 	struct GameSettings {
-		uint8_t stage_id;
 		std::array<uint8_t, 2> characters;
 		std::array<uint8_t, 2> character_palettes;
 		std::array<bool, 2> ranked;
+		uint8_t stage_id;
+		uint8_t video_system;
 	};
 
 	/**

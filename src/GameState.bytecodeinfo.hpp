@@ -159,31 +159,36 @@ uint16_t const player_b_gravity_lsb = 0x4f;
 uint16_t const player_a_gravity_msb = 0x50;
 uint16_t const player_b_gravity_msb = 0x51;
 
-// $52 to $56 - unused
+uint16_t const player_a_grounded = 0x52; // $00 if not grounded, else the offset of grounded platform from stage_data
+uint16_t const player_b_grounded = 0x53;
+uint16_t const player_a_walled = 0x54; // $00 if not touching a wall, else the offset of the platform from stage_data
+uint16_t const player_b_walled = 0x55;
+uint16_t const player_a_walled_direction = 0x56; // DIRECTION_LEFT - player is on the left of the wall
+uint16_t const player_b_walled_direction = 0x57; // DIRECTION_RIGHT - player is on the right of the wall
 
-uint16_t const player_a_hurtbox_left_msb = 0x57;
-uint16_t const player_b_hurtbox_left_msb = 0x58;
-uint16_t const player_a_hurtbox_right_msb = 0x59;
-uint16_t const player_b_hurtbox_right_msb = 0x5a;
-uint16_t const player_a_hurtbox_top_msb = 0x5b;
-uint16_t const player_b_hurtbox_top_msb = 0x5c;
-uint16_t const player_a_hurtbox_bottom_msb = 0x5d;
-uint16_t const player_b_hurtbox_bottom_msb = 0x5e;
-uint16_t const player_a_hitbox_left_msb = 0x5f;
-uint16_t const player_b_hitbox_left_msb = 0x60;
-uint16_t const player_a_hitbox_right_msb = 0x61;
-uint16_t const player_b_hitbox_right_msb = 0x62;
-uint16_t const player_a_hitbox_top_msb = 0x63;
-uint16_t const player_b_hitbox_top_msb = 0x64;
-uint16_t const player_a_hitbox_bottom_msb = 0x65;
-uint16_t const player_b_hitbox_bottom_msb = 0x66;
+uint16_t const player_a_hurtbox_left_msb = 0x58;
+uint16_t const player_b_hurtbox_left_msb = 0x59;
+uint16_t const player_a_hurtbox_right_msb = 0x5a;
+uint16_t const player_b_hurtbox_right_msb = 0x5b;
+uint16_t const player_a_hurtbox_top_msb = 0x5c;
+uint16_t const player_b_hurtbox_top_msb = 0x5d;
+uint16_t const player_a_hurtbox_bottom_msb = 0x5e;
+uint16_t const player_b_hurtbox_bottom_msb = 0x5f;
+uint16_t const player_a_hitbox_left_msb = 0x60;
+uint16_t const player_b_hitbox_left_msb = 0x61;
+uint16_t const player_a_hitbox_right_msb = 0x62;
+uint16_t const player_b_hitbox_right_msb = 0x63;
+uint16_t const player_a_hitbox_top_msb = 0x64;
+uint16_t const player_b_hitbox_top_msb = 0x65;
+uint16_t const player_a_hitbox_bottom_msb = 0x66;
+uint16_t const player_b_hitbox_bottom_msb = 0x67;
 
-uint16_t const player_a_grounded = 0x67; // $00 if not grounded, else the offset of grounded platform from stage_data
-uint16_t const player_b_grounded = 0x68;
-uint16_t const player_a_walled = 0x69; // $00 if not touching a wall, else the offset of the platform from stage_data
-uint16_t const player_b_walled = 0x6a;
-uint16_t const player_a_walled_direction = 0x6b; // DIRECTION_LEFT - player is on the left of the wall
-uint16_t const player_b_walled_direction = 0x6c; // DIRECTION_RIGHT - player is on the right of the wall
+uint16_t const player_a_last_shown_damage = 0x68;
+uint16_t const player_b_last_shown_damage = 0x69;
+uint16_t const player_a_last_shown_stocks = 0x6a;
+uint16_t const player_b_last_shown_stocks = 0x6b;
+
+// $6c-$6f unused
 
 uint16_t const screen_shake_counter = 0x70;
 uint16_t const screen_shake_nextval_x = 0x71;
@@ -256,24 +261,25 @@ uint16_t const stage_gem_frame_cnt = 0x8d;
 // Network engine labels
 //
 
-uint16_t const server_current_frame_byte0 = 0xb1;
-uint16_t const server_current_frame_byte1 = 0xb2;
-uint16_t const server_current_frame_byte2 = 0xb3;
-uint16_t const server_current_frame_byte3 = 0xb4;
-uint16_t const network_rollback_mode = 0xb5; // 0 - normal, 1 - rolling // Note - also used by game tick to know if a frame will be drawn, may be renamed something more generic like "dummy_frame"
+uint16_t const server_current_frame_byte0 = 0xb0;
+uint16_t const server_current_frame_byte1 = 0xb1;
+uint16_t const server_current_frame_byte2 = 0xb2;
+uint16_t const server_current_frame_byte3 = 0xb3;
+uint16_t const network_rollback_mode = 0xb4; // 0 - normal, 1 - rolling // Note - also used by game tick to know if a frame will be drawn, may be renamed something more generic like "dummy_frame"
 
-uint16_t const network_current_frame_byte0 = 0xb6;
-uint16_t const network_current_frame_byte1 = 0xb7;
-uint16_t const network_current_frame_byte2 = 0xb8;
-uint16_t const network_current_frame_byte3 = 0xb9;
+uint16_t const network_current_frame_byte0 = 0xb5;
+uint16_t const network_current_frame_byte1 = 0xb6;
+uint16_t const network_current_frame_byte2 = 0xb7;
+uint16_t const network_current_frame_byte3 = 0xb8;
 
-uint16_t const network_client_id_byte0 = 0xba;
-uint16_t const network_client_id_byte1 = 0xbb;
-uint16_t const network_client_id_byte2 = 0xbc;
-uint16_t const network_client_id_byte3 = 0xbd;
+uint16_t const network_client_id_byte0 = 0xb9;
+uint16_t const network_client_id_byte1 = 0xba;
+uint16_t const network_client_id_byte2 = 0xbb;
+uint16_t const network_client_id_byte3 = 0xbc;
 
-uint16_t const network_last_sent_btns = 0xbe;
-uint16_t const network_local_player_number = 0xbf;
+uint16_t const network_last_sent_btns = 0xbd;
+uint16_t const network_local_player_number = 0xbe;
+uint16_t const network_frame_diff = 0xbf;
 
 //
 // Network login labels
@@ -455,7 +461,9 @@ uint16_t const gameover_balloon3_velocity_h = 0x6b;
 uint16_t const gameover_balloon4_velocity_h = 0x6c;
 uint16_t const gameover_balloon5_velocity_h = 0x6d;
 
-uint16_t const gameover_random = 0x4e;
+uint16_t const gameover_random = 0x4d;
+uint16_t const gameover_gamepads_ready_a = 0x4e;
+uint16_t const gameover_gamepads_ready_b = 0x4f;
 
 uint16_t const gameover_winner = 0x0580;
 

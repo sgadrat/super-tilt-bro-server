@@ -93,8 +93,9 @@ GameState initial_gamestate() {
 
 	const uint8_t CHAR_SINBAD = 0;
 	const uint8_t CHAR_KIKI = 1;
+	const uint8_t CHAR_PEPPER = 1;
 
-	return GameState(STAGE_FLATLAND, std::array<uint8_t, 2>{CHAR_SINBAD, CHAR_SINBAD}, [](std::string const & m) {std::cerr << m << '\n';});
+	return GameState(STAGE_FLATLAND, std::array<uint8_t, 2>{CHAR_SINBAD, CHAR_SINBAD}, GameState::VideoSystem::PAL, [](std::string const & m) {std::cerr << m << '\n';});
 }
 
 #if PERF_UNITS == PERF_TIME

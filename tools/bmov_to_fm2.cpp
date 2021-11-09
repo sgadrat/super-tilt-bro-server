@@ -132,6 +132,7 @@ std::vector<uint8_t> generate_savestate(
 	uint8_t stage,
 	uint8_t character_1, uint8_t character_1_palette,
 	uint8_t character_2, uint8_t character_2_palette,
+	GameState::VideoSystem video_system,
 	std::string data_dir,
 	std::string rom_version
 )
@@ -165,7 +166,7 @@ std::vector<uint8_t> generate_savestate(
 	uint8_t const apu_status = 0x0f;
 
 	// Initialize emulator and get its memory
-	GameState gamestate(stage, {character_1, character_2});
+	GameState gamestate(stage, {character_1, character_2}, video_system);
 	std::array<uint8_t, 2048> ram_array = gamestate.get_ram_dump();
 	std::vector<uint8_t> ram;
 	ram.insert(ram.end(), ram_array.begin(), ram_array.end());
@@ -431,7 +432,7 @@ int main(int argc, char** argv) {
 	std::filesystem::path savestate_data_dir;
 	std::string bmov_path = "/tmp/replay.bmov";
 	std::string rom_version = CURRENT_ROM_VERSION;
-	uint8_t character_1_palette = 0;
+	uint8_t character_1_palette = 0; // NOTE: char palettes from bmov take precedence over command-line (unnatural, and to be changed if there is a need)
 	uint8_t character_2_palette = 1;
 	{
 		args::Args params = args::parse(argc, argv, {"--palette-a", "--palette-b", "--rom-version"});
@@ -474,6 +475,7 @@ int main(int argc, char** argv) {
 	uint8_t stage = 255;
 	uint8_t character_1 = 255;
 	uint8_t character_2 = 255;
+	GameState::VideoSystem video_system = GameState::VideoSystem::PAL;
 	{
 		std::ifstream bmov_file(bmov_path);
 
@@ -502,13 +504,30 @@ int main(int argc, char** argv) {
 		};
 
 		// Header
-		u8(); /* bmov version */
+		uint8_t bmov_version = u8();
+		if (bmov_version > 1) {
+			std::cerr << "unsuported bmov version " << uint16_t(bmov_version) << '\n';
+			return 1;
+		}
+
 		num_ticks_in_game = u32();
 		stage = u8();
 		character_1 = u8();
 		character_2 = u8();
-		u32(); /* ID player A */
-		u32(); /* ID player B */
+		if (bmov_version == 0) {
+			u32(); /* ID player A */
+			u32(); /* ID player B */
+		}
+		if (bmov_version >= 1) {
+			character_1_palette = u8();
+			character_2_palette = u8();
+			uint8_t raw_video_system = u8();
+			if (raw_video_system > 1) {
+				std::cerr << "unsuported video system " << uint16_t(raw_video_system) << '\n';
+				return 1;
+			}
+			video_system = static_cast<GameState::VideoSystem>(raw_video_system);
+		}
 
 		// Controller A
 		controller_a_history = controller();
@@ -524,6 +543,7 @@ int main(int argc, char** argv) {
 			stage,
 			character_1, character_1_palette,
 			character_2, character_2_palette,
+			video_system,
 			savestate_data_dir.native()
 		);
 		std::ofstream ofs("/tmp/test.fcs");
@@ -557,6 +577,7 @@ int main(int argc, char** argv) {
 			stage,
 			character_1, character_1_palette,
 			character_2, character_2_palette,
+			video_system,
 			savestate_data_dir.native(),
 			rom_version
 		)) +"\n";

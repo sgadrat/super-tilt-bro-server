@@ -92,6 +92,7 @@ void StatisticsSink::run() {
 					"character_a_palette=" << uint16_t(game_summary->character_a_palette) << '\t' <<
 					"character_b_palette=" << uint16_t(game_summary->character_b_palette) << '\t' <<
 					"stage=" << uint16_t(game_summary->stage) << '\t' <<
+					"video_system=" << uint16_t(game_summary->video_system) << '\t' <<
 					"winner=" << uint16_t(game_summary->winner) << '\t' <<
 				'\n';
 
@@ -116,8 +117,17 @@ void StatisticsSink::run() {
 				// Serialize replay
 				std::vector<uint8_t> serialized_replay;
 				serialized_replay.reserve(
-					// Header: version + num frames + stage + character_a + character_b + client_a + client_b
-					1 + 4 + 1 + 1 + 1 + 4 + 4 +
+					// Header:
+					//  version + num frames +
+					//  stage + character_a + character_b +
+					//  client_a + client_b +
+					//  character_a_palette + character_b_palette +
+					//  video_system
+					1 + 4 +
+					1 + 1 + 1 +
+					4 + 4 +
+					1 + 1 +
+					1 +
 
 					// Controller A
 					4 + game_summary->controller_a_history->size() * (4 + 1) +
@@ -144,13 +154,14 @@ void StatisticsSink::run() {
 				};
 
 				// Header
-				u8(0);
+				u8(1);
 				u32(game_summary->num_ticks_in_game);
 				u8(game_summary->stage);
 				u8(game_summary->character_a);
 				u8(game_summary->character_b);
-				u32(game_summary->client_a_id);
-				u32(game_summary->client_b_id);
+				u8(game_summary->character_a_palette);
+				u8(game_summary->character_b_palette);
+				u8(game_summary->video_system == static_cast<uint8_t>(GameState::VideoSystem::PAL) ? 0 : 1);
 
 				// Controller A
 				controller(*game_summary->controller_a_history);

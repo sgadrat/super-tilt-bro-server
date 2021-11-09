@@ -13,6 +13,11 @@ class GameState {
 public:
 	typedef std::function<void(std::string const&)> LoggerCallback;
 
+	enum class VideoSystem: uint8_t {
+		PAL = 0,
+		NTSC = 1,
+	};
+
 	struct ControllerState {
 		bool a_pressed;
 		bool b_pressed;
@@ -55,7 +60,7 @@ public:
 		}
 	};
 
-	GameState(uint8_t stage, std::array<uint8_t, 2> characters, LoggerCallback logger = nullptr);
+	GameState(uint8_t stage, std::array<uint8_t, 2> characters, VideoSystem system, LoggerCallback logger = nullptr);
 
 	bool tick();
 	bool is_gameover() const {return this->emulator.run_context.gameover;}

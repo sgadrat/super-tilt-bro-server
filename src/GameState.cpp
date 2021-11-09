@@ -113,7 +113,7 @@ bool GameState::EmulatorRunContext::write(uint16_t addr, uint8_t value) {
 	return addr == stop_trigger_addr;
 }
 
-GameState::GameState(uint8_t stage, std::array<uint8_t, 2> characters, GameState::LoggerCallback logger)
+GameState::GameState(uint8_t stage, std::array<uint8_t, 2> characters, VideoSystem system, GameState::LoggerCallback logger)
 : logger(logger)
 {
 	// Init registers
@@ -151,6 +151,7 @@ GameState::GameState(uint8_t stage, std::array<uint8_t, 2> characters, GameState
 	this->emulator_ram[0] = stage;
 	this->emulator_ram[1] = characters[0];
 	this->emulator_ram[2] = characters[1];
+	this->emulator_ram[3] = static_cast<uint8_t>(system);
 	this->emulator.Reset();
 	this->emulator.pc = (uint16_t(emulator_rom[0x1f * 0x4000 + (bytecodeVectorInitHigh % 0x4000)] << 8) + emulator_rom[0x1f * 0x4000 + (bytecodeVectorInitLow % 0x4000)]); //TODO use actual read implementation
 	uint64_t cycles_count = 0;

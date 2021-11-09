@@ -47,6 +47,7 @@ public:
 		uint8_t character_a_palette;
 		uint8_t character_b_palette;
 		uint8_t stage;
+		uint8_t video_system;
 		uint8_t winner;
 	};
 

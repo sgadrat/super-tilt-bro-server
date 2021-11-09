@@ -69,6 +69,7 @@ namespace {
 		uint_fast8_t selected_character;
 		uint_fast8_t selected_palette;
 		uint_fast8_t selected_stage;
+		bool is_ntsc;
 		bool ranked;
 		std::array<uint8_t, 16> password;
 		std::chrono::time_point<std::chrono::steady_clock> last_heartbeat;
@@ -264,20 +265,6 @@ void InitializationHandler::run() {
 						"                        ",
 						in_message->sender
 					);
-				}else if (connection_request.is_ntsc()) {
-					// Send error
-					syslog(LOG_NOTICE, "InitializationHandler: connection request with NTSC timing: client version %s", computeVersionName(connection_request).c_str());
-					this->rejectConnection(
-						"bad system              "
-						"                        "
-						"you seem to run the game"
-						"on an ntsc system       "
-						"                        "
-						"netplay not available on"
-						"ntsc systems for now    "
-						"                        ",
-						in_message->sender
-					);
 				}else {
 					// Add client
 					bool found = false;
@@ -291,6 +278,7 @@ void InitializationHandler::run() {
 						.selected_character = connection_request.selected_character,
 						.selected_palette = connection_request.selected_palette,
 						.selected_stage = connection_request.selected_stage,
+						.is_ntsc = connection_request.is_ntsc(),
 						.ranked = connection_request.ranked_play,
 						.password = connection_request.password,
 						.last_heartbeat = now
@@ -350,7 +338,11 @@ void InitializationHandler::run() {
 							// Search a possible match with a previous client
 							bool matched = false;
 							for (std::array<std::list<ClientData>::iterator, 2>& match: match_list) {
-								if (match[1] == clients.end() && match[0]->password == client->password) {
+								if (
+									match[1] == clients.end() &&
+									match[0]->password == client->password &&
+									match[0]->is_ntsc == client->is_ntsc
+								) {
 									match[1] = client;
 									matched = true;
 									break;
@@ -375,9 +367,10 @@ void InitializationHandler::run() {
 
 					for (std::array<std::list<ClientData>::iterator, 2> const& matched_clients: match_list) {
 						// Compute antilag prediction
-						//   total_ping / 2 = transmission time from one client to another ; 5 = frame duration (PAL)
+						//   total_ping / 2 = transmission time from one client to another
 						auto ttime = [&](size_t client_a, size_t client_b) -> uint32_t {
-							return ((matched_clients.at(client_a)->ping_min + matched_clients.at(client_b)->ping_min) / 2) / 5;
+							uint_fast8_t const frame_duration = (matched_clients.at(client_a)->is_ntsc ? 4 : 5);
+							return ((matched_clients.at(client_a)->ping_min + matched_clients.at(client_b)->ping_min) / 2) / frame_duration;
 						};
 						std::array<std::array<uint32_t, 2>, 2> const transit_time = {{
 							{ttime(0, 0), ttime(0, 1)},
@@ -393,10 +386,11 @@ void InitializationHandler::run() {
 
 						// Prepare game instance
 						GameInstance::GameSettings game_settings = {
-							.stage_id = matched_clients.at(client_with_stage_selection)->selected_stage,
 							.characters = {matched_clients.at(0)->selected_character, matched_clients.at(1)->selected_character},
 							.character_palettes = {matched_clients.at(0)->selected_palette, matched_clients.at(1)->selected_palette},
-							.ranked = {matched_clients.at(0)->ranked, matched_clients.at(1)->ranked}
+							.ranked = {matched_clients.at(0)->ranked, matched_clients.at(1)->ranked},
+							.stage_id = matched_clients.at(client_with_stage_selection)->selected_stage,
+							.video_system = uint8_t((matched_clients.at(0)->is_ntsc ? 1 : 0)),
 						};
 						client_with_stage_selection = (client_with_stage_selection + 1) % 2;
 						std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> game_in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
