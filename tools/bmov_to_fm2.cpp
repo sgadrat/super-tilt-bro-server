@@ -25,11 +25,13 @@ std::string const CURRENT_ROM_VERSION = "2.0-alpha9-unrom";
 std::map<std::string, std::string> const roms_checksum{
 	{"2.0-alpha8-unrom", "base64:npc22x82bJ+GEfIeZEq/cQ=="},
 	{"2.0-alpha9-unrom", "base64:/wQ5QXbvWmziKHsuVvVFug=="},
+	{"2.0-alpha10-unrom", "base64:oSD2Yg96HL4qKe/c54VAPg=="},
 };
 
 std::map<std::string, uint16_t> const roms_entry_point{
 	{"2.0-alpha8-unrom", 0xc07f},
 	{"2.0-alpha9-unrom", 0xc07e},
+	{"2.0-alpha10-unrom", 0xc07e},
 };
 
 std::string generate_guid() {
