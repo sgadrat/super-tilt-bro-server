@@ -26,9 +26,9 @@ At any time during the initialization phase, the server may send a Disconnected 
 	Connection {
 		uint8  message_type = 0;
 		uint32 client_id;
-		uint8 ping_min;
 		uint8 protocol_version;
-		uint8 ping_max;
+		uint8 protocol_version_mirror;
+		uint8[3] ping;
 		uint1 framerate;
 		uint2 support;
 		uint2 release_type;
@@ -38,13 +38,14 @@ At any time during the initialization phase, the server may send a Disconnected 
 		uint8 selected_palette;
 		uint8 selected_stage;
 		uint8 ranked_play;
-		uint8[16] password; /* Optional */
+		uint8[16] password;
 	}
 
 * **client_id**: Identifier unique to this client.
-* **ping_min**: Minimal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_min=3 means 12ms of ping.)
-* **protocol_version**: Expected version of this protocol. This document describes version 5.
-* **ping_max**: Maximal time of completion of an ICMP echo request from client to server. Timescale is four milliseconds per tick (ping_max=3 means 12ms of ping.)
+* **ranked_play**: 0: non-ranked, 1: ranked
+* **protocol_version**: Expected version of this protocol. This document describes version 6.
+* **protocol_version_mirror**: Placeolder for retro-compatibility with version 5 and below. Later revisions will remove this field.
+* **ping**: Measures of ICMP echo request from client to server, each measure on one byte. Timescale is four milliseconds per tick (ping_max=3 means 12ms of ping.)
 * **framerate**: 0: 50Hz, 1: 60Hz.
 * **support**: 0: physical cartridge, 1: native emulator, 2: web emulator, 3: unknown/other
 * **release_type**: 0: alpha, 1: beta, 2: release candidate, 3: release
@@ -53,7 +54,6 @@ At any time during the initialization phase, the server may send a Disconnected 
 * **selected_character**: Character that the player wants to play
 * **selected_palette**: Color variant that the player wants to play
 * **selected_stage**: Stage on which the player wants to play
-* **ranked_play**: 0: non-ranked, 1: ranked
 * **password**: only players with the same password can be matched together. If absent, should be infered to be zero-filled
 
 .. note::
@@ -67,7 +67,11 @@ At any time during the initialization phase, the server may send a Disconnected 
 
 	Connected {
 		uint8 message_type = 0;
+		uint4 reserved = 0;
+		uint4 connection_quality;
 	}
+
+* **connection_quality**: Indicator of the quality level of the connection between the player and the server (0: excellent, 1: good, 2: acceptable, 3: bad)
 
 At this stage Client1 may display a message indicating that it is waiting for another player to join the game.
 
@@ -79,10 +83,10 @@ When both clients are connected, the server sends a StartGame message, ending th
 
 	Disconnected {
 		uint8 message_type = 4;
-		uint8[24*8] reason;
+		uint8[16*12] reason;
 	}
 
-* **reason**: ascii characters explaining why the client is disconnected. Each 24 character sequence is to be displayed as a line on client' screen.
+* **reason**: ascii characters explaining why the client is disconnected. Each 16 character sequence is to be displayed as a line on client's screen.
 
 Upon reception of this message, the client should display the message and stop sending connection requests.
 
@@ -99,17 +103,21 @@ Upon reception of this message, the client should display the message and stop s
 		uint8 player_b_character;
 		uint8 player_a_palette;
 		uint8 player_b_palette;
+		uint8[3] player_a_ping;
+		uint8[3] player_b_ping;
 	}
 
 * **stage**: Stage on which the game will be played. 0 for Flatland, 1 for The Pit, 2 for Skyride or 3 for The Hunt.
 * **stocks**: Initial number of lifes for each opponent.
 * **player_number**: Indicates the avatar that this client will control. 0 for player one, 1 for player two.
-* **player_a_connection_quality**: Indicator of the quality level of the connection between player one and the server (0: excellent, 1: good, 2: acceptable)
-* **player_b_connection_quality**: Indicator of the quality level of the connection between player two and the server (0: excellent, 1: good, 2: acceptable)
+* **player_a_connection_quality**: Indicator of the quality level of the connection between player one and the server (0: excellent, 1: good, 2: acceptable, 3: bad)
+* **player_b_connection_quality**: Indicator of the quality level of the connection between player two and the server (0: excellent, 1: good, 2: acceptable, 3: bad)
 * **player_a_character**: Character played by player one.
 * **player_b_character**: Character played by player two.
 * **player_a_palette**: Color variant of the character played by player one.
 * **player_b_palette**: Color variant of the character played by player two.
+* **player_a_ping**: Ping values for player one. Timescale is four milliseconds per tick.
+* **player_b_ping**: Ping values for player two. Timescale is four milliseconds per tick.
 
 Uppon reception of this message, clients should start a game on the selected stage. The game should start within a fixed timeframe shared by both clients (eg. the game starts 120 frames after message's reception).
 

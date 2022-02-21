@@ -10,7 +10,7 @@
 
 namespace stnp {
 
-constexpr uint8_t LAST_VERSION = 5;
+constexpr uint8_t LAST_VERSION = 6;
 
 namespace message {
 
@@ -177,15 +177,15 @@ private:
 
 struct Connection {
 	uint32_t client_id;
-	uint8_t ping_min;
+	bool ranked_play;
+	uint8_t protocol_version2;
 	uint8_t protocol_version;
-	uint8_t ping_max;
 	uint8_t flags_and_major_version;
 	uint8_t minor_version;
 	uint8_t selected_character;
 	uint8_t selected_palette;
 	uint8_t selected_stage;
-	bool ranked_play;
+	std::array<uint8_t, 3> ping;
 	std::array<uint8_t, 16> password;
 
 	enum class SupportType {
@@ -222,43 +222,62 @@ struct Connection {
 		return this->flags_and_major_version & 0b00000111;
 	}
 
+	uint8_t get_ping_min() const {
+		uint8_t min_ping = 255;
+		for (size_t i = 0; i < this->ping.size(); ++i) {
+			if (this->ping[i] < min_ping) {
+				min_ping = this->ping[i];
+			}
+		}
+		return min_ping;
+	}
+
+	uint8_t get_ping_max() const {
+		uint8_t max_ping = 0;
+		for (size_t i = 0; i < this->ping.size(); ++i) {
+			if (this->ping[i] > max_ping) {
+				max_ping = this->ping[i];
+			}
+		}
+		return max_ping;
+	}
+
 	template <typename SerializationHandler>
 	void serial(SerializationHandler& s) {
 		s.type(ClientMessageType::Connection);
 		s.uint32(this->client_id);
-		s.uint8(this->ping_min);
+		s.uint8(this->protocol_version2); //NOTE: at version 7, this one will become the main version field, the following one will disapear.
 		s.uint8(this->protocol_version);
-		if (this->protocol_version >= 1) {
-			s.uint8(this->ping_max);
-		}
-		if (this->protocol_version >= 2) {
+
+		// Note, we don't parse other fields for version 5 and lower. Server must reject clients using those version without using other field.
+		if (this->protocol_version >= 6) {
+			for (uint8_t i = 0; i < this->ping.size(); ++i) {
+				s.uint8(this->ping[i]);
+			}
 			s.uint8(this->flags_and_major_version);
 			s.uint8(this->minor_version);
-		}
-		if (this->protocol_version >= 3) {
 			s.uint8(this->selected_character);
 			s.uint8(this->selected_palette);
 			s.uint8(this->selected_stage);
-		}
-		if (this->protocol_version >= 4) {
 			uint8_t ranked = this->ranked_play;
 			s.uint8(ranked);
-			this->ranked_play = ranked;
-			try {
-				for (size_t i = 0; i < this->password.size(); ++i) {
-					s.uint8(this->password[i]);
-				}
-			}catch (std::out_of_range const&) {
-				::bzero((void*)this->password.data(), this->password.size());
+			this->ranked_play = (ranked != 0);
+			for (size_t i = 0; i < this->password.size(); ++i) {
+				s.uint8(this->password[i]);
 			}
 		}
 	}
 };
 
 struct Connected {
+	uint8_t connection_quality = 0;
+
 	template <typename SerializationHandler>
-    void serial(SerializationHandler& s) {
+    void serial(SerializationHandler& s, uint8_t protocol_version) {
 		s.type(ServerMessageType::Connected);
+		if (protocol_version >= 6) {
+			s.uint8(this->connection_quality);
+		}
 	}
 };
 
@@ -271,6 +290,8 @@ struct StartGame {
 	uint8_t player_b_character;
 	uint8_t player_a_palette;
 	uint8_t player_b_palette;
+	std::array<uint8_t, 3> player_a_ping;
+	std::array<uint8_t, 3> player_b_ping;
 
 	uint8_t player_a_connection_quality() const {
 		return this->connections_quality >> 4;
@@ -310,6 +331,14 @@ struct StartGame {
 			s.uint8(this->player_b_character);
 			s.uint8(this->player_a_palette);
 			s.uint8(this->player_b_palette);
+		}
+		if (protocol_version >= 6) {
+			for (size_t i = 0; i < this->player_a_ping.size(); ++i) {
+				s.uint8(this->player_a_ping[i]);
+			}
+			for (size_t i = 0; i < this->player_a_ping.size(); ++i) {
+				s.uint8(this->player_b_ping[i]);
+			}
 		}
 	}
 };

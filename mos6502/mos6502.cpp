@@ -1,3 +1,6 @@
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 template <class RunContext>
 typename mos6502<RunContext>::Instr const mos6502<RunContext>::InstrTable[256] = {
 	// 00
@@ -1929,3 +1932,5 @@ void mos6502<RunContext>::Op_TYA(uint16_t src)
 	A = m;
 	return;
 }
+
+#pragma GCC diagnostic pop

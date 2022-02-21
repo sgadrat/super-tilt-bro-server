@@ -14,7 +14,7 @@ if [ ! -z "$BETA_SERVER" ]; then
 fi
 
 g++ \
-	$optim_flags -o stb_server$bin_suffix $beta_flags $dbg_log_flags \
+	$optim_flags -o stb_server$bin_suffix $beta_flags $dbg_log_flags -Wall -Wextra \
 	-I .. -I ../.. \
 	stb_server.cpp \
 	../network.cpp \

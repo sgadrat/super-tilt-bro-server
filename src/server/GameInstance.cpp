@@ -256,7 +256,6 @@ void GameInstance::run(
 		// Process incoming messages
 		while (this->keep_running) {
 			// Reconstruct gamestate history according to bufferized messages
-			bool handled_message = false;
 			while (this->keep_running) {
 				// Get next incomming message
 				try {
@@ -267,7 +266,6 @@ void GameInstance::run(
 						input_batch_begin = last_input_clock_time;
 						new_input_batch = false;
 					}
-					handled_message = true;
 				}catch(std::exception const& e) {
 					in_message = nullptr;
 				}

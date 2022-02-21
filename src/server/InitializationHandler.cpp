@@ -64,8 +64,7 @@ namespace {
 
 	struct ClientData {
 		GameInstance::ClientInfo client;
-		uint_fast8_t ping_min; // Timescale 4ms (4 is an NTSC frame, 5 is a PAL frame)
-		uint_fast8_t ping_max;
+		std::array<uint_fast8_t, 3> ping; // Timescale 4ms (4 is an NTSC frame, 5 is a PAL frame)
 		uint_fast8_t selected_character;
 		uint_fast8_t selected_palette;
 		uint_fast8_t selected_stage;
@@ -73,6 +72,22 @@ namespace {
 		bool ranked;
 		std::array<uint8_t, 16> password;
 		std::chrono::time_point<std::chrono::steady_clock> last_heartbeat;
+
+		uint_fast8_t ping_min() {
+			uint_fast8_t res = 255;
+			for (size_t i = 0; i < this->ping.size(); ++i) {
+				if (this->ping[i] < res) {res = this->ping[i];}
+			}
+			return res;
+		}
+
+		uint_fast8_t ping_max() {
+			uint_fast8_t res = 0;
+			for (size_t i = 0; i < this->ping.size(); ++i) {
+				if (this->ping[i] > res) {res = this->ping[i];}
+			}
+			return res;
+		}
 	};
 
 	uint8_t compute_connection_indicator(uint8_t ping_min, uint8_t ping_max) {
@@ -90,9 +105,12 @@ namespace {
 		// Compute quality based on max ping
 		//  excelent < 40ms
 		//  good     < 80ms
-		//  acceptable otherwise
+		//  acceptable < 300ms
+		//  bad otherwise
 		uint8_t max_ping_indicator = 0;
-		if (ping_max >= 80 / 4) {
+		if (ping_max >= 300 / 4) {
+			max_ping_indicator = 3;
+		}else if (ping_max >= 80 / 4) {
 			max_ping_indicator = 2;
 		}else if (ping_max >= 40 / 4) {
 			max_ping_indicator = 1;
@@ -141,8 +159,10 @@ InitializationHandler::InitializationHandler(
 	std::shared_ptr<ClientsDatagramRouting> clients_routing,
 	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> game_info_messages
 )
-: in_messages(in_messages), out_messages(out_messages), clients_routing(clients_routing)
+: in_messages(in_messages)
+, out_messages(out_messages)
 , game_info_messages(game_info_messages)
+, clients_routing(clients_routing)
 {}
 
 void InitializationHandler::run() {
@@ -273,8 +293,7 @@ void InitializationHandler::run() {
 							.endpoint = in_message->sender,
 							.id = connection_request.client_id
 						},
-						.ping_min = connection_request.ping_min,
-						.ping_max = connection_request.ping_max,
+						.ping = connection_request.ping,
 						.selected_character = connection_request.selected_character,
 						.selected_palette = connection_request.selected_palette,
 						.selected_stage = connection_request.selected_stage,
@@ -293,23 +312,25 @@ void InitializationHandler::run() {
 					if (!found) {
 						syslog(
 							LOG_INFO,
-							"InitializationHandler: new client: %s:%d id=%08x ping_min=%dms ping_max=%dms version=%s ranked=%s password=%s",
-							in_message->sender.address().to_string().c_str(),
-							in_message->sender.port(),
-							connection_request.client_id,
-							connection_request.ping_min * 4,
-							connection_request.ping_max * 4,
+							"InitializationHandler: new client: %s:%d id=%08x ping=%d/%d/%dms version=%s ranked=%s password=%s",
+							client.client.endpoint.address().to_string().c_str(),
+							client.client.endpoint.port(),
+							client.client.id,
+							client.ping[0] * 4,
+							client.ping[1] * 4,
+							client.ping[2] * 4,
 							computeVersionName(connection_request).c_str(),
-							connection_request.ranked_play ? "true" : "false",
-							connection_request.password == std::array<uint8_t, 16>{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} ? "no" : "yes"
+							client.ranked ? "true" : "false",
+							client.password == std::array<uint8_t, 16>{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} ? "no" : "yes"
 						);
 						clients.push_back(client);
 					}
 
 					// Send response
 					stnp::message::Connected connection_response;
+					connection_response.connection_quality = compute_connection_indicator(client.ping_min(), client.ping_max());
 					stnp::message::MessageSerializer serializer;
-					connection_response.serial(serializer);
+					connection_response.serial(serializer, STNP_VERSION);
 
 					std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
 					out_message->destination = client.client.endpoint;
@@ -370,7 +391,7 @@ void InitializationHandler::run() {
 						//   total_ping / 2 = transmission time from one client to another
 						auto ttime = [&](size_t client_a, size_t client_b) -> uint32_t {
 							uint_fast8_t const frame_duration = (matched_clients.at(client_a)->is_ntsc ? 4 : 5);
-							return ((matched_clients.at(client_a)->ping_min + matched_clients.at(client_b)->ping_min) / 2) / frame_duration;
+							return ((matched_clients.at(client_a)->ping_min() + matched_clients.at(client_b)->ping_min()) / 2) / frame_duration;
 						};
 						std::array<std::array<uint32_t, 2>, 2> const transit_time = {{
 							{ttime(0, 0), ttime(0, 1)},
@@ -409,8 +430,8 @@ void InitializationHandler::run() {
 						this->clients_routing->set_queue(matched_clients.at(1)->client.endpoint, game_in_messages);
 
 						// Send StartGame messages
-						uint8_t const player_a_connection = compute_connection_indicator(matched_clients.at(0)->ping_min, matched_clients.at(0)->ping_max);
-						uint8_t const player_b_connection = compute_connection_indicator(matched_clients.at(1)->ping_min, matched_clients.at(1)->ping_max);
+						uint8_t const player_a_connection = compute_connection_indicator(matched_clients.at(0)->ping_min(), matched_clients.at(0)->ping_max());
+						uint8_t const player_b_connection = compute_connection_indicator(matched_clients.at(1)->ping_min(), matched_clients.at(1)->ping_max());
 						for (size_t client_index = 0; client_index <= 1; ++client_index) {
 							stnp::message::StartGame start_signal;
 							start_signal.stage = game_settings.stage_id;
@@ -422,6 +443,8 @@ void InitializationHandler::run() {
 							start_signal.player_b_character = game_settings.characters[1];
 							start_signal.player_a_palette = matched_clients.at(0)->selected_palette;
 							start_signal.player_b_palette = matched_clients.at(1)->selected_palette;
+							start_signal.player_a_ping = matched_clients.at(0)->ping;
+							start_signal.player_b_ping = matched_clients.at(1)->ping;
 							serializer.clear();
 							start_signal.serial(serializer, STNP_VERSION);
 
