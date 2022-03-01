@@ -302,6 +302,9 @@ uint16_t const title_cheatstate = 0x00;
 uint16_t const title_animation_frame = 0x01;
 uint16_t const title_animation_state = 0x02;
 uint16_t const title_original_music_state = 0x03;
+uint16_t const title_wait_time = 0x04;
+
+uint16_t const title_buffer = 0x0580;
 
 //
 // MODE_SELECTION labels
@@ -310,6 +313,25 @@ uint16_t const title_original_music_state = 0x03;
 uint16_t const mode_selection_current_option = last_c_label+1; // $39
 
 uint16_t const mode_selection_mem_buffer = 0x0580;
+
+//
+// CREDITS labels
+//
+
+uint16_t const credits_current_page = last_c_label+1; // $39
+uint16_t const credits_page_dirty = credits_current_page+1; // $3a
+uint16_t const credits_last_illustration_lsb = credits_page_dirty+1; // $3b
+uint16_t const credits_last_illustration_msb = credits_last_illustration_lsb+1; // $3c
+uint16_t const credits_last_illustration_bank = credits_last_illustration_msb+1; // $3d
+
+uint16_t const credits_mem_buffer = 0x0580; // $0580 to $05bf (64 bytes)
+uint16_t const credits_cursor_anim = 0x05c0; // $05c0 to $05cc
+//$05cd to $05ff - unused
+uint16_t const credits_bubble_anim_1 = 0x068d; // to $0699
+uint16_t const credits_bubble_anim_2 = 0x069a; // to $06a6
+uint16_t const credits_bubble_anim_3 = 0x06a7; // to $06b3
+uint16_t const credits_bubble_anim_4 = 0x06b4; // to $06c0
+uint16_t const credits_bubble_anims = credits_bubble_anim_1;
 
 //
 // ONLINE_MODE_SELECTION labels
@@ -380,12 +402,21 @@ uint16_t const stage_selection_mem_buffer = 0x0580; // $0580 to $05bf (4*16 byte
 // NETPLAY_LAUNCH labels
 //
 
-uint16_t const netplay_launch_state = 0x00;
-uint16_t const netplay_launch_counter = 0x01;
-uint16_t const netplay_launch_ping_min = 0x02;
-uint16_t const netplay_launch_ping_max = 0x03;
-uint16_t const netplay_launch_server = 0x04;
-uint16_t const netplay_launch_nb_servers = 0x05;
+uint16_t const netplay_launch_cursor_anim = last_c_label+1; // $39-$45
+uint16_t const netplay_launch_bg_task = netplay_launch_cursor_anim+13; // $46-$47
+uint16_t const netplay_launch_fg_task = netplay_launch_bg_task+2; // $48-$49
+uint16_t const netplay_launch_server = netplay_launch_fg_task+2; // $4a
+uint16_t const netplay_launch_nb_servers = netplay_launch_server+1; // $4b
+uint16_t const netplay_launch_local_ping_count = netplay_launch_nb_servers+1; // $4c
+uint16_t const netplay_launch_local_ping_values = netplay_launch_local_ping_count+1; // $4d-$4f
+uint16_t const netplay_launch_local_ping_quality = netplay_launch_local_ping_values+3; // $50
+uint16_t const netplay_launch_rival_ping_count = netplay_launch_local_ping_quality+1; // $51
+uint16_t const netplay_launch_rival_ping_values = netplay_launch_rival_ping_count+1; // $52-$54
+uint16_t const netplay_launch_rival_ping_quality = netplay_launch_rival_ping_values+3; // $55
+uint16_t const netplay_launch_countdown = netplay_launch_rival_ping_quality+1; // $56
+uint16_t const netplay_launch_original_music_state = netplay_launch_countdown+1; // $57
+
+uint16_t const netplay_launch_bg_mem_buffer = 0x0580; // $0580 to $???? (current biggest usage, 3+16 bytes, map illustration draw)
 
 //
 // DONATION labels
@@ -557,6 +588,8 @@ uint16_t const config_player_a_character = 0xe0;
 uint16_t const config_player_b_character = 0xe1;
 uint16_t const config_game_mode = 0xe2;
 
+uint16_t const current_bank = 0xe3;
+
 //
 // Zero-page constants
 //
@@ -619,6 +652,8 @@ uint16_t const config_requested_player_b_character = 0x0543;
 uint16_t const config_requested_player_a_palette = 0x0544;
 uint16_t const config_requested_player_b_palette = 0x0545;
 uint16_t const config_ingame_track = 0x0546;
+uint16_t const config_ticks_per_frame = 0x0547;
+uint16_t const current_frame_tick = 0x0548;
 //$0580 to $05ff may be used by game states
 
 //$06xx may be used by audio engine, see "Audio engine labels"
@@ -627,7 +662,6 @@ uint16_t const virtual_frame_cnt = 0x0700;
 uint16_t const network_last_known_remote_input = 0x07bf;
 uint16_t const network_player_local_btns_history = 0x07c0; // one byte per frame, circular buffers, 32 entries
 uint16_t const network_player_remote_btns_history = 0x07e0; //
-uint16_t const netplay_launch_received_msg = 0x0702;
 
 //
 // /home/sylvain/workspace/nes/tilt/game/logic/rainbow_lib.asm
@@ -655,49 +689,51 @@ uint16_t const TOESP_MSG_WIFI_GET_IP = 10 ; // Get WiFi IP address
 // AP CMDS
 uint16_t const TOESP_MSG_AP_GET_SSID = 11 ; // Get Access Point network SSID
 uint16_t const TOESP_MSG_AP_GET_IP = 12 ; // Get Access Point IP address
+uint16_t const TOESP_MSG_AP_GET_CONFIG = 13 ; // Get Access Point config
+uint16_t const TOESP_MSG_AP_SET_CONFING = 14 ; // Set Access Point config
 
 // RND CMDS
-uint16_t const TOESP_MSG_RND_GET_BYTE = 13 ; // Get random byte
-uint16_t const TOESP_MSG_RND_GET_BYTE_RANGE = 14 ; // Get random byte between custom min/max
-uint16_t const TOESP_MSG_RND_GET_WORD = 15 ; // Get random word
-uint16_t const TOESP_MSG_RND_GET_WORD_RANGE = 16 ; // Get random word between custom min/max
+uint16_t const TOESP_MSG_RND_GET_BYTE = 15 ; // Get random byte
+uint16_t const TOESP_MSG_RND_GET_BYTE_RANGE = 16 ; // Get random byte between custom min/max
+uint16_t const TOESP_MSG_RND_GET_WORD = 17 ; // Get random word
+uint16_t const TOESP_MSG_RND_GET_WORD_RANGE = 18 ; // Get random word between custom min/max
 
 // SERVER CMDS
-uint16_t const TOESP_MSG_SERVER_GET_STATUS = 17 ; // Get server connection status
-uint16_t const TOESP_MSG_SERVER_PING = 18 ; // Get ping between ESP and server
-uint16_t const TOESP_MSG_SERVER_SET_PROTOCOL = 19 ; // Set protocol to be used to communicate (WS/UDP)
-uint16_t const TOESP_MSG_SERVER_GET_SETTINGS = 20 ; // Get current server host name and port
-uint16_t const TOESP_MSG_SERVER_GET_CONFIG_SETTINGS = 21 ; // Get server host name and port defined in the Rainbow config file
-uint16_t const TOESP_MSG_SERVER_SET_SETTINGS = 22 ; // Set current server host name and port
-uint16_t const TOESP_MSG_SERVER_RESTORE_SETTINGS = 23 ; // Restore server host name and port to values defined in the Rainbow config
-uint16_t const TOESP_MSG_SERVER_CONNECT = 24 ; // Connect to server
-uint16_t const TOESP_MSG_SERVER_DISCONNECT = 25 ; // Disconnect from server
-uint16_t const TOESP_MSG_SERVER_SEND_MESSAGE = 26 ; // Send message to server
+uint16_t const TOESP_MSG_SERVER_GET_STATUS = 19 ; // Get server connection status
+uint16_t const TOESP_MSG_SERVER_PING = 20 ; // Get ping between ESP and server
+uint16_t const TOESP_MSG_SERVER_SET_PROTOCOL = 21 ; // Set protocol to be used to communicate (WS/UDP)
+uint16_t const TOESP_MSG_SERVER_GET_SETTINGS = 22 ; // Get current server host name and port
+uint16_t const TOESP_MSG_SERVER_GET_CONFIG_SETTINGS = 23 ; // Get server host name and port defined in the Rainbow config file
+uint16_t const TOESP_MSG_SERVER_SET_SETTINGS = 24 ; // Set current server host name and port
+uint16_t const TOESP_MSG_SERVER_RESTORE_SETTINGS = 25 ; // Restore server host name and port to values defined in the Rainbow config
+uint16_t const TOESP_MSG_SERVER_CONNECT = 26 ; // Connect to server
+uint16_t const TOESP_MSG_SERVER_DISCONNECT = 27 ; // Disconnect from server
+uint16_t const TOESP_MSG_SERVER_SEND_MESSAGE = 28 ; // Send message to server
 
 // NETWORK CMDS
-uint16_t const TOESP_MSG_NETWORK_SCAN = 27 ; // Scan networks around and return count
-uint16_t const TOESP_MSG_NETWORK_GET_SCANNED_DETAILS = 28 ; // Get scanned network details
-uint16_t const TOESP_MSG_NETWORK_GET_REGISTERED = 29 ; // Get registered networks status
-uint16_t const TOESP_MSG_NETWORK_GET_REGISTERED_DETAILS = 30 ; // Get registered network SSID
-uint16_t const TOESP_MSG_NETWORK_REGISTER = 31 ; // Register network
-uint16_t const TOESP_MSG_NETWORK_UNREGISTER = 32 ; // Unregister network
+uint16_t const TOESP_MSG_NETWORK_SCAN = 29 ; // Scan networks around and return count
+uint16_t const TOESP_MSG_NETWORK_GET_SCANNED_DETAILS = 30 ; // Get scanned network details
+uint16_t const TOESP_MSG_NETWORK_GET_REGISTERED = 31 ; // Get registered networks status
+uint16_t const TOESP_MSG_NETWORK_GET_REGISTERED_DETAILS = 32 ; // Get registered network SSID
+uint16_t const TOESP_MSG_NETWORK_REGISTER = 33 ; // Register network
+uint16_t const TOESP_MSG_NETWORK_UNREGISTER = 34 ; // Unregister network
 
 // FILE COMMANDS
-uint16_t const TOESP_MSG_FILE_OPEN = 33 ; // Open working file
-uint16_t const TOESP_MSG_FILE_CLOSE = 34 ; // Close working file
-uint16_t const TOESP_MSG_FILE_STATUS = 35 ; // Get working file status
-uint16_t const TOESP_MSG_FILE_EXISTS = 36 ; // Check if file exists
-uint16_t const TOESP_MSG_FILE_DELETE = 37 ; // Delete a file
-uint16_t const TOESP_MSG_FILE_SET_CUR = 38 ; // Set working file cursor position a file
-uint16_t const TOESP_MSG_FILE_READ = 39 ; // Read working file (at specific position)
-uint16_t const TOESP_MSG_FILE_WRITE = 40 ; // Write working file (at specific position)
-uint16_t const TOESP_MSG_FILE_APPEND = 41 ; // Append data to working file
-uint16_t const TOESP_MSG_FILE_COUNT = 42 ; // Count files in a specific path
-uint16_t const TOESP_MSG_FILE_GET_LIST = 43 ; // Get list of existing files in a path
-uint16_t const TOESP_MSG_FILE_GET_FREE_ID = 44 ; // Get an unexisting file ID in a specific path
-uint16_t const TOESP_MSG_FILE_GET_INFO = 45 ; // Get file info (size + crc32)
-uint16_t const TOESP_MSG_FILE_DOWNLOAD = 46 ; // Download a file from a giving URL to a specific path index / file index
-uint16_t const TOESP_MSG_FILE_FORMAT = 47 ; // Format file system
+uint16_t const TOESP_MSG_FILE_OPEN = 35 ; // Open working file
+uint16_t const TOESP_MSG_FILE_CLOSE = 36 ; // Close working file
+uint16_t const TOESP_MSG_FILE_STATUS = 37 ; // Get working file status
+uint16_t const TOESP_MSG_FILE_EXISTS = 38 ; // Check if file exists
+uint16_t const TOESP_MSG_FILE_DELETE = 39 ; // Delete a file
+uint16_t const TOESP_MSG_FILE_SET_CUR = 40 ; // Set working file cursor position a file
+uint16_t const TOESP_MSG_FILE_READ = 41 ; // Read working file (at specific position)
+uint16_t const TOESP_MSG_FILE_WRITE = 42 ; // Write working file (at specific position)
+uint16_t const TOESP_MSG_FILE_APPEND = 43 ; // Append data to working file
+uint16_t const TOESP_MSG_FILE_COUNT = 44 ; // Count files in a specific path
+uint16_t const TOESP_MSG_FILE_GET_LIST = 45 ; // Get list of existing files in a path
+uint16_t const TOESP_MSG_FILE_GET_FREE_ID = 46 ; // Get an unexisting file ID in a specific path
+uint16_t const TOESP_MSG_FILE_GET_INFO = 47 ; // Get file info (size + crc32)
+uint16_t const TOESP_MSG_FILE_DOWNLOAD = 48 ; // Download a file from a giving URL to a specific path index / file index
+uint16_t const TOESP_MSG_FILE_FORMAT = 49 ; // Format file system
 
 //-------------------------------------------------------------------------------
 // Commands from ESP to NES
@@ -712,37 +748,54 @@ uint16_t const FROMESP_MSG_ESP_FIRMWARE_VERSION = 2  ; // Returns the Rainbow fi
 uint16_t const FROMESP_MSG_WIFI_STATUS = 3  ; // Returns WiFi connection status
 uint16_t const FROMESP_MSG_SSID = 4  ; // WiFi/AccessPoint SSID
 uint16_t const FROMESP_MSG_IP_ADDRESS = 5  ; // WiFi/AccessPoint IP address
+uint16_t const FROMESP_MSG_AP_CONFIG = 6  ; // Returns AP config
 
 // RND CMDS
-uint16_t const FROMESP_MSG_RND_BYTE = 6  ; // Returns random byte value
-uint16_t const FROMESP_MSG_RND_WORD = 7  ; // Returns random word value
+uint16_t const FROMESP_MSG_RND_BYTE = 7  ; // Returns random byte value
+uint16_t const FROMESP_MSG_RND_WORD = 8  ; // Returns random word value
 
 // SERVER CMDS
-uint16_t const FROMESP_MSG_SERVER_STATUS = 8  ; // Returns server connection status
-uint16_t const FROMESP_MSG_SERVER_PING = 9  ; // Returns min, max and average round-trip time and number of lost packets
-uint16_t const FROMESP_MSG_SERVER_SETTINGS = 10 ; // Returns server settings (host name + port)
-uint16_t const FROMESP_MSG_MESSAGE_FROM_SERVER = 11 ; // Message from server
+uint16_t const FROMESP_MSG_SERVER_STATUS = 9  ; // Returns server connection status
+uint16_t const FROMESP_MSG_SERVER_PING = 10 ; // Returns min, max and average round-trip time and number of lost packets
+uint16_t const FROMESP_MSG_SERVER_SETTINGS = 11 ; // Returns server settings (host name + port)
+uint16_t const FROMESP_MSG_MESSAGE_FROM_SERVER = 12 ; // Message from server
 
 // NETWORK CMDS
-uint16_t const FROMESP_MSG_NETWORK_COUNT = 12 ; // Returns number of networks found
-uint16_t const FROMESP_MSG_NETWORK_SCANNED_DETAILS = 13 ; // Returns details for a scanned network
-uint16_t const FROMESP_MSG_NETWORK_REGISTERED_DETAILS = 14 ; // Returns SSID for a registered network
-uint16_t const FROMESP_MSG_NETWORK_REGISTERED = 15 ; // Returns registered networks status
+uint16_t const FROMESP_MSG_NETWORK_COUNT = 13 ; // Returns number of networks found
+uint16_t const FROMESP_MSG_NETWORK_SCANNED_DETAILS = 14 ; // Returns details for a scanned network
+uint16_t const FROMESP_MSG_NETWORK_REGISTERED_DETAILS = 15 ; // Returns SSID for a registered network
+uint16_t const FROMESP_MSG_NETWORK_REGISTERED = 16 ; // Returns registered networks status
 
 // FILE CMDS
-uint16_t const FROMESP_MSG_FILE_STATUS = 16 ; // Returns the working file status
-uint16_t const FROMESP_MSG_FILE_EXISTS = 17 ; // Returns if file exists or not
-uint16_t const FROMESP_MSG_FILE_DELETE = 18 ; // Returns when trying to delete a file
-uint16_t const FROMESP_MSG_FILE_LIST = 19 ; // Returns path file list (FILE_GET_LIST)
-uint16_t const FROMESP_MSG_FILE_DATA = 20 ; // Returns file data (FILE_READ)
-uint16_t const FROMESP_MSG_FILE_COUNT = 21 ; // Returns file count in a specific path
-uint16_t const FROMESP_MSG_FILE_ID = 22 ; // Returns a free file ID (FILE_GET_FREE_ID)
-uint16_t const FROMESP_MSG_FILE_INFO = 23 ; // Returns file info (size + CRC32) (FILE_GET_INFO)
-uint16_t const FROMESP_MSG_FILE_DOWNLOAD = 24 ; // Returns download result code
+uint16_t const FROMESP_MSG_FILE_STATUS = 17 ; // Returns the working file status
+uint16_t const FROMESP_MSG_FILE_EXISTS = 18 ; // Returns if file exists or not
+uint16_t const FROMESP_MSG_FILE_DELETE = 19 ; // Returns when trying to delete a file
+uint16_t const FROMESP_MSG_FILE_LIST = 20 ; // Returns path file list (FILE_GET_LIST)
+uint16_t const FROMESP_MSG_FILE_DATA = 21 ; // Returns file data (FILE_READ)
+uint16_t const FROMESP_MSG_FILE_COUNT = 22 ; // Returns file count in a specific path
+uint16_t const FROMESP_MSG_FILE_ID = 23 ; // Returns a free file ID (FILE_GET_FREE_ID)
+uint16_t const FROMESP_MSG_FILE_INFO = 24 ; // Returns file info (size + CRC32) (FILE_GET_INFO)
+uint16_t const FROMESP_MSG_FILE_DOWNLOAD = 25 ; // Returns download result code
 
 //-------------------------------------------------------------------------------
 // Constants to be used in commands
 //-------------------------------------------------------------------------------
+
+// Server protocol
+uint16_t const ESP_PROTOCOL_WEBSOCKET = 0;
+uint16_t const ESP_PROTOCOL_WEBSOCKET_SECURED = 1;
+uint16_t const ESP_PROTOCOL_TCP = 2;
+uint16_t const ESP_PROTOCOL_TCP_SECURED = 3;
+uint16_t const ESP_PROTOCOL_UDP = 4;
+
+// Wi-Fi status
+uint16_t const ESP_WIFI_STATUS_IDLE_STATUS = 0;
+uint16_t const ESP_WIFI_STATUS_NO_SSID_AVAIL = 1;
+uint16_t const ESP_WIFI_STATUS_SCAN_COMPLETED = 2;
+uint16_t const ESP_WIFI_STATUS_CONNECTED = 3;
+uint16_t const ESP_WIFI_STATUS_CONNECT_FAILED = 4;
+uint16_t const ESP_WIFI_STATUS_CONNECTION_LOST = 5;
+uint16_t const ESP_WIFI_STATUS_DISCONNECTED = 6;
 
 // Filesystem directories
 uint16_t const ESP_FILE_PATH_SAVE = 0;
@@ -752,13 +805,6 @@ uint16_t const ESP_FILE_PATH_USER = 2;
 // File open options
 uint16_t const ESP_FILE_MODE_AUTO = 0b00000000;
 uint16_t const ESP_FILE_MODE_MANUAL = 0b00000001;
-
-// Server protocol
-uint16_t const ESP_PROTOCOL_WEBSOCKET = 0;
-uint16_t const ESP_PROTOCOL_WEBSOCKET_SECURED = 1;
-uint16_t const ESP_PROTOCOL_TCP = 2;
-uint16_t const ESP_PROTOCOL_TCP_SECURED = 3;
-uint16_t const ESP_PROTOCOL_UDP = 4;
 
 // File delete results
 uint16_t const ESP_FILE_DELETE_SUCCESS = 0;
@@ -790,8 +836,11 @@ uint16_t const ESP_FILE_DOWNLOAD_NETWORK_ERROR_READ_TIMEOUT = 245; // Read timeo
 // Rainbow registers
 //-------------------------------------------------------------------------------
 
-uint16_t const RAINBOW_DATA = 0x4100;
-uint16_t const RAINBOW_FLAGS = 0x4101;
+uint16_t const RAINBOW_WIFI_CONF = 0x4100;
+uint16_t const RAINBOW_WIFI_RX = 0x4101;
+uint16_t const RAINBOW_WIFI_TX = 0x4102;
+uint16_t const RAINBOW_WIFI_RX_DEST = 0x4103;
+uint16_t const RAINBOW_WIFI_TX_SOURCE = 0x4104;
 
 uint16_t const RAINBOW_CONFIGURATION = 0x4110;
 uint16_t const RAINBOW_MAPPER_VERSION = 0x4113;
@@ -829,3 +878,27 @@ uint16_t const RAINBOW_SAW_CHANNEL_FREQ_HIGH = 0x4158;
 
 uint16_t const RAINBOW_MULTIPLY_A = 0x4160;
 uint16_t const RAINBOW_MULTIPLY_B = 0x4161;
+
+//-------------------------------------------------------------------------------
+// Message parsing constants
+//-------------------------------------------------------------------------------
+
+uint16_t const ESP_MSG_SIZE = 0;
+uint16_t const ESP_MSG_TYPE = 1;
+uint16_t const ESP_MSG_PAYLOAD = 2;
+
+//-------------------------------------------------------------------------------
+// Invariable messages
+//-------------------------------------------------------------------------------
+
+
+
+
+//-------------------------------------------------------------------------------
+// Utility routines
+//-------------------------------------------------------------------------------
+
+// Hardcoded position of the buffers for convenience routines
+//  If you change buffers positions (RAINBOW_WIFI_RX_DEST/TX_DEST), you should update it
+uint16_t const esp_rx_buffer = 0x4800;
+uint16_t const esp_tx_buffer = 0x4900;
