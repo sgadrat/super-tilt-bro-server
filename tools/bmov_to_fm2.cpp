@@ -27,7 +27,7 @@ std::map<std::string, std::string> const roms_checksum{
 	{"2.0-alpha9-unrom", "base64:/wQ5QXbvWmziKHsuVvVFug=="},
 	{"2.0-alpha10-unrom", "base64:oSD2Yg96HL4qKe/c54VAPg=="},
 	{"2.0-alpha11-unrom", "base64:S0NjSc2fV2a1y/c2YY6LSg=="},
-	{"2.0-alpha11-unrom", "base64:etYRF1yCmvt7WIP/p2s/NA=="},
+	{"2.0-alpha12-unrom", "base64:etYRF1yCmvt7WIP/p2s/NA=="},
 };
 
 std::map<std::string, uint16_t> const roms_entry_point{
@@ -35,7 +35,7 @@ std::map<std::string, uint16_t> const roms_entry_point{
 	{"2.0-alpha9-unrom", 0xc07e},
 	{"2.0-alpha10-unrom", 0xc07e},
 	{"2.0-alpha11-unrom", 0xc0af},
-	{"2.0-alpha11-unrom", 0xc0af},
+	{"2.0-alpha12-unrom", 0xc0af},
 };
 
 std::string generate_guid() {
