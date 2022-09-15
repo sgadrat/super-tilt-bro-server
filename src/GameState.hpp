@@ -105,12 +105,13 @@ private:
 template <typename SerializationHandler>
 void GameState::serial(SerializationHandler& s) {
 	// Copy gamestate
-	for (size_t i = 0; i < 0x68; ++i) {
+	for (size_t i = 0; i < 0x6a; ++i) {
 		s.uint8(this->emulator_ram[i]);
 	}
 
 	// Copy special state
 	s.uint8(this->emulator_ram[screen_shake_counter]);
+	s.uint8(this->emulator_ram[stage_restore_screen_step]); //TODO investigate - may need special handling to not miss a screen redraw accidentally
 
 	// Copy controllers state
 	s.uint8(this->emulator_ram[controller_a_btns]);
@@ -209,6 +210,10 @@ void GameState::serial(SerializationHandler& s) {
 				//s.uint8(this->emulator_ram[character_objects + 1 + 12]); // ANIMATION_STATE_OFFSET_NTSC_CNT ; Actually should be serialized, forgot it in the NTSC adaptation of the protocol
 				break;
 
+			// VGSage
+			case 3:
+				break;
+
 			default:
 				throw std::runtime_error("tried to serialize unknown character");
 		}
@@ -251,33 +256,34 @@ void GameState::serial(SerializationHandler& s) {
 			uint8_t const STAGE_GEM_GEM_STATE_BREAKING = 2;
 			uint8_t const STAGE_GEM_GEM_STATE_BUFF = 3;
 
-			s.uint8(this->emulator_ram[stage_gem_gem_state]);
-			switch (this->emulator_ram[stage_gem_gem_state]) {
+			s.uint8(this->emulator_ram[stage_thehunt_fade_level]);
+			s.uint8(this->emulator_ram[stage_thehunt_gem_state]);
+			switch (this->emulator_ram[stage_thehunt_gem_state]) {
 				case STAGE_GEM_GEM_STATE_COOLDOWN:
-					s.uint8(this->emulator_ram[stage_gem_gem_cooldown_low]);
-					s.uint8(this->emulator_ram[stage_gem_gem_cooldown_high]);
+					s.uint8(this->emulator_ram[stage_thehunt_gem_cooldown_low]);
+					s.uint8(this->emulator_ram[stage_thehunt_gem_cooldown_high]);
 					break;
 
 				case STAGE_GEM_GEM_STATE_ACTIVE:
-					s.uint8(this->emulator_ram[stage_gem_gem_position_x_low]);
-					s.uint8(this->emulator_ram[stage_gem_gem_position_x_high]);
-					s.uint8(this->emulator_ram[stage_gem_gem_position_y_low]);
-					s.uint8(this->emulator_ram[stage_gem_gem_position_y_high]);
-					s.uint8(this->emulator_ram[stage_gem_gem_velocity_h_low]);
-					s.uint8(this->emulator_ram[stage_gem_gem_velocity_h_high]);
-					s.uint8(this->emulator_ram[stage_gem_gem_velocity_v_low]);
-					s.uint8(this->emulator_ram[stage_gem_gem_velocity_v_high]);
+					s.uint8(this->emulator_ram[stage_thehunt_gem_position_x_low]);
+					s.uint8(this->emulator_ram[stage_thehunt_gem_position_x_high]);
+					s.uint8(this->emulator_ram[stage_thehunt_gem_position_y_low]);
+					s.uint8(this->emulator_ram[stage_thehunt_gem_position_y_high]);
+					s.uint8(this->emulator_ram[stage_thehunt_gem_velocity_h_low]);
+					s.uint8(this->emulator_ram[stage_thehunt_gem_velocity_h_high]);
+					s.uint8(this->emulator_ram[stage_thehunt_gem_velocity_v_low]);
+					s.uint8(this->emulator_ram[stage_thehunt_gem_velocity_v_high]);
 					break;
 
 				case STAGE_GEM_GEM_STATE_BREAKING:
-					s.uint8(this->emulator_ram[stage_gem_buffed_player]);
+					s.uint8(this->emulator_ram[stage_thehunt_buffed_player]);
 					break;
 
 				case STAGE_GEM_GEM_STATE_BUFF:
-					s.uint8(this->emulator_ram[stage_gem_gem_cooldown_low]);
-					s.uint8(this->emulator_ram[stage_gem_gem_cooldown_high]);
-					s.uint8(this->emulator_ram[stage_gem_last_opponent_state]);
-					s.uint8(this->emulator_ram[stage_gem_buffed_player]);
+					s.uint8(this->emulator_ram[stage_thehunt_gem_cooldown_low]);
+					s.uint8(this->emulator_ram[stage_thehunt_gem_cooldown_high]);
+					s.uint8(this->emulator_ram[stage_thehunt_last_opponent_state]);
+					s.uint8(this->emulator_ram[stage_thehunt_buffed_player]);
 					break;
 
 				default:

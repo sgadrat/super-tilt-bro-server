@@ -112,8 +112,8 @@ uint16_t const player_a_hitbox_top = 0x20;
 uint16_t const player_b_hitbox_top = 0x21;
 uint16_t const player_a_hitbox_bottom = 0x22;
 uint16_t const player_b_hitbox_bottom = 0x23;
-uint16_t const player_a_hitbox_enabled = 0x24; // 0 - hitbox disabled
-uint16_t const player_b_hitbox_enabled = 0x25; // 1 - hitbox enabled
+uint16_t const player_a_hitbox_enabled = 0x24; // 0 - hitbox disabled, 1 - direct hitbox, 2 - custom hitbox
+uint16_t const player_b_hitbox_enabled = 0x25; //
 uint16_t const player_a_hitbox_force_v = 0x26;
 uint16_t const player_b_hitbox_force_v = 0x27;
 uint16_t const player_a_hitbox_force_h = 0x28;
@@ -165,30 +165,53 @@ uint16_t const player_a_walled = 0x54; // $00 if not touching a wall, else the o
 uint16_t const player_b_walled = 0x55;
 uint16_t const player_a_walled_direction = 0x56; // DIRECTION_LEFT - player is on the left of the wall
 uint16_t const player_b_walled_direction = 0x57; // DIRECTION_RIGHT - player is on the right of the wall
+uint16_t const player_a_ceiled = 0x58; // $00 if not touching a ceiling, else the offset of the platform from stage_data
+uint16_t const player_b_ceiled = 0x59;
 
-uint16_t const player_a_hurtbox_left_msb = 0x58;
-uint16_t const player_b_hurtbox_left_msb = 0x59;
-uint16_t const player_a_hurtbox_right_msb = 0x5a;
-uint16_t const player_b_hurtbox_right_msb = 0x5b;
-uint16_t const player_a_hurtbox_top_msb = 0x5c;
-uint16_t const player_b_hurtbox_top_msb = 0x5d;
-uint16_t const player_a_hurtbox_bottom_msb = 0x5e;
-uint16_t const player_b_hurtbox_bottom_msb = 0x5f;
-uint16_t const player_a_hitbox_left_msb = 0x60;
-uint16_t const player_b_hitbox_left_msb = 0x61;
-uint16_t const player_a_hitbox_right_msb = 0x62;
-uint16_t const player_b_hitbox_right_msb = 0x63;
-uint16_t const player_a_hitbox_top_msb = 0x64;
-uint16_t const player_b_hitbox_top_msb = 0x65;
-uint16_t const player_a_hitbox_bottom_msb = 0x66;
-uint16_t const player_b_hitbox_bottom_msb = 0x67;
+uint16_t const player_a_hurtbox_left_msb = 0x5a;
+uint16_t const player_b_hurtbox_left_msb = 0x5b;
+uint16_t const player_a_hurtbox_right_msb = 0x5c;
+uint16_t const player_b_hurtbox_right_msb = 0x5d;
+uint16_t const player_a_hurtbox_top_msb = 0x5e;
+uint16_t const player_b_hurtbox_top_msb = 0x5f;
+uint16_t const player_a_hurtbox_bottom_msb = 0x60;
+uint16_t const player_b_hurtbox_bottom_msb = 0x61;
+uint16_t const player_a_hitbox_left_msb = 0x62;
+uint16_t const player_b_hitbox_left_msb = 0x63;
+uint16_t const player_a_hitbox_right_msb = 0x64;
+uint16_t const player_b_hitbox_right_msb = 0x65;
+uint16_t const player_a_hitbox_top_msb = 0x66;
+uint16_t const player_b_hitbox_top_msb = 0x67;
+uint16_t const player_a_hitbox_bottom_msb = 0x68;
+uint16_t const player_b_hitbox_bottom_msb = 0x69;
 
-uint16_t const player_a_last_shown_damage = 0x68;
-uint16_t const player_b_last_shown_damage = 0x69;
-uint16_t const player_a_last_shown_stocks = 0x6a;
-uint16_t const player_b_last_shown_stocks = 0x6b;
+uint16_t const player_a_custom_hitbox_routine_lsb = player_a_hitbox_base_knock_up_v_low; // $3e
+uint16_t const player_b_custom_hitbox_routine_lsb = player_b_hitbox_base_knock_up_v_low; // $3f
+uint16_t const player_a_custom_hitbox_routine_msb = player_a_hitbox_base_knock_up_v_high; // $3a
+uint16_t const player_b_custom_hitbox_routine_msb = player_b_hitbox_base_knock_up_v_high; // $3b
+uint16_t const player_a_custom_hitbox_directional1_lsb = player_a_hitbox_base_knock_up_h_low; // $40
+uint16_t const player_b_custom_hitbox_directional1_lsb = player_b_hitbox_base_knock_up_h_low; // $41
+uint16_t const player_a_custom_hitbox_directional1_msb = player_a_hitbox_base_knock_up_h_high; // $3c
+uint16_t const player_b_custom_hitbox_directional1_msb = player_b_hitbox_base_knock_up_h_high; // $3d
+uint16_t const player_a_custom_hitbox_directional2_lsb = player_a_hitbox_force_h_low; // $38
+uint16_t const player_b_custom_hitbox_directional2_lsb = player_b_hitbox_force_h_low; // $39
+uint16_t const player_a_custom_hitbox_directional2_msb = player_a_hitbox_force_h; // $28
+uint16_t const player_b_custom_hitbox_directional2_msb = player_b_hitbox_force_h; // $29
+uint16_t const player_a_custom_hitbox_value1 = player_a_hitbox_force_v_low; // $36
+uint16_t const player_b_custom_hitbox_value1 = player_b_hitbox_force_v_low; // $37
+uint16_t const player_a_custom_hitbox_value2 = player_a_hitbox_force_v; // $26
+uint16_t const player_b_custom_hitbox_value2 = player_b_hitbox_force_v; // $27
+uint16_t const player_a_custom_hitbox_value3 = player_a_hitbox_damages; // $2a
+uint16_t const player_b_custom_hitbox_value3 = player_b_hitbox_damages; // $2b
 
-// $6c-$6f unused
+uint16_t const player_a_last_shown_damage = 0x6a;
+uint16_t const player_b_last_shown_damage = 0x6b;
+uint16_t const player_a_last_shown_stocks = 0x6c;
+uint16_t const player_b_last_shown_stocks = 0x6d;
+
+uint16_t const stage_restore_screen_step = 0x6e; // Set to zero to start asynchrone restoration of the screen by stage's logic
+
+// $6f unused
 
 uint16_t const screen_shake_counter = 0x70;
 uint16_t const screen_shake_nextval_x = 0x71;
@@ -229,6 +252,18 @@ uint16_t const ai_current_action_modifier = 0x05d8;
 uint16_t const ai_delay = 0x05d9;
 uint16_t const ai_max_delay = 0x05da;
 
+uint16_t const game_mode_state_begin = 0x05db;
+
+uint16_t const arcade_mode_stage_type = 0x05db;
+
+uint16_t const arcade_mode_targets_x = 0x05dc; // $05dc to $05e5
+uint16_t const arcade_mode_targets_y = 0x05e6; // $05e6 to $05ef
+uint16_t const arcade_mode_target_break_animation = 0x05f0; // $05f0 to $05fc
+uint16_t const arcade_mode_target_break_animation_timer = 0x05fd;
+
+uint16_t const arcade_mode_run_teleport_animation = 0x05f0; // $05f0 to $05fc
+uint16_t const arcade_mode_run_teleport_timer = 0x05fd;
+
 //
 // Stage specific labels
 //
@@ -240,20 +275,21 @@ uint16_t const stage_pit_platform2_direction_v = 0x81;
 uint16_t const stage_pit_platform1_direction_h = 0x82;
 uint16_t const stage_pit_platform2_direction_h = 0x83;
 
-uint16_t const stage_gem_gem_position_x_low = 0x80;
-uint16_t const stage_gem_gem_position_x_high = 0x81;
-uint16_t const stage_gem_gem_position_y_low = 0x82;
-uint16_t const stage_gem_gem_position_y_high = 0x83;
-uint16_t const stage_gem_gem_velocity_h_low = 0x84;
-uint16_t const stage_gem_gem_velocity_h_high = 0x85;
-uint16_t const stage_gem_gem_velocity_v_low = 0x86;
-uint16_t const stage_gem_gem_velocity_v_high = 0x87;
-uint16_t const stage_gem_gem_cooldown_low = 0x88;
-uint16_t const stage_gem_gem_cooldown_high = 0x89;
-uint16_t const stage_gem_gem_state = 0x8a; // one of STAGE_GEM_GEM_STATE_*
-uint16_t const stage_gem_buffed_player = 0x8b;
-uint16_t const stage_gem_last_opponent_state = 0x8c;
-uint16_t const stage_gem_frame_cnt = 0x8d;
+uint16_t const stage_thehunt_gem_position_x_low = 0x80;
+uint16_t const stage_thehunt_gem_position_x_high = 0x81;
+uint16_t const stage_thehunt_gem_position_y_low = 0x82;
+uint16_t const stage_thehunt_gem_position_y_high = 0x83;
+uint16_t const stage_thehunt_gem_velocity_h_low = 0x84;
+uint16_t const stage_thehunt_gem_velocity_h_high = 0x85;
+uint16_t const stage_thehunt_gem_velocity_v_low = 0x86;
+uint16_t const stage_thehunt_gem_velocity_v_high = 0x87;
+uint16_t const stage_thehunt_gem_cooldown_low = 0x88;
+uint16_t const stage_thehunt_gem_cooldown_high = 0x89;
+uint16_t const stage_thehunt_gem_state = 0x8a; // one of STAGE_GEM_GEM_STATE_*
+uint16_t const stage_thehunt_buffed_player = 0x8b;
+uint16_t const stage_thehunt_last_opponent_state = 0x8c;
+uint16_t const stage_thehunt_frame_cnt = 0x8d;
+uint16_t const stage_thehunt_fade_level = 0x8e;
 
 //Note - $90 to $af are used by DI particles
 
@@ -309,8 +345,6 @@ uint16_t const title_buffer = 0x0580;
 //
 // MODE_SELECTION labels
 //
-
-uint16_t const mode_selection_current_option = last_c_label+1; // $39
 
 uint16_t const mode_selection_mem_buffer = 0x0580;
 
@@ -417,6 +451,29 @@ uint16_t const netplay_launch_countdown = netplay_launch_rival_ping_quality+1; /
 uint16_t const netplay_launch_original_music_state = netplay_launch_countdown+1; // $57
 
 uint16_t const netplay_launch_bg_mem_buffer = 0x0580; // $0580 to $???? (current biggest usage, 3+16 bytes, map illustration draw)
+
+//
+// ARCADE_MODE labels
+//
+
+uint16_t const arcade_mode_last_game_winner = last_c_label+1; // $39
+
+uint16_t const arcade_mode_bg_mem_buffer = 0x0580; // $0580 to $05a3 (max text size 32 + nt buffer header)
+
+uint16_t const cutscene_anims = 0x0580; // $0580 to $05b3 - 4 animation states
+uint16_t const cutscene_anims_enabled = 0x05b4; // $05b4 to $05b7 - 4 bytes
+uint16_t const cutscene_anims_velocity_h_pixel = 0x05b8; // to $05bb
+uint16_t const cutscene_anims_velocity_h_subpixel = 0x05bc; // to $05bf
+uint16_t const cutscene_anims_velocity_v_pixel = 0x05c0; // to $05c3
+uint16_t const cutscene_anims_velocity_v_subpixel = 0x05c4; // to $05c7
+uint16_t const cutscene_anims_pos_x_subpixel = 0x05c8; // to $05cb
+uint16_t const cutscene_anims_pos_y_subpixel = 0x05cc; // to $05cf
+uint16_t const cutscene_anims_bank = 0x05d0; // to $05d3
+uint16_t const cutscene_anims_player = 0x05d4; // to $05d7
+uint16_t const cutscene_autoscroll_h = 0x05d8;
+uint16_t const cutscene_autoscroll_v = 0x05d9;
+uint16_t const cutscene_frame_count = 0x05da;
+uint16_t const cutscene_frames_skippable = 0x05db;
 
 //
 // DONATION labels
@@ -589,6 +646,7 @@ uint16_t const config_player_b_character = 0xe1;
 uint16_t const config_game_mode = 0xe2;
 
 uint16_t const current_bank = 0xe3;
+uint16_t const nt_buffer_timer = 0xe4;
 
 //
 // Zero-page constants
@@ -646,6 +704,7 @@ uint16_t const particle_block_0 = 0x0500;
 uint16_t const particle_block_1 = 0x0520;
 
 uint16_t const previous_global_game_state = 0x0540;
+
 uint16_t const config_requested_stage = 0x0541;
 uint16_t const config_requested_player_a_character = 0x0542;
 uint16_t const config_requested_player_b_character = 0x0543;
@@ -653,7 +712,24 @@ uint16_t const config_requested_player_a_palette = 0x0544;
 uint16_t const config_requested_player_b_palette = 0x0545;
 uint16_t const config_ingame_track = 0x0546;
 uint16_t const config_ticks_per_frame = 0x0547;
-uint16_t const current_frame_tick = 0x0548;
+uint16_t const config_player_a_present = 0x0548; // 0 - player is absent, and should not impact the screen, 1 - player is there as usual
+uint16_t const config_player_b_present = 0x0549; // 0 - player is absent, and should not impact the screen, 1 - player is there as usual
+
+uint16_t const current_frame_tick = 0x054a;
+
+uint16_t const arcade_mode_current_encounter = 0x054b;
+uint16_t const arcade_mode_player_damages = 0x054c;
+uint16_t const arcade_mode_counter_frames = 0x054d;
+uint16_t const arcade_mode_counter_seconds = 0x054e;
+uint16_t const arcade_mode_counter_minutes = 0x054f;
+uint16_t const arcade_mode_nb_credits_used = 0x0550;
+
+// Menu state variable that must persist between screens
+uint16_t const menu_state_mode_selection_current_option = 0x0551;
+
+// Nine-gine variables
+uint16_t const nt_buffers_begin = 0x0552;
+
 //$0580 to $05ff may be used by game states
 
 //$06xx may be used by audio engine, see "Audio engine labels"
