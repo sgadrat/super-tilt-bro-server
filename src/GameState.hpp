@@ -111,7 +111,8 @@ void GameState::serial(SerializationHandler& s) {
 
 	// Copy special state
 	s.uint8(this->emulator_ram[screen_shake_counter]);
-	s.uint8(this->emulator_ram[stage_restore_screen_step]); //TODO investigate - may need special handling to not miss a screen redraw accidentally
+	s.uint8(this->emulator_ram[stage_fade_level]);
+	s.uint8(this->emulator_ram[stage_screen_effect]);
 
 	// Copy controllers state
 	s.uint8(this->emulator_ram[controller_a_btns]);
@@ -256,7 +257,6 @@ void GameState::serial(SerializationHandler& s) {
 			uint8_t const STAGE_GEM_GEM_STATE_BREAKING = 2;
 			uint8_t const STAGE_GEM_GEM_STATE_BUFF = 3;
 
-			s.uint8(this->emulator_ram[stage_thehunt_fade_level]);
 			s.uint8(this->emulator_ram[stage_thehunt_gem_state]);
 			switch (this->emulator_ram[stage_thehunt_gem_state]) {
 				case STAGE_GEM_GEM_STATE_COOLDOWN:
