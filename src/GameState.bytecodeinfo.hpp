@@ -209,9 +209,8 @@ uint16_t const player_b_last_shown_damage = 0x6b;
 uint16_t const player_a_last_shown_stocks = 0x6c;
 uint16_t const player_b_last_shown_stocks = 0x6d;
 
-uint16_t const stage_restore_screen_step = 0x6e; // Set to zero to start asynchrone restoration of the screen by stage's logic
-
-// $6f unused
+uint16_t const stage_fade_level = 0x6e;
+uint16_t const stage_screen_effect = 0x6f; // 0 - The screen is clean from effects, any other - There are effects at play (inc when starting an effect, dec on end)
 
 uint16_t const screen_shake_counter = 0x70;
 uint16_t const screen_shake_nextval_x = 0x71;
@@ -227,16 +226,28 @@ uint16_t const directional_indicator_player_a_direction_y_high = 0x79;
 uint16_t const directional_indicator_player_b_direction_y_high = 0x7a;
 uint16_t const directional_indicator_player_a_direction_y_low = 0x7b;
 uint16_t const directional_indicator_player_b_direction_y_low = 0x7c;
+
+uint16_t const death_particles_player_a_counter = 0x7d;
+uint16_t const death_particles_player_b_counter = 0x7e;
+
+uint16_t const slow_down_counter = 0x7f;
+
 // particles lo position tables
 //  | byte 0 | bytes 1 to 7       | byte 8 | bytes 9 to 15      |
 //  | unused | player A particles | unused | player B particles |
 uint16_t const directional_indicator_player_a_position_x_low = 0x90; // $90 to $9f - unused $90 and $98
 uint16_t const directional_indicator_player_a_position_y_low = 0xa0; // $a0 to $af - unused $a0 and $a8
 
-uint16_t const death_particles_player_a_counter = 0x7d;
-uint16_t const death_particles_player_b_counter = 0x7e;
+// Stages common variables
+uint16_t const stage_restore_screen_step = 0x0560; // Set to zero to start asynchrone restoration of the screen by stage's logic
+uint16_t const stage_current_fade_level = 0x0561;
 
-uint16_t const slow_down_counter = 0x7f;
+// Deathplosion
+uint16_t const deathplosion_step = 0x0562;
+uint16_t const deathplosion_pos = 0x0563;
+uint16_t const deathplosion_origin = 0x0564;
+
+//$0565-$057f unused
 
 uint16_t const players_palettes = 0x0580; // $0580 to $059f - 4 nametable buffers (8 bytes each) containing avatars palettes in normal and alternate mode
 uint16_t const player_a_animation = 0x05a0; // $05a0 to $05ac - player a's animation state
@@ -252,17 +263,21 @@ uint16_t const ai_current_action_modifier = 0x05d8;
 uint16_t const ai_delay = 0x05d9;
 uint16_t const ai_max_delay = 0x05da;
 
-uint16_t const game_mode_state_begin = 0x05db;
+uint16_t const game_winner = 0x05db; // Set to winner's player number after the game is finished
 
-uint16_t const arcade_mode_stage_type = 0x05db;
+uint16_t const game_mode_state_begin = 0x05dc;
 
-uint16_t const arcade_mode_targets_x = 0x05dc; // $05dc to $05e5
-uint16_t const arcade_mode_targets_y = 0x05e6; // $05e6 to $05ef
-uint16_t const arcade_mode_target_break_animation = 0x05f0; // $05f0 to $05fc
-uint16_t const arcade_mode_target_break_animation_timer = 0x05fd;
+uint16_t const arcade_mode_stage_type = 0x05dc;
 
-uint16_t const arcade_mode_run_teleport_animation = 0x05f0; // $05f0 to $05fc
-uint16_t const arcade_mode_run_teleport_timer = 0x05fd;
+uint16_t const arcade_mode_targets_x = 0x05dd; // $05dd to $05e6
+uint16_t const arcade_mode_targets_y = 0x05e7; // $05e7 to $05f0
+uint16_t const arcade_mode_target_break_animation = 0x05f1; // $05f1 to $05fd
+uint16_t const arcade_mode_target_break_animation_timer = 0x05fe;
+
+uint16_t const arcade_mode_run_teleport_animation = 0x05f1; // $05f1 to $05fd
+uint16_t const arcade_mode_run_teleport_timer = 0x05fe;
+
+uint16_t const game_mode_state_end = 0x05ff; // Inclusive (game mode can safely write here)
 
 //
 // Stage specific labels
@@ -289,7 +304,6 @@ uint16_t const stage_thehunt_gem_state = 0x8a; // one of STAGE_GEM_GEM_STATE_*
 uint16_t const stage_thehunt_buffed_player = 0x8b;
 uint16_t const stage_thehunt_last_opponent_state = 0x8c;
 uint16_t const stage_thehunt_frame_cnt = 0x8d;
-uint16_t const stage_thehunt_fade_level = 0x8e;
 
 //Note - $90 to $af are used by DI particles
 
@@ -553,7 +567,7 @@ uint16_t const gameover_random = 0x4d;
 uint16_t const gameover_gamepads_ready_a = 0x4e;
 uint16_t const gameover_gamepads_ready_b = 0x4f;
 
-uint16_t const gameover_winner = 0x0580;
+uint16_t const gameover_winner = game_winner;
 
 //
 // Audio engine labels
@@ -725,14 +739,16 @@ uint16_t const arcade_mode_counter_minutes = 0x054f;
 uint16_t const arcade_mode_nb_credits_used = 0x0550;
 
 // Menu state variable that must persist between screens
-uint16_t const menu_state_mode_selection_current_option = 0x0551;
+uint16_t const menu_state_mode_selection_current_option = 0x0552;
 
 // Nine-gine variables
-uint16_t const nt_buffers_begin = 0x0552;
+uint16_t const nt_buffers_begin = 0x0553;
+uint16_t const nt_buffers_end = 0x0554;
 
-//$0580 to $05ff may be used by game states
+//$0560 to $05ff may be used by game states
 
-//$06xx may be used by audio engine, see "Audio engine labels"
+//$0600 to $067f may be used by audio engine, see "Audio engine labels"
+//$0680 to $06ff may be used by game states
 
 uint16_t const virtual_frame_cnt = 0x0700;
 uint16_t const network_last_known_remote_input = 0x07bf;
