@@ -20,22 +20,30 @@
 // g++ -std=c++17 -O3 -DNDEBUG -flto bmov_to_fm2.cpp ../src/GameState.cpp -I ../src -I .. -luuid -lz -o bmov_to_fm2
 // # May need -lstdc++fs on older distribs
 
-std::string const CURRENT_ROM_VERSION = "2.0-alpha12-unrom";
+std::string const CURRENT_ROM_VERSION = "2.0-beta1-unrom";
 
+// FCEUX checksum of the ROM
+//  How to find:
+//   $ tail -c +17 tilt_no_network_unrom_\(E\).nes | md5sum | cut -d' ' -f1 | xxd -r -p | base64
 std::map<std::string, std::string> const roms_checksum{
 	{"2.0-alpha8-unrom", "base64:npc22x82bJ+GEfIeZEq/cQ=="},
 	{"2.0-alpha9-unrom", "base64:/wQ5QXbvWmziKHsuVvVFug=="},
 	{"2.0-alpha10-unrom", "base64:oSD2Yg96HL4qKe/c54VAPg=="},
 	{"2.0-alpha11-unrom", "base64:S0NjSc2fV2a1y/c2YY6LSg=="},
 	{"2.0-alpha12-unrom", "base64:etYRF1yCmvt7WIP/p2s/NA=="},
+	{"2.0-beta1-unrom", "base64:INg1DfwHB6YgmIloJQ7VdA=="},
 };
 
+// Address of the "forever" loop
+//  How to find:
+//   Compile Super Tilt Bro. with xa-listing, then search for the "forever" label in the generated listing
 std::map<std::string, uint16_t> const roms_entry_point{
 	{"2.0-alpha8-unrom", 0xc07f},
 	{"2.0-alpha9-unrom", 0xc07e},
 	{"2.0-alpha10-unrom", 0xc07e},
 	{"2.0-alpha11-unrom", 0xc0af},
 	{"2.0-alpha12-unrom", 0xc0af},
+	{"2.0-beta1-unrom", 0xc0b0},
 };
 
 std::string generate_guid() {
@@ -105,7 +113,7 @@ void read_nametable_file(std::vector<uint8_t>& palettes, std::vector<uint8_t>& n
 	std::ifstream ifs(filename);
 
 	// Palettes
-	ifs.read(reinterpret_cast<char*>(palettes.data()), 8*4);
+	ifs.read(reinterpret_cast<char*>(palettes.data()), 4*4);
 
 	// top nametable
 	bool run = true;
@@ -152,7 +160,7 @@ std::vector<uint8_t> generate_savestate(
 	uint8_t const Z_FLAG = 0x02;
 	uint8_t const C_FLAG = 0x01;
 
-	std::array<std::string, 3> char_names = {"sinbad", "kiki", "pepper"};
+	std::array<std::string, 4> char_names = {"sinbad", "kiki", "pepper", "vgsage"};
 	std::array<std::string, 4> stage_names = {"plateau", "pit", "shelf", "gem"};
 	std::array<std::string, 4> stage_tilesets = {"ruins", "jungle", "ruins", "magma"};
 
@@ -184,6 +192,8 @@ std::vector<uint8_t> generate_savestate(
 	ram[config_player_a_weapon_palette] = character_1_palette;
 	ram[config_player_b_character_palette] = character_2_palette;
 	ram[config_player_b_weapon_palette] = character_2_palette;
+	ram[config_player_a_present] = 1;
+	ram[config_player_b_present] = 1;
 	ram[network_rollback_mode] = 0;
 	ram[ppuctrl_val] = ppu_ctrl;
 	for (size_t i = 0; i < 0x100; i += 4) {
