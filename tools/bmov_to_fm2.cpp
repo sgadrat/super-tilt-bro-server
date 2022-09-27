@@ -217,7 +217,20 @@ std::vector<uint8_t> generate_savestate(
 		std::vector<uint8_t>& palette_data = (char_num == 0 ? character_1_palette_data : character_2_palette_data);
 		size_t const palette_num = (char_num == 0 ? character_1_palette : character_2_palette);
 		size_t const palette_data_index = 3 * palette_num;
-		std::copy(palette_data.begin() + palette_data_index, palette_data.begin() + palette_data_index + 3, players_palettes_cursor);
+		if (char_num == 0 || character_2_palette != character_1_palette) {
+			std::copy(palette_data.begin() + palette_data_index, palette_data.begin() + palette_data_index + 3, players_palettes_cursor);
+		}else {
+			// If both players have the same character with same colors, lighten player B's colors
+			for (size_t i = 0; i < 3; ++i) {
+				uint8_t color = *(palette_data.begin() + palette_data_index + i);
+				if (color == 0x0f) {
+					color = 0x00; // black -> dark grey
+				}else if (color < 0x30) {
+					color += 0x10;
+				}
+				*(players_palettes_cursor + i) = color;
+			}
+		}
 		players_palettes_cursor += 3;
 		*players_palettes_cursor = 0;
 		++players_palettes_cursor;
