@@ -20,7 +20,7 @@
 // g++ -std=c++17 -O3 -DNDEBUG -flto bmov_to_fm2.cpp ../src/GameState.cpp -I ../src -I .. -luuid -lz -o bmov_to_fm2
 // # May need -lstdc++fs on older distribs
 
-std::string const CURRENT_ROM_VERSION = "2.0-beta1-unrom";
+std::string const CURRENT_ROM_VERSION = "2.0-beta2-unrom";
 
 // FCEUX checksum of the ROM
 //  How to find:
@@ -32,6 +32,7 @@ std::map<std::string, std::string> const roms_checksum{
 	{"2.0-alpha11-unrom", "base64:S0NjSc2fV2a1y/c2YY6LSg=="},
 	{"2.0-alpha12-unrom", "base64:etYRF1yCmvt7WIP/p2s/NA=="},
 	{"2.0-beta1-unrom", "base64:INg1DfwHB6YgmIloJQ7VdA=="},
+	{"2.0-beta2-unrom", "base64:R7D6SBSvO/v0roAenUmLeA=="},
 };
 
 // Address of the "forever" loop
@@ -44,6 +45,7 @@ std::map<std::string, uint16_t> const roms_entry_point{
 	{"2.0-alpha11-unrom", 0xc0af},
 	{"2.0-alpha12-unrom", 0xc0af},
 	{"2.0-beta1-unrom", 0xc0b0},
+	{"2.0-beta2-unrom", 0xc0b0},
 };
 
 std::string generate_guid() {
@@ -78,7 +80,7 @@ std::string base64_encode(std::vector<uint8_t> const& s)
 	return result;
 }
 
-void read_raw_file(std::vector<uint8_t>::iterator out, std::string filename, size_t size = 0) {
+void read_raw_file(std::vector<uint8_t>::iterator out, std::string filename, size_t size = 0, size_t offset = 0) {
 	std::ifstream ifs(filename);
 
 	if (size == 0) {
@@ -86,6 +88,8 @@ void read_raw_file(std::vector<uint8_t>::iterator out, std::string filename, siz
 		size = ifs.tellg();
 		ifs.seekg(0, ifs.beg);
 	}
+
+	ifs.seekg(offset, ifs.beg);
 
 	char buf[size];
 	ifs.read(buf, size);
@@ -163,6 +167,7 @@ std::vector<uint8_t> generate_savestate(
 	std::array<std::string, 4> char_names = {"sinbad", "kiki", "pepper", "vgsage"};
 	std::array<std::string, 4> stage_names = {"plateau", "pit", "shelf", "gem"};
 	std::array<std::string, 4> stage_tilesets = {"ruins", "jungle", "ruins", "magma"};
+	std::array<std::string, 4> stage_sprite_tilesets = {"", "pit_ts_sprites", "", "gem_ts_sprites"};
 
 	// Misc
 	uint32_t const version = 22020; ///< Version of the savestate format
@@ -252,20 +257,56 @@ std::vector<uint8_t> generate_savestate(
 	}
 	assert(players_palettes_cursor == ram.begin() + players_palettes + 4 * 8);
 
+	// Place characters' portraits sprites
+	std::array<uint8_t, 4*2*4> portraits_oam{
+		0xbf, 248+0, 0x00, 0x48,
+		0xbf, 248+1, 0x00, 0x50,
+		0xc7, 248+2, 0x00, 0x48,
+		0xc7, 248+3, 0x00, 0x50,
+
+		0xbf, 248+4, 0x02, 0xa8,
+		0xbf, 248+5, 0x02, 0xb0,
+		0xc7, 248+6, 0x02, 0xa8,
+		0xc7, 248+7, 0x02, 0xb0,
+	};
+	std::copy(portraits_oam.begin(), portraits_oam.end(), ram.begin() + oam_mirror + 42*4);
+
 	// Construct CHR-RAM
 	std::vector<uint8_t> chrr(8192, 0xff);
 	read_raw_file(chrr.begin() + 0, data_dir+"/chr_data.dat", 0x1000);
+	read_tileset(chrr.begin() + 0 + 241*16, data_dir+"/ts_common_ingame_sprites.dat");
+	if (stage_sprite_tilesets[stage] != "") {
+		read_tileset(chrr.begin() + 2*96*16, data_dir+"/"+ stage_sprite_tilesets[stage] +".dat");
+	}
 	read_tileset(chrr.begin() + 0x1000 + 218*16, data_dir+"/ts_common.dat");
 	read_tileset(chrr.begin() + 0x1000, data_dir+"/ts_"+ stage_tilesets[stage] +".dat");
 
 	read_raw_file(chrr.begin() + 0, data_dir+"/"+ char_names[character_1] +"_tiles.dat");
 	read_raw_file(chrr.begin() + 0x1d00, data_dir+"/"+ char_names[character_1] +"_illustrations.dat", 5*16);
+	read_raw_file(chrr.begin() + 0 + 248*16, data_dir+"/"+ char_names[character_1] +"_illustrations.dat", 4*16, 1*16);
+	for (size_t tile_num = 0; tile_num < 4; ++tile_num) {
+		for (size_t line_num = 0; line_num < 8; ++line_num) {
+			// We want to swap colors 0 and 1
+			// so, when a bit in the second byte of a line is 0, the equivalent bit in first line must be swapped
+			auto pixels_line_lsb = chrr.begin() + (248+tile_num)*16+line_num;
+			auto pixels_line_msb = pixels_line_lsb + 8;
+			uint8_t const bitmask = ~(*pixels_line_msb);
+			*pixels_line_lsb = (*pixels_line_lsb) ^ bitmask;
+		}
+	}
 
 	read_raw_file(chrr.begin() + 96*16, data_dir+"/"+ char_names[character_2] +"_tiles.dat");
 	read_raw_file(chrr.begin() + 0x1d50, data_dir+"/"+ char_names[character_2] +"_illustrations.dat", 5*16);
-
-	if (stage_names[stage] == "gem") {
-		read_tileset(chrr.begin() + 0 + 2*96*16, data_dir+"/gem_ts_sprites.dat");
+	read_raw_file(chrr.begin() + 0 + 252*16, data_dir+"/"+ char_names[character_2] +"_illustrations.dat", 4*16, 1*16);
+	for (size_t tile_num = 0; tile_num < 4; ++tile_num) {
+		for (size_t line_num = 0; line_num < 8; ++line_num) {
+			// We want to swap colors 0 and 1
+			// so, when a bit in the second byte of a line is 0, the equivalent bit in first line must be swapped
+			auto pixels_line_lsb = chrr.begin() + (252+tile_num)*16+line_num;
+			auto pixels_line_msb = pixels_line_lsb + 8;
+			uint8_t const bitmask = ~(*pixels_line_msb);
+			*pixels_line_lsb = (*pixels_line_lsb) ^ bitmask;
+		}
 	}
 
 	// Construct palettes and nametable

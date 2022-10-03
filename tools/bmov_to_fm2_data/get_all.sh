@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -x
+
 tilt_dir="$1"
 
 # Stages "screen" file (palettes + zipped nametable)
@@ -10,6 +13,7 @@ done
 # Common tilesets
 xa -DCURRENT_BANK_NUMBER=0 -DCHARACTERS_END_TILES_OFFSET=2*96*16 "$tilt_dir"/game/banks/chr_data.asm -o chr_data.dat
 
+set +x
 echo "; The tiles constructed by extra_init_game_state, in a convenient tileset file" > /tmp/ts_common.asm
 echo ".byt 12" >> /tmp/ts_common.asm
 echo "; empty_stock" >>/tmp/ts_common.asm
@@ -39,7 +43,11 @@ echo ".byt %11111111, %11000011, %10011001, %10010011, %11000011, %11001001, %10
 echo ".byt %11111111, %11000011, %10011001, %10010011, %11000011, %11001001, %10011001, %10000011" >> /tmp/ts_common.asm
 echo ".byt %11111111, %10000011, %00111001, %10011001, %11000001, %11111001, %10011001, %11000011" >> /tmp/ts_common.asm
 echo ".byt %11111111, %10000011, %00111001, %10011001, %11000001, %11111001, %10011001, %11000011" >> /tmp/ts_common.asm
+set -x
 ./get_tileset.sh /tmp/ts_common.asm ts_common.dat
+
+# Common sprites
+./get_tileset.sh "$tilt_dir"/game/data/tilesets/common_ingame_sprites.asm ts_common_ingame_sprites.dat
 
 # Main background tilesets
 ./get_tileset.sh "$tilt_dir"/game/data/tilesets/ruins.asm ts_ruins.dat
@@ -47,7 +55,8 @@ echo ".byt %11111111, %10000011, %00111001, %10011001, %11000001, %11111001, %10
 ./get_tileset.sh "$tilt_dir"/game/data/tilesets/magma.asm ts_magma.dat
 
 # Stage-specific tilesets
-xa -DCURRENT_BANK_NUMBER=0 -DCHARACTERS_END_TILES_OFFSET=2*96*16 "$tilt_dir"/game/data/stages/gem/tilesets.asm -o gem_ts_sprites.dat
+xa -DCURRENT_BANK_NUMBER=0 -DSTAGE_FIRST_SPRITE_TILE_OFFSET=2*96*16 -DSTAGE_NUM_SPRITE_TILES=241-2*96 "$tilt_dir"/game/data/stages/gem/tilesets.asm -o gem_ts_sprites.dat
+xa -DCURRENT_BANK_NUMBER=0 -DSTAGE_FIRST_SPRITE_TILE_OFFSET=2*96*16 -DSTAGE_NUM_SPRITE_TILES=241-2*96 "$tilt_dir"/game/data/stages/pit/tilesets.asm -o pit_ts_sprites.dat
 
 # Characters sprites and illustrations
 for char in sinbad kiki pepper vgsage; do

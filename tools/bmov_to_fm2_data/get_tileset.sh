@@ -1,5 +1,11 @@
 #!/bin/bash
 
+set -e
+
 tileset_asm="$1"
 
-xa -DCURRENT_BANK_NUMBER=0 "$1" -o "$2"
+xa \
+	-DCURRENT_BANK_NUMBER=0 \
+	-DINGAME_COMMON_FIRST_SPRITE_TILE=241 \
+	-DINGAME_CHARACTER_A_PORTRAIT_FIRST_SPRITE_TILE=248 \
+	"$1" -o "$2"
