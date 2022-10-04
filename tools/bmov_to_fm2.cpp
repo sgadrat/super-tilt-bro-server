@@ -20,34 +20,6 @@
 // g++ -std=c++17 -O3 -DNDEBUG -flto bmov_to_fm2.cpp ../src/GameState.cpp -I ../src -I .. -luuid -lz -o bmov_to_fm2
 // # May need -lstdc++fs on older distribs
 
-std::string const CURRENT_ROM_VERSION = "2.0-beta2-unrom";
-
-// FCEUX checksum of the ROM
-//  How to find:
-//   $ tail -c +17 tilt_no_network_unrom_\(E\).nes | md5sum | cut -d' ' -f1 | xxd -r -p | base64
-std::map<std::string, std::string> const roms_checksum{
-	{"2.0-alpha8-unrom", "base64:npc22x82bJ+GEfIeZEq/cQ=="},
-	{"2.0-alpha9-unrom", "base64:/wQ5QXbvWmziKHsuVvVFug=="},
-	{"2.0-alpha10-unrom", "base64:oSD2Yg96HL4qKe/c54VAPg=="},
-	{"2.0-alpha11-unrom", "base64:S0NjSc2fV2a1y/c2YY6LSg=="},
-	{"2.0-alpha12-unrom", "base64:etYRF1yCmvt7WIP/p2s/NA=="},
-	{"2.0-beta1-unrom", "base64:INg1DfwHB6YgmIloJQ7VdA=="},
-	{"2.0-beta2-unrom", "base64:R7D6SBSvO/v0roAenUmLeA=="},
-};
-
-// Address of the "forever" loop
-//  How to find:
-//   Compile Super Tilt Bro. with xa-listing, then search for the "forever" label in the generated listing
-std::map<std::string, uint16_t> const roms_entry_point{
-	{"2.0-alpha8-unrom", 0xc07f},
-	{"2.0-alpha9-unrom", 0xc07e},
-	{"2.0-alpha10-unrom", 0xc07e},
-	{"2.0-alpha11-unrom", 0xc0af},
-	{"2.0-alpha12-unrom", 0xc0af},
-	{"2.0-beta1-unrom", 0xc0b0},
-	{"2.0-beta2-unrom", 0xc0b0},
-};
-
 std::string generate_guid() {
 	uuid_t uuid;
 	char cstr_uuid[37];
@@ -151,8 +123,7 @@ std::vector<uint8_t> generate_savestate(
 	uint8_t character_1, uint8_t character_1_palette,
 	uint8_t character_2, uint8_t character_2_palette,
 	GameState::VideoSystem video_system,
-	std::string data_dir,
-	std::string rom_version
+	std::string data_dir
 )
 {
 	uint8_t const N_FLAG = 0x80;
@@ -173,7 +144,11 @@ std::vector<uint8_t> generate_savestate(
 	uint32_t const version = 22020; ///< Version of the savestate format
 
 	// CPU
-	uint16_t const entry_point = roms_entry_point.at(rom_version); ///< PC value, where execution will resume (should be the start of the game loop)
+	uint16_t entry_point = 0; ///< PC value, where execution will resume (should be the start of the game loop)
+	{
+		std::ifstream ifs(data_dir+"/entry_point.dat");
+		ifs >> entry_point;
+	}
 	uint8_t const cpu_flags = I_FLAG;
 
 	// PPU
@@ -493,7 +468,6 @@ std::string usage() {
 		"\n"
 		"\t--palette-a\tSkin number for player A (default: 0)\n"
 		"\t--palette-b\tSkin number for player B (default: 1)\n"
-		"\t--rom-version\tVersion of the game to generate the movie for (default: "+ CURRENT_ROM_VERSION +")\n"
 	;
 }
 
@@ -501,11 +475,10 @@ int main(int argc, char** argv) {
 	// Parse command line
 	std::filesystem::path savestate_data_dir;
 	std::string bmov_path = "/tmp/replay.bmov";
-	std::string rom_version = CURRENT_ROM_VERSION;
 	uint8_t character_1_palette = 0; // NOTE: char palettes from bmov take precedence over command-line (unnatural, and to be changed if there is a need)
 	uint8_t character_2_palette = 1;
 	{
-		args::Args params = args::parse(argc, argv, {"--palette-a", "--palette-b", "--rom-version"});
+		args::Args params = args::parse(argc, argv, {"--palette-a", "--palette-b"});
 		if (params.flags.count("-h") || params.flags.count("--help")) {
 			std::cout << usage();
 			return 0;
@@ -528,14 +501,6 @@ int main(int argc, char** argv) {
 		if (params.values.count("--palette-b")) {
 			character_2_palette = args::lex_cast<unsigned int>(params.values.at("--palette-b"));
 		}
-		if (params.values.count("--rom-version")) {
-			rom_version = params.values.at("--rom-version");
-		}
-	}
-
-	if (roms_checksum.find(rom_version) == roms_checksum.end()) {
-		std::cerr << "unknown rom version '" << rom_version << "'\n";
-		return 1;
 	}
 
 	// Parse bmov file
@@ -641,15 +606,17 @@ int main(int argc, char** argv) {
 		std::cout << "port2 0\n";
 		std::cout << "romFilename tilt_no_network_unrom_(E)\n";
 		std::cout << "guid " << generate_guid() << "\n";
-		std::cout << "romChecksum " << roms_checksum.at(rom_version) << "\n";
+
+		std::vector<uint8_t> checksum(16, 0);
+		read_raw_file(checksum.begin(), (savestate_data_dir / "checksum.dat").native());
+		std::cout << "romChecksum base64:" << base64_encode(checksum) << "\n";
 
 		std::cout << "savestate base64:"+ base64_encode(generate_savestate(
 			stage,
 			character_1, character_1_palette,
 			character_2, character_2_palette,
 			video_system,
-			savestate_data_dir.native(),
-			rom_version
+			savestate_data_dir.native()
 		)) +"\n";
 	}
 
