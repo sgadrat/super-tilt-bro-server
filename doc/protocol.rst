@@ -4,9 +4,9 @@ Super Tilt Network Protocol
 Introduction
 ------------
 
-The Super Tilt Network Protocol (STNP) is a network protocol aimed to enable plays of Super Tilt Bro over the internet. Its goals are to be low overhead, to cope with limited resources of the NES, low latency and allow local machines to predict the game state, to keep it playable even with more than 16 milliseconds of ping.
+The Super Tilt Network Protocol (STNP) is a network protocol aimed to enable plays of Super Tilt Bro. over the internet. Its goals are to be low overhead, to cope with limited resources of the NES, low latency and allow local machines to predict the game state, to keep it playable even with more than 16 milliseconds of ping.
 
-STNP considere three peers. Two clients, which are NES machines running Super Tilt Bro, and a server, which is a computer in the network running the serving software. The server keeps the reference state of the game. The two clients connect to the server, send their input, receive the game state and display it. In order to obtain a smooth experience, clients should be able to predict game states and replay recent inputs on received reference game states.
+STNP considere three peers. Two clients, which are NES machines running Super Tilt Bro., and a server, which is a computer in the network running the serving software. The server keeps the reference state of the game. The two clients connect to the server, send their input, receive the game state and display it. In order to obtain a smooth experience, clients should be able to predict game states and replay recent inputs on received reference game states.
 
 All communications are made of independent messages. Transport mechanisms must allow to separate individual messages, some messages may be lost during transport or be received out of order. While transport of messages is out of scope, this documentation considers that each message is sent over UDP in its own datagram.
 

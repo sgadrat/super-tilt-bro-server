@@ -187,7 +187,12 @@ void InitializationHandler::run() {
 
 			// Special handling for Ping requests
 			//FIXME whould be better in a "Global messages" component, but for now InitializationHandler receives all non-connected messages
-			if (in_message != nullptr && in_message->data.size() > 0 && in_message->data[0] == static_cast<uint8_t>(stnp::message::ClientMessageType::Ping)) {
+			if (
+				in_message != nullptr &&
+				in_message->data.size() > 0 &&
+				in_message->data[0] == static_cast<uint8_t>(stnp::message::ClientMessageType::Ping)
+			)
+			{
 				// Parse message
 				stnp::message::Ping ping_request;
 				stnp::message::MessageDeserializer deserializer(in_message->data);
@@ -198,6 +203,30 @@ void InitializationHandler::run() {
 				ping_response.client_data = std::move(ping_request.free_data);
 				stnp::message::MessageSerializer serializer;
 				ping_response.serial(serializer);
+
+				std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
+				out_message->destination = in_message->sender;
+				out_message->data = serializer.serialized();
+				this->out_messages->push(out_message);
+
+				// Avoid further processing of this message
+				in_message = nullptr;
+			}
+
+			// Special handling for ControllerState messages
+			//FIXME whould be better in a "Global messages" component, but for now InitializationHandler receives all non-connected messages
+			if (
+				in_message != nullptr &&
+				in_message->data.size() > 0 &&
+				in_message->data[0] == static_cast<uint8_t>(stnp::message::ClientMessageType::ControllerState)
+			)
+			{
+				// Client may have missed GameOver message, send them another one
+				//TODO Keep last games results in a cache to not have to guess winner
+				stnp::message::GameOver gameover_msg;
+				gameover_msg.winner_player_number = 0;
+				stnp::message::MessageSerializer serializer;
+				gameover_msg.serial(serializer);
 
 				std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
 				out_message->destination = in_message->sender;

@@ -184,6 +184,15 @@ std::vector<uint8_t> serialize_new_game_state_msg(
 	new_gamestate_msg.serial(serializer, stnp::LAST_VERSION);
 	return serializer.serialized();
 }
+
+std::vector<uint8_t> serialize_gameover_msg(uint8_t winner_player_number) {
+	stnp::message::GameOver gameover_msg{
+		.winner_player_number = winner_player_number
+	};
+	stnp::message::MessageSerializer serializer;
+	gameover_msg.serial(serializer);
+	return serializer.serialized();
+}
 }
 
 void GameInstance::run(
@@ -445,8 +454,25 @@ void GameInstance::run(
 			}
 		}
 
-		// Send game's result
+		// Send GameOver message to clients
 		syslog(LOG_INFO, "GameInstance: game over");
+		std::vector<uint8_t> gameover_data = serialize_gameover_msg(gamestate_history.rbegin()->second.winner());
+		for (size_t client_index = 0; client_index < clients.size(); ++client_index) {
+			boost::asio::ip::udp::endpoint const& client_endpoint = clients.at(client_index);
+			std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
+			out_message->destination = client_endpoint;
+			out_message->data = gameover_data;
+			out_messages->push(out_message);
+			srv_dbg(
+				LOG_DEBUG, "%lu send %s to %s:%d",
+				wall_clock_milli(),
+				"gameover",
+				client_endpoint.address().to_string().c_str(),
+				client_endpoint.port()
+			);
+		}
+
+		// Send game's result to game info
 		if (game_info_queue) {
 			game_info->game_end = std::chrono::system_clock::now();
 			game_info->winner = gamestate_history.rbegin()->second.winner();
