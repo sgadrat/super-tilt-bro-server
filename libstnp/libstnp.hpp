@@ -10,7 +10,7 @@
 
 namespace stnp {
 
-constexpr uint8_t LAST_VERSION = 6;
+constexpr uint8_t LAST_VERSION = 7;
 
 namespace message {
 
@@ -178,7 +178,6 @@ private:
 struct Connection {
 	uint32_t client_id;
 	bool ranked_play;
-	uint8_t protocol_version2;
 	uint8_t protocol_version;
 	uint8_t flags_and_major_version;
 	uint8_t minor_version;
@@ -246,8 +245,11 @@ struct Connection {
 	void serial(SerializationHandler& s) {
 		s.type(ClientMessageType::Connection);
 		s.uint32(this->client_id);
-		s.uint8(this->protocol_version2); //NOTE: at version 7, this one will become the main version field, the following one will disapear.
 		s.uint8(this->protocol_version);
+		if (this->protocol_version == 6) {
+			uint8_t protocol_version_mirror = 6;
+			s.uint8(protocol_version_mirror);
+		}
 
 		// Note, we don't parse other fields for version 5 and lower. Server must reject clients using those version without using other field.
 		if (this->protocol_version >= 6) {
@@ -292,6 +294,7 @@ struct StartGame {
 	uint8_t player_b_palette;
 	std::array<uint8_t, 3> player_a_ping;
 	std::array<uint8_t, 3> player_b_ping;
+	uint8_t framerates = 0;
 
 	uint8_t player_a_connection_quality() const {
 		return this->connections_quality >> 4;
@@ -306,7 +309,7 @@ struct StartGame {
 	}
 
 	uint8_t player_b_connection_quality() const {
-		return this->connections_quality | 0b0000'0011;
+		return this->connections_quality & 0b0000'0011;
 	}
 
 	void player_b_connection_quality(uint8_t quality) {
@@ -315,6 +318,30 @@ struct StartGame {
 			(this->connections_quality & 0b1111'1100) +
 			quality
 		;
+	}
+
+	bool player_a_is_ntsc() const {
+		return this->framerates & 0b1000'0000;
+	}
+
+	void player_a_is_ntsc(bool ntsc = true) {
+		this->framerates = (this->framerates & 0b0111'1111) | (ntsc ? 0b1000'0000 : 0b0000'0000);
+	}
+
+	bool player_b_is_ntsc() const {
+		return this->framerates & 0b0100'0000;
+	}
+
+	void player_b_is_ntsc(bool ntsc = true) {
+		this->framerates = (this->framerates & 0b1011'1111) | (ntsc ? 0b0100'0000 : 0b0000'0000);
+	}
+
+	bool game_is_ntsc() const {
+		return this->framerates & 0b0010'0000;
+	}
+
+	void game_is_ntsc(bool ntsc = true) {
+		this->framerates = (this->framerates & 0b1101'1111) | (ntsc ? 0b0010'0000 : 0b0000'0000);
 	}
 
 	template <typename SerializationHandler>
@@ -339,6 +366,9 @@ struct StartGame {
 			for (size_t i = 0; i < this->player_a_ping.size(); ++i) {
 				s.uint8(this->player_b_ping[i]);
 			}
+		}
+		if (protocol_version >= 7) {
+			s.uint8(this->framerates);
 		}
 	}
 };

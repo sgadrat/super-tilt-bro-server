@@ -27,7 +27,6 @@ At any time during the initialization phase, the server may send a Disconnected 
 		uint8  message_type = 0;
 		uint32 client_id;
 		uint8 protocol_version;
-		uint8 protocol_version_mirror;
 		uint8[3] ping;
 		uint1 framerate;
 		uint2 support;
@@ -43,8 +42,7 @@ At any time during the initialization phase, the server may send a Disconnected 
 
 * **client_id**: Identifier unique to this client.
 * **ranked_play**: 0: non-ranked, 1: ranked
-* **protocol_version**: Expected version of this protocol. This document describes version 6.
-* **protocol_version_mirror**: Placeolder for retro-compatibility with version 5 and below. Later revisions will remove this field.
+* **protocol_version**: Expected version of this protocol. This document describes version 7.
 * **ping**: Measures of ICMP echo request from client to server, each measure on one byte. Timescale is four milliseconds per tick (ping_max=3 means 12ms of ping.)
 * **framerate**: 0: 50Hz, 1: 60Hz.
 * **support**: 0: physical cartridge, 1: native emulator, 2: web emulator, 3: unknown/other
@@ -57,7 +55,7 @@ At any time during the initialization phase, the server may send a Disconnected 
 * **password**: only players with the same password can be matched together. If absent, should be infered to be zero-filled
 
 .. note::
-	Bytes 8 and 9 may be refered as flags and version.
+	Bytes 9 and 10 may be refered as flags and version.
 
 	A client with version "2.alpha-3" running in a PAL emulator would be noted as
 
@@ -105,6 +103,10 @@ Upon reception of this message, the client should display the message and stop s
 		uint8 player_b_palette;
 		uint8[3] player_a_ping;
 		uint8[3] player_b_ping;
+		uint1 player_a_framerate;
+		uint1 player_b_framerate;
+		uint1 game_framerate;
+		uint5 reserved = 0;
 	}
 
 * **stage**: Stage on which the game will be played. 0 for Flatland, 1 for The Pit, 2 for Skyride or 3 for The Hunt.
@@ -118,6 +120,9 @@ Upon reception of this message, the client should display the message and stop s
 * **player_b_palette**: Color variant of the character played by player two.
 * **player_a_ping**: Ping values for player one. Timescale is four milliseconds per tick.
 * **player_b_ping**: Ping values for player two. Timescale is four milliseconds per tick.
+* **player_a_framerate**: Native framerate for player A. 0: 50Hz, 1: 60Hz.
+* **player_b_framerate**: Native framerate for player B. 0: 50Hz, 1: 60Hz.
+* **game_framerate**: Framerate at which the game will be played. 0: 50Hz, 1: 60Hz.
 
 Uppon reception of this message, clients should start a game on the selected stage. The game should start within a fixed timeframe shared by both clients (eg. the game starts 120 frames after message's reception).
 

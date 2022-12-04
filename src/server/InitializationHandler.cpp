@@ -435,12 +435,13 @@ void InitializationHandler::run() {
 						);
 
 						// Prepare game instance
+						bool const game_is_ntsc = matched_clients.at(0)->is_ntsc && matched_clients.at(1)->is_ntsc;
 						GameInstance::GameSettings game_settings = {
 							.characters = {matched_clients.at(0)->selected_character, matched_clients.at(1)->selected_character},
 							.character_palettes = {matched_clients.at(0)->selected_palette, matched_clients.at(1)->selected_palette},
 							.ranked = {matched_clients.at(0)->ranked, matched_clients.at(1)->ranked},
 							.stage_id = matched_clients.at(client_with_stage_selection)->selected_stage,
-							.video_system = uint8_t((matched_clients.at(0)->is_ntsc ? 1 : 0)),
+							.video_system = uint8_t(game_is_ntsc ? 1 : 0),
 						};
 						client_with_stage_selection = (client_with_stage_selection + 1) % 2;
 						std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> game_in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
@@ -474,6 +475,9 @@ void InitializationHandler::run() {
 							start_signal.player_b_palette = matched_clients.at(1)->selected_palette;
 							start_signal.player_a_ping = matched_clients.at(0)->ping;
 							start_signal.player_b_ping = matched_clients.at(1)->ping;
+							start_signal.player_a_is_ntsc(matched_clients.at(0)->is_ntsc);
+							start_signal.player_b_is_ntsc(matched_clients.at(1)->is_ntsc);
+							start_signal.game_is_ntsc(game_is_ntsc);
 							serializer.clear();
 							start_signal.serial(serializer, STNP_VERSION);
 
