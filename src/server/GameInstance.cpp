@@ -186,6 +186,7 @@ std::vector<uint8_t> serialize_new_game_state_msg(
 }
 
 std::vector<uint8_t> serialize_gameover_msg(uint8_t winner_player_number) {
+	assert(winner_player_number < 2);
 	stnp::message::GameOver gameover_msg{
 		.winner_player_number = winner_player_number
 	};
@@ -456,7 +457,7 @@ void GameInstance::run(
 
 		// Send GameOver message to clients
 		syslog(LOG_INFO, "GameInstance: game over");
-		std::vector<uint8_t> gameover_data = serialize_gameover_msg(gamestate_history.rbegin()->second.winner());
+		std::vector<uint8_t> gameover_data = serialize_gameover_msg(gamestate_history.rbegin()->second.winner() % 2);
 		for (size_t client_index = 0; client_index < clients.size(); ++client_index) {
 			boost::asio::ip::udp::endpoint const& client_endpoint = clients.at(client_index);
 			std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
@@ -475,7 +476,7 @@ void GameInstance::run(
 		// Send game's result to game info
 		if (game_info_queue) {
 			game_info->game_end = std::chrono::system_clock::now();
-			game_info->winner = gamestate_history.rbegin()->second.winner();
+			game_info->winner = gamestate_history.rbegin()->second.winner() % 2;
 			game_info->controller_a_history = controller_a_history_ptr;
 			game_info->controller_b_history = controller_b_history_ptr;
 			//HACK
