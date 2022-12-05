@@ -390,8 +390,7 @@ void InitializationHandler::run() {
 							for (std::array<std::list<ClientData>::iterator, 2>& match: match_list) {
 								if (
 									match[1] == clients.end() &&
-									match[0]->password == client->password &&
-									match[0]->is_ntsc == client->is_ntsc
+									match[0]->password == client->password
 								) {
 									match[1] = client;
 									matched = true;
@@ -416,10 +415,13 @@ void InitializationHandler::run() {
 					}();
 
 					for (std::array<std::list<ClientData>::iterator, 2> const& matched_clients: match_list) {
+						// Deduce game's framerate
+						bool const game_is_ntsc = matched_clients.at(0)->is_ntsc && matched_clients.at(1)->is_ntsc;
+
 						// Compute antilag prediction
 						//   total_ping / 2 = transmission time from one client to another
 						auto ttime = [&](size_t client_a, size_t client_b) -> uint32_t {
-							uint_fast8_t const frame_duration = (matched_clients.at(client_a)->is_ntsc ? 4 : 5);
+							uint_fast8_t const frame_duration = (game_is_ntsc ? 4 : 5);
 							return ((matched_clients.at(client_a)->ping_min() + matched_clients.at(client_b)->ping_min()) / 2) / frame_duration;
 						};
 						std::array<std::array<uint32_t, 2>, 2> const transit_time = {{
@@ -435,7 +437,6 @@ void InitializationHandler::run() {
 						);
 
 						// Prepare game instance
-						bool const game_is_ntsc = matched_clients.at(0)->is_ntsc && matched_clients.at(1)->is_ntsc;
 						GameInstance::GameSettings game_settings = {
 							.characters = {matched_clients.at(0)->selected_character, matched_clients.at(1)->selected_character},
 							.character_palettes = {matched_clients.at(0)->selected_palette, matched_clients.at(1)->selected_palette},
