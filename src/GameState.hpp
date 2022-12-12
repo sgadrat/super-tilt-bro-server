@@ -111,6 +111,10 @@ void GameState::serial(SerializationHandler& s) {
 
 	// Copy special state
 	s.uint8(this->emulator_ram[screen_shake_counter]);
+	s.uint8(this->emulator_ram[screen_shake_current_x]);
+	s.uint8(this->emulator_ram[screen_shake_current_y]);
+	s.uint8(this->emulator_ram[screen_shake_noise_h]);
+	s.uint8(this->emulator_ram[screen_shake_noise_v]);
 	s.uint8(this->emulator_ram[deathplosion_step]);
 	s.uint8(this->emulator_ram[deathplosion_pos]);
 	s.uint8(this->emulator_ram[deathplosion_origin]);
