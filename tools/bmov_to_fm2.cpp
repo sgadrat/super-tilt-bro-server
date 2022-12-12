@@ -135,6 +135,10 @@ std::vector<uint8_t> generate_savestate(
 	uint8_t const Z_FLAG = 0x02;
 	uint8_t const C_FLAG = 0x01;
 
+	//uint8_t const STAGE_PLATEAU = 0;
+	//uint8_t const STAGE_PIT = 1;
+	//uint8_t const STAGE_SHELF = 2;
+	uint8_t const STAGE_GEM = 3;
 	std::array<std::string, 4> char_names = {"sinbad", "kiki", "pepper", "vgsage"};
 	std::array<std::string, 4> stage_names = {"plateau", "pit", "shelf", "gem"};
 	std::array<std::string, 4> stage_tilesets = {"ruins", "jungle", "ruins", "magma"};
@@ -197,10 +201,13 @@ std::vector<uint8_t> generate_savestate(
 		std::vector<uint8_t>& palette_data = (char_num == 0 ? character_1_palette_data : character_2_palette_data);
 		size_t const palette_num = (char_num == 0 ? character_1_palette : character_2_palette);
 		size_t const palette_data_index = 3 * palette_num;
-		if (char_num == 0 || character_1 != character_2 || character_2_palette != character_1_palette) {
-			std::copy(palette_data.begin() + palette_data_index, palette_data.begin() + palette_data_index + 3, players_palettes_cursor);
-		}else {
-			// If both players have the same character with same colors, lighten player B's colors
+		bool const lightened =
+			// Both characters have the same colors, lighten player B
+			(character_1 == character_2 && character_1_palette == character_2_palette && char_num == 1) ||
+			// Both sharacters are distinct, but we are on stage gem, lighten both players
+			((character_1 != character_2 || character_1_palette != character_2_palette) && stage == STAGE_GEM)
+		;
+		if (lightened) {
 			for (size_t i = 0; i < 3; ++i) {
 				uint8_t color = *(palette_data.begin() + palette_data_index + i);
 				if (color == 0x0f) {
@@ -210,6 +217,8 @@ std::vector<uint8_t> generate_savestate(
 				}
 				*(players_palettes_cursor + i) = color;
 			}
+		}else {
+			std::copy(palette_data.begin() + palette_data_index, palette_data.begin() + palette_data_index + 3, players_palettes_cursor);
 		}
 		players_palettes_cursor += 3;
 		*players_palettes_cursor = 0;
