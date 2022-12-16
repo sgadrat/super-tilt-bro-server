@@ -213,8 +213,8 @@ uint16_t const stage_fade_level = 0x6e;
 uint16_t const stage_screen_effect = 0x6f; // 0 - The screen is clean from effects, any other - There are effects at play (inc when starting an effect, dec on end)
 
 uint16_t const screen_shake_counter = 0x70;
-uint16_t const screen_shake_nextval_x = 0x71;
-uint16_t const screen_shake_nextval_y = 0x72;
+uint16_t const screen_shake_current_x = 0x71;
+uint16_t const screen_shake_current_y = 0x72;
 
 uint16_t const directional_indicator_player_a_counter = 0x73;
 uint16_t const directional_indicator_player_b_counter = 0x74;
@@ -232,11 +232,17 @@ uint16_t const death_particles_player_b_counter = 0x7e;
 
 uint16_t const slow_down_counter = 0x7f;
 
+uint16_t const stage_state_begin = 0x80; // $80 to $8f
+
 // particles lo position tables
 //  | byte 0 | bytes 1 to 7       | byte 8 | bytes 9 to 15      |
 //  | unused | player A particles | unused | player B particles |
 uint16_t const directional_indicator_player_a_position_x_low = 0x90; // $90 to $9f - unused $90 and $98
 uint16_t const directional_indicator_player_a_position_y_low = 0xa0; // $a0 to $af - unused $a0 and $a8
+
+//$b0 to $bf used by network engine
+//$c0 to $c9 used by audio engine
+//$d0 to $ff used by global labels, constants and registers ($e5 and $e6 are still free)
 
 // Stages common variables
 uint16_t const stage_restore_screen_step = 0x0560; // Set to zero to start asynchrone restoration of the screen by stage's logic
@@ -247,7 +253,17 @@ uint16_t const deathplosion_step = 0x0562;
 uint16_t const deathplosion_pos = 0x0563;
 uint16_t const deathplosion_origin = 0x0564;
 
-//$0565-$057f unused
+// Temporary velocity
+uint16_t const player_a_temporary_velocity_h_low = 0x0565;
+uint16_t const player_b_temporary_velocity_h_low = 0x0566;
+uint16_t const player_a_temporary_velocity_h = 0x0567;
+uint16_t const player_b_temporary_velocity_h = 0x0568;
+uint16_t const player_a_temporary_velocity_v_low = 0x0569;
+uint16_t const player_b_temporary_velocity_v_low = 0x056a;
+uint16_t const player_a_temporary_velocity_v = 0x056b;
+uint16_t const player_b_temporary_velocity_v = 0x056c;
+
+//$056d-$057f unused
 
 uint16_t const players_palettes = 0x0580; // $0580 to $059f - 4 nametable buffers (8 bytes each) containing avatars palettes in normal and alternate mode
 uint16_t const player_a_animation = 0x05a0; // $05a0 to $05ac - player a's animation state
@@ -267,23 +283,24 @@ uint16_t const game_winner = 0x05db; // Set to winner's player number after the 
 
 uint16_t const game_mode_state_begin = 0x05dc;
 
-uint16_t const arcade_mode_stage_type = 0x05dc;
+uint16_t const local_mode_paused = game_mode_state_begin; // $05dc
+uint16_t const local_mode_state_end = local_mode_paused+1;
 
-uint16_t const arcade_mode_targets_x = 0x05dd; // $05dd to $05e6
-uint16_t const arcade_mode_targets_y = 0x05e7; // $05e7 to $05f0
-uint16_t const arcade_mode_target_break_animation = 0x05f1; // $05f1 to $05fd
-uint16_t const arcade_mode_target_break_animation_timer = 0x05fe;
+uint16_t const arcade_mode_stage_type = 0x05dd;
 
-uint16_t const arcade_mode_run_teleport_animation = 0x05f1; // $05f1 to $05fd
-uint16_t const arcade_mode_run_teleport_timer = 0x05fe;
+uint16_t const arcade_mode_targets_x = 0x05de; // $05de to $05e7
+uint16_t const arcade_mode_targets_y = 0x05e8; // $05e8 to $05f1
+uint16_t const arcade_mode_target_break_animation = 0x05f2; // $05f2 to $05fe
+uint16_t const arcade_mode_target_break_animation_timer = 0x05ff;
+
+uint16_t const arcade_mode_run_teleport_animation = 0x05f2; // $05f2 to $05fe
+uint16_t const arcade_mode_run_teleport_timer = 0x05ff;
 
 uint16_t const game_mode_state_end = 0x05ff; // Inclusive (game mode can safely write here)
 
 //
 // Stage specific labels
 //
-
-uint16_t const stage_state_begin = 0x80;
 
 uint16_t const stage_pit_platform1_direction_v = 0x80;
 uint16_t const stage_pit_platform2_direction_v = 0x81;
@@ -463,6 +480,7 @@ uint16_t const netplay_launch_rival_ping_values = netplay_launch_rival_ping_coun
 uint16_t const netplay_launch_rival_ping_quality = netplay_launch_rival_ping_values+3; // $55
 uint16_t const netplay_launch_countdown = netplay_launch_rival_ping_quality+1; // $56
 uint16_t const netplay_launch_original_music_state = netplay_launch_countdown+1; // $57
+uint16_t const netplay_launch_rival_system = netplay_launch_original_music_state+1; // $58
 
 uint16_t const netplay_launch_bg_mem_buffer = 0x0580; // $0580 to $???? (current biggest usage, 3+16 bytes, map illustration draw)
 
@@ -488,6 +506,13 @@ uint16_t const cutscene_autoscroll_h = 0x05d8;
 uint16_t const cutscene_autoscroll_v = 0x05d9;
 uint16_t const cutscene_frame_count = 0x05da;
 uint16_t const cutscene_frames_skippable = 0x05db;
+
+//
+// JUKEBOX labels
+//
+
+uint16_t const jukebox_zp_mem = last_c_label+1; // $39
+uint16_t const jukebox_mem = 0x0580;
 
 //
 // DONATION labels
@@ -666,6 +691,7 @@ uint16_t const nt_buffer_timer = 0xe4;
 // Zero-page constants
 //
 
+uint16_t const pal_emulation_counter = 0xe7; // $ff - disabled, set to 5 to enable
 uint16_t const system_index = 0xe8; // 0 - PAL, 1 - NTSC
 
 //
@@ -725,11 +751,11 @@ uint16_t const config_requested_player_b_character = 0x0543;
 uint16_t const config_requested_player_a_palette = 0x0544;
 uint16_t const config_requested_player_b_palette = 0x0545;
 uint16_t const config_ingame_track = 0x0546;
-uint16_t const config_ticks_per_frame = 0x0547;
+//unused $0547
 uint16_t const config_player_a_present = 0x0548; // 0 - player is absent, and should not impact the screen, 1 - player is there as usual
 uint16_t const config_player_b_present = 0x0549; // 0 - player is absent, and should not impact the screen, 1 - player is there as usual
 
-uint16_t const current_frame_tick = 0x054a;
+//unused $054a
 
 uint16_t const arcade_mode_current_encounter = 0x054b;
 uint16_t const arcade_mode_player_damages = 0x054c;
@@ -744,6 +770,11 @@ uint16_t const menu_state_mode_selection_current_option = 0x0552;
 // Nine-gine variables
 uint16_t const nt_buffers_begin = 0x0553;
 uint16_t const nt_buffers_end = 0x0554;
+
+uint16_t const screen_shake_noise_h = 0x0555;
+uint16_t const screen_shake_noise_v = 0x0556;
+uint16_t const screen_shake_speed_h = 0x0557;
+uint16_t const screen_shake_speed_v = 0x0558;
 
 //$0560 to $05ff may be used by game states
 
