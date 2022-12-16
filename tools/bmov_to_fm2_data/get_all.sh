@@ -10,7 +10,7 @@ if [ ! -d "$tilt_dir" ]; then
 fi
 
 # Stages "screen" file (palettes + zipped nametable)
-for stage in plateau pit shelf gem; do
+for stage in plateau pit shelf gem theplank; do
 	./get_stage_nt.sh "$tilt_dir" "$stage"
 done
 

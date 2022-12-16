@@ -139,10 +139,12 @@ std::vector<uint8_t> generate_savestate(
 	//uint8_t const STAGE_PIT = 1;
 	//uint8_t const STAGE_SHELF = 2;
 	uint8_t const STAGE_GEM = 3;
+	//uint8_t const STAGE_PLANK = 4;
+	//TODO extract those data from game's files
 	std::array<std::string, 4> char_names = {"sinbad", "kiki", "pepper", "vgsage"};
-	std::array<std::string, 4> stage_names = {"plateau", "pit", "shelf", "gem"};
-	std::array<std::string, 4> stage_tilesets = {"ruins", "jungle", "ruins", "magma"};
-	std::array<std::string, 4> stage_sprite_tilesets = {"", "pit_ts_sprites", "", "gem_ts_sprites"};
+	std::array<std::string, 5> stage_names = {"plateau", "pit", "shelf", "gem", "theplank"};
+	std::array<std::string, 5> stage_tilesets = {"ruins", "jungle", "ruins", "magma", "jungle"};
+	std::array<std::string, 5> stage_sprite_tilesets = {"", "pit_ts_sprites", "", "gem_ts_sprites", ""};
 
 	// Misc
 	uint32_t const version = 22020; ///< Version of the savestate format

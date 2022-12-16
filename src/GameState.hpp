@@ -299,6 +299,10 @@ void GameState::serial(SerializationHandler& s) {
 			break;
 		}
 
+		// The Plank
+		case 4:
+			break;
+
 		default:
 			throw std::runtime_error("tried to serialize unknown stage");
 	}
