@@ -286,6 +286,7 @@ uint16_t const game_mode_state_begin = 0x05dc;
 uint16_t const local_mode_paused = game_mode_state_begin; // $05dc
 uint16_t const local_mode_state_end = local_mode_paused+1;
 
+// Arcade mode stuff not expected to be preseved by the encounter
 uint16_t const arcade_mode_stage_type = 0x05dd;
 
 uint16_t const arcade_mode_targets_x = 0x05de; // $05de to $05e7
@@ -301,6 +302,8 @@ uint16_t const game_mode_state_end = 0x05ff; // Inclusive (game mode can safely 
 //
 // Stage specific labels
 //
+
+uint16_t const stages_magma_frame_cnt = 0x8f;
 
 uint16_t const stage_pit_platform1_direction_v = 0x80;
 uint16_t const stage_pit_platform2_direction_v = 0x81;
@@ -320,7 +323,7 @@ uint16_t const stage_thehunt_gem_cooldown_high = 0x89;
 uint16_t const stage_thehunt_gem_state = 0x8a; // one of STAGE_GEM_GEM_STATE_*
 uint16_t const stage_thehunt_buffed_player = 0x8b;
 uint16_t const stage_thehunt_last_opponent_state = 0x8c;
-uint16_t const stage_thehunt_frame_cnt = 0x8d;
+uint16_t const stage_thehunt_frame_cnt = stages_magma_frame_cnt;
 
 //Note - $90 to $af are used by DI particles
 
@@ -490,7 +493,13 @@ uint16_t const netplay_launch_bg_mem_buffer = 0x0580; // $0580 to $???? (current
 
 uint16_t const arcade_mode_last_game_winner = last_c_label+1; // $39
 
-uint16_t const arcade_mode_bg_mem_buffer = 0x0580; // $0580 to $05a3 (max text size 32 + nt buffer header)
+uint16_t const arcade_mode_bg_mem_buffer = 0x0580; // $0580 to $05a3 (max text size 32 + nt buffer header) //TODO rename to "arcade_mode_mem_buffer", it got more uses than just nt buffers
+uint16_t const arcade_mode_encounter = 0x05a4; // $05a4 to $05ac (ENCOUNTER_ENTRY_SIZE)
+
+uint16_t const arcade_mode_congratz_medals_x_subpixel = 0x05a4; // $05a4 to $05b3 (room for 16 medals)
+uint16_t const arcade_mode_congratz_medals_y_subpixel = 0x05b4; // $05b4 to $05c3 (room for 16 medals)
+uint16_t const arcade_mode_congratz_medals_h_velocity = 0x05c4; // $05c4 to $05d3
+uint16_t const arcade_mode_congratz_medals_v_velocity = 0x05d4; // $05d4 to $05e3
 
 uint16_t const cutscene_anims = 0x0580; // $0580 to $05b3 - 4 animation states
 uint16_t const cutscene_anims_enabled = 0x05b4; // $05b4 to $05b7 - 4 bytes
@@ -506,6 +515,9 @@ uint16_t const cutscene_autoscroll_h = 0x05d8;
 uint16_t const cutscene_autoscroll_v = 0x05d9;
 uint16_t const cutscene_frame_count = 0x05da;
 uint16_t const cutscene_frames_skippable = 0x05db;
+uint16_t const cutscene_sprite0_hit = 0x05dc;
+uint16_t const cutscene_sprite0_scroll = 0x05dd;
+uint16_t const cutscene_flags = 0x05de; // Freely usable by cutscene script, opcodes won't overwrite it
 
 //
 // JUKEBOX labels
@@ -751,30 +763,34 @@ uint16_t const config_requested_player_b_character = 0x0543;
 uint16_t const config_requested_player_a_palette = 0x0544;
 uint16_t const config_requested_player_b_palette = 0x0545;
 uint16_t const config_ingame_track = 0x0546;
-//unused $0547
-uint16_t const config_player_a_present = 0x0548; // 0 - player is absent, and should not impact the screen, 1 - player is there as usual
-uint16_t const config_player_b_present = 0x0549; // 0 - player is absent, and should not impact the screen, 1 - player is there as usual
+uint16_t const config_player_a_present = 0x0547; // 0 - player is absent, and should not impact the screen, 1 - player is there as usual
+uint16_t const config_player_b_present = 0x0548; // 0 - player is absent, and should not impact the screen, 1 - player is there as usual
 
-//unused $054a
+//unused $0549-$054c
 
-uint16_t const arcade_mode_current_encounter = 0x054b;
-uint16_t const arcade_mode_player_damages = 0x054c;
-uint16_t const arcade_mode_counter_frames = 0x054d;
-uint16_t const arcade_mode_counter_seconds = 0x054e;
-uint16_t const arcade_mode_counter_minutes = 0x054f;
-uint16_t const arcade_mode_nb_credits_used = 0x0550;
+// Arcade mode stuff expected to be preseved by the encounter
+uint16_t const arcade_mode_medals = 0x054d; // $054d to $054f
+uint16_t const arcade_mode_saved_counter_frames = 0x0550;
+uint16_t const arcade_mode_saved_counter_seconds = 0x0551;
+uint16_t const arcade_mode_saved_counter_minutes = 0x0552;
+uint16_t const arcade_mode_current_encounter = 0x0553;
+uint16_t const arcade_mode_player_damages = 0x0554;
+uint16_t const arcade_mode_counter_frames = 0x0555;
+uint16_t const arcade_mode_counter_seconds = 0x0556;
+uint16_t const arcade_mode_counter_minutes = 0x0557;
+uint16_t const arcade_mode_nb_credits_used = 0x0558;
 
 // Menu state variable that must persist between screens
-uint16_t const menu_state_mode_selection_current_option = 0x0552;
+uint16_t const menu_state_mode_selection_current_option = 0x0559;
 
 // Nine-gine variables
-uint16_t const nt_buffers_begin = 0x0553;
-uint16_t const nt_buffers_end = 0x0554;
+uint16_t const nt_buffers_begin = 0x055a;
+uint16_t const nt_buffers_end = 0x055b;
 
-uint16_t const screen_shake_noise_h = 0x0555;
-uint16_t const screen_shake_noise_v = 0x0556;
-uint16_t const screen_shake_speed_h = 0x0557;
-uint16_t const screen_shake_speed_v = 0x0558;
+uint16_t const screen_shake_noise_h = 0x055c;
+uint16_t const screen_shake_noise_v = 0x055d;
+uint16_t const screen_shake_speed_h = 0x055e;
+uint16_t const screen_shake_speed_v = 0x055f;
 
 //$0560 to $05ff may be used by game states
 
