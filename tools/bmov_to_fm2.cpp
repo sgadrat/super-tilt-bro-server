@@ -140,11 +140,12 @@ std::vector<uint8_t> generate_savestate(
 	//uint8_t const STAGE_SHELF = 2;
 	uint8_t const STAGE_GEM = 3;
 	//uint8_t const STAGE_PLANK = 4;
+	uint8_t const STAGE_DEEPROCK = 5;
 	//TODO extract those data from game's files
 	std::array<std::string, 4> char_names = {"sinbad", "kiki", "pepper", "vgsage"};
-	std::array<std::string, 5> stage_names = {"plateau", "pit", "shelf", "gem", "theplank"};
-	std::array<std::string, 5> stage_tilesets = {"ruins", "jungle", "ruins", "magma", "jungle"};
-	std::array<std::string, 5> stage_sprite_tilesets = {"", "pit_ts_sprites", "", "gem_ts_sprites", ""};
+	std::array<std::string, 5> stage_names = {"plateau", "pit", "shelf", "gem", "theplank", "deeprock"};
+	std::array<std::string, 5> stage_tilesets = {"ruins", "jungle", "ruins", "magma", "jungle", "magma"};
+	std::array<std::string, 5> stage_sprite_tilesets = {"", "pit_ts_sprites", "", "gem_ts_sprites", "", ""};
 
 	// Misc
 	uint32_t const version = 22020; ///< Version of the savestate format
@@ -207,7 +208,7 @@ std::vector<uint8_t> generate_savestate(
 			// Both characters have the same colors, lighten player B
 			(character_1 == character_2 && character_1_palette == character_2_palette && char_num == 1) ||
 			// Both sharacters are distinct, but we are on stage gem, lighten both players
-			((character_1 != character_2 || character_1_palette != character_2_palette) && stage == STAGE_GEM)
+			((character_1 != character_2 || character_1_palette != character_2_palette) && (stage == STAGE_GEM || stage == STAGE_DEEPROCK))
 		;
 		if (lightened) {
 			for (size_t i = 0; i < 3; ++i) {

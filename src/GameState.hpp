@@ -303,6 +303,10 @@ void GameState::serial(SerializationHandler& s) {
 		case 4:
 			break;
 
+		// Deep Rock
+		case 5:
+			break;
+
 		default:
 			throw std::runtime_error("tried to serialize unknown stage");
 	}
