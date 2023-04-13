@@ -101,7 +101,7 @@ bool GameState::EmulatorRunContext::write(uint16_t addr, uint8_t value) {
 	}
 
 	// Banking register
-	if (addr == RAINBOW_PRG_BANKING_1) {
+	if (addr == RAINBOW_PRG_BANK_8000_MODE_1_LO) {
 		uint8_t* const rom_begin = memory_segments[6] - (0x1f * 0x4000); // segment 6 is fixed bank begining, which is bank 0x1f
 		uint8_t* const bank_begin = rom_begin + value * 0x4000;
 		memory_segments[4] = bank_begin;
