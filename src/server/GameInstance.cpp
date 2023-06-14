@@ -323,6 +323,21 @@ void GameInstance::run(
 					impacted_clients[opponent_index] = true;
 
 					// Update inputs history
+					{
+						microseconds const frame_duration((1'000'000 + frame_rate/2) / frame_rate);
+						uint32_t const last_input_time = std::max(controller_a_history.rbegin()->first, controller_b_history.rbegin()->first);
+						uint32_t n_frames_since_last_input = duration_cast<microseconds>(steady_clock::now() - last_input_clock_time).count() / frame_duration.count();
+						uint32_t const current_time = last_input_time + n_frames_since_last_input;
+						uint32_t const max_delay = 5;
+						if (current_time > max_delay + INPUT_LAG && message.timestamp + INPUT_LAG < current_time - max_delay) {
+							syslog(
+								LOG_WARNING, "GameInstance: warning: replaced late input: sender=%u, message_time=%u, current_time=%u, late_by=%u",
+								uint32_t(sender_index), message.timestamp, current_time, current_time - message.timestamp + INPUT_LAG
+							);
+							message.timestamp = current_time - max_delay - INPUT_LAG;
+							impacted_clients[sender_index] = true;
+						}
+					}
 					GameState::ControllerState controller_state = controller_state_from_message(message);
 					std::map<uint32_t, GameState::ControllerState>& sender_controller_history = (message.client_id == client_a.id ? controller_a_history : controller_b_history);
 					sender_controller_history[message.timestamp + INPUT_LAG] = controller_state;
