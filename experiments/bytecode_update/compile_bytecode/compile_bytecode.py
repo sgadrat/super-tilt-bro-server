@@ -7,6 +7,7 @@ import json
 bytecode_file_path = sys.argv[1]
 entry_points_file_path = sys.argv[2]
 known_opcodes_file_path = sys.argv[3]
+fixed_bank_index = int(sys.argv[4])
 
 # Load files
 with open(entry_points_file_path, 'r') as entry_points_file:
@@ -35,7 +36,7 @@ for entry_point in entry_points:
 
 	pc = entry_point['pc']
 	assert pc >= 0xc000 and pc <= 0xffff
-	bytecode_addr = 0x1f * 0x4000 + (pc - 0xc000)
+	bytecode_addr = fixed_bank_index * 0x4000 + (pc - 0xc000)
 
 	stop = False
 	while not stop:

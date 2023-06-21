@@ -12,6 +12,7 @@ MEM_LABELS_PATH="$tilt_dir/game/mem_labels.asm"
 RAINBOW_LABELS_PATH="$tilt_dir/game/logic/rainbow_lib.asm"
 XA_LISTING_PATH=/tmp/server_bytecode.lst
 KNOWN_OPCODES_PATH="$base/compile_bytecode/known_opcodes.json"
+FIXED_BANK_INDEX="1"
 
 # Ouptput/intermediate files (will be overwriten)
 ENTRY_POINTS_PATH=/tmp/entries.json
@@ -27,4 +28,4 @@ CPP_MEM_LABELS_PATH="$src_dir/GameState.bytecodeinfo.hpp"
 
 # Get pre-filled JIT structure
 "$base/compile_bytecode/extract_entry_points.py" "$XA_LISTING_PATH" > "$ENTRY_POINTS_PATH"
-"$base/compile_bytecode/compile_bytecode.py" "$BYTECODE_PATH" "$ENTRY_POINTS_PATH" "$KNOWN_OPCODES_PATH" > "$CPP_COMPILED_PATH"
+"$base/compile_bytecode/compile_bytecode.py" "$BYTECODE_PATH" "$ENTRY_POINTS_PATH" "$KNOWN_OPCODES_PATH" "$FIXED_BANK_INDEX" > "$CPP_COMPILED_PATH"

@@ -12,6 +12,8 @@ static uint16_t const bytecodeVectorInitLow = mos6502<GameState::EmulatorRunCont
 static uint16_t const bytecodeVectorTickHigh = mos6502<GameState::EmulatorRunContext>::nmiVectorH;
 static uint16_t const bytecodeVectorTickLow = mos6502<GameState::EmulatorRunContext>::nmiVectorL;
 
+static size_t const fixed_bank_index = 0x01;
+
 #ifdef DEBUG_LOG
 
 class DbgGuard {
@@ -102,7 +104,7 @@ bool GameState::EmulatorRunContext::write(uint16_t addr, uint8_t value) {
 
 	// Banking register
 	if (addr == RAINBOW_PRG_BANK_8000_MODE_1_LO) {
-		uint8_t* const rom_begin = memory_segments[6] - (0x1f * 0x4000); // segment 6 is fixed bank begining, which is bank 0x1f
+		uint8_t* const rom_begin = memory_segments[6] - (fixed_bank_index * 0x4000); // segment 6 is fixed bank begining
 		uint8_t* const bank_begin = rom_begin + value * 0x4000;
 		memory_segments[4] = bank_begin;
 		memory_segments[5] = bank_begin + 0x2000;
@@ -140,8 +142,8 @@ GameState::GameState(uint8_t stage, std::array<uint8_t, 2> characters, VideoSyst
 			GameState::emulator_rom.data() + 0x2000,
 
 			// Fixed bank
-			GameState::emulator_rom.data() + 0x1f * 0x4000,
-			GameState::emulator_rom.data() + 0x1f * 0x4000 + 0x2000,
+			GameState::emulator_rom.data() + fixed_bank_index * 0x4000,
+			GameState::emulator_rom.data() + fixed_bank_index * 0x4000 + 0x2000,
 		},
 		.compiled_segments = &GameState::emulator_compiled_segments,
 		.gameover = false
@@ -153,7 +155,7 @@ GameState::GameState(uint8_t stage, std::array<uint8_t, 2> characters, VideoSyst
 	this->emulator_ram[2] = characters[1];
 	this->emulator_ram[3] = static_cast<uint8_t>(system);
 	this->emulator.Reset();
-	this->emulator.pc = (uint16_t(emulator_rom[0x1f * 0x4000 + (bytecodeVectorInitHigh % 0x4000)] << 8) + emulator_rom[0x1f * 0x4000 + (bytecodeVectorInitLow % 0x4000)]); //TODO use actual read implementation
+	this->emulator.pc = (uint16_t(emulator_rom[fixed_bank_index * 0x4000 + (bytecodeVectorInitHigh % 0x4000)] << 8) + emulator_rom[fixed_bank_index * 0x4000 + (bytecodeVectorInitLow % 0x4000)]); //TODO use actual read implementation
 	uint64_t cycles_count = 0;
 	this->emulator.Run(
 		1'000'000, cycles_count,
@@ -184,7 +186,7 @@ bool GameState::tick() {
 	// Emulate tick routine
 	this->emulator.run_context.memory_segments[0] = this->emulator_ram.data(); // Reset this pointer, it may be wrong if current GameState instance is a copy of another one
 	this->emulator.Reset();
-	this->emulator.pc = (uint16_t(emulator_rom[0x1f * 0x4000 + (bytecodeVectorTickHigh % 0x4000)] << 8) + this->emulator_rom[0x1f * 0x4000 + (bytecodeVectorTickLow % 0x4000)]); //TODO use actual read implementation
+	this->emulator.pc = (uint16_t(emulator_rom[fixed_bank_index * 0x4000 + (bytecodeVectorTickHigh % 0x4000)] << 8) + this->emulator_rom[fixed_bank_index * 0x4000 + (bytecodeVectorTickLow % 0x4000)]); //TODO use actual read implementation
 	uint64_t cycles_count = 0;
 	this->emulator.Run(
 		1'000'000, cycles_count,
