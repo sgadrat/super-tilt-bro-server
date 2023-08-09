@@ -5,6 +5,7 @@
 #include <condition_variable>
 #include <deque>
 #include <locale.h>
+#include <stdexcept>
 #include <string.h>
 #include <memory>
 #include <mutex>
