@@ -12,8 +12,6 @@ static uint16_t const bytecodeVectorInitLow = mos6502<GameState::EmulatorRunCont
 static uint16_t const bytecodeVectorTickHigh = mos6502<GameState::EmulatorRunContext>::nmiVectorH;
 static uint16_t const bytecodeVectorTickLow = mos6502<GameState::EmulatorRunContext>::nmiVectorL;
 
-static size_t const fixed_bank_index = 0x01;
-
 #ifdef DEBUG_LOG
 
 class DbgGuard {
