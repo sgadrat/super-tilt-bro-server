@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 //
-// /home/sylvain/workspace/nes/tilt/game/mem_labels.asm
+// /home/sylvain/workspace/nes/tilt/game/c_labels.asm
 //
 
 //
@@ -68,6 +68,15 @@ uint16_t const _sa = 0x36;
 uint16_t const _sx = 0x37;
 uint16_t const _sy = 0x38;
 uint16_t const last_c_label = _sy;
+
+//
+// /home/sylvain/workspace/nes/tilt/game/mem_labels.asm
+//
+
+//
+// C code labels
+//
+
 
 //
 // INGAME labels
@@ -146,8 +155,8 @@ uint16_t const player_a_num_aerial_jumps = 0x42;
 uint16_t const player_b_num_aerial_jumps = 0x43;
 uint16_t const player_a_stocks = 0x44;
 uint16_t const player_b_stocks = 0x45;
-uint16_t const player_a_walljump = 0x46;
-uint16_t const player_b_walljump = 0x47;
+uint16_t const player_a_special_jumps = 0x46; // F... ...W - W = wall jump OK, F = footstool OK
+uint16_t const player_b_special_jumps = 0x47;
 uint16_t const player_a_state_field1 = 0x48;
 uint16_t const player_b_state_field1 = 0x49;
 uint16_t const player_a_state_field2 = 0x4a;
@@ -803,7 +812,7 @@ uint16_t const network_player_local_btns_history = 0x07c0; // one byte per frame
 uint16_t const network_player_remote_btns_history = 0x07e0; //
 
 //
-// /home/sylvain/workspace/nes/tilt/game/logic/rainbow_lib.asm
+// /home/sylvain/workspace/nes/tilt/game/rainbow_lib_declarations.asm
 //
 
 //-------------------------------------------------------------------------------
@@ -818,61 +827,65 @@ uint16_t const TOESP_MSG_DEBUG_LOG = 3  ; // Debug / Log data
 uint16_t const TOESP_MSG_CLEAR_BUFFERS = 4  ; // Clear RX/TX buffers
 uint16_t const TOESP_MSG_FROMESP_MSG_BUFFER_DROP_FROM_ESP = 5  ; // Drop messages from TX (ESP->outside world) buffer
 uint16_t const TOESP_MSG_ESP_GET_FIRMWARE_VERSION = 6  ; // Get Rainbow firmware version
-uint16_t const TOESP_MSG_ESP_RESTART = 7  ; // Restart ESP
+uint16_t const TOESP_MSG_ESP_FACTORY_RESET = 7  ; // Reset ESP to factory settings
+uint16_t const TOESP_MSG_ESP_RESTART = 8  ; // Restart ESP
 
 // WIFI CMDS
-uint16_t const TOESP_MSG_WIFI_GET_STATUS = 8  ; // Get WiFi connection status
-uint16_t const TOESP_MSG_WIFI_GET_SSID = 9  ; // Get WiFi network SSID
-uint16_t const TOESP_MSG_WIFI_GET_IP = 10 ; // Get WiFi IP address
+uint16_t const TOESP_MSG_WIFI_GET_STATUS = 9  ; // Get WiFi connection status
+uint16_t const TOESP_MSG_WIFI_GET_SSID = 10 ; // Get WiFi network SSID
+uint16_t const TOESP_MSG_WIFI_GET_IP = 11 ; // Get WiFi IP address
 
 // AP CMDS
-uint16_t const TOESP_MSG_AP_GET_SSID = 11 ; // Get Access Point network SSID
-uint16_t const TOESP_MSG_AP_GET_IP = 12 ; // Get Access Point IP address
-uint16_t const TOESP_MSG_AP_GET_CONFIG = 13 ; // Get Access Point config
-uint16_t const TOESP_MSG_AP_SET_CONFING = 14 ; // Set Access Point config
+uint16_t const TOESP_MSG_WIFI_GET_CONFIG = 12 ; // Get WiFi / Access Point / Web Server config
+uint16_t const TOESP_MSG_WIFI_SET_CONFIG = 13 ; // Set WiFi / Access Point / Web Server config
+uint16_t const TOESP_MSG_AP_GET_SSID = 14 ; // Get Access Point network SSID
+uint16_t const TOESP_MSG_AP_GET_IP = 15 ; // Get Access Point IP address
 
 // RND CMDS
-uint16_t const TOESP_MSG_RND_GET_BYTE = 15 ; // Get random byte
-uint16_t const TOESP_MSG_RND_GET_BYTE_RANGE = 16 ; // Get random byte between custom min/max
-uint16_t const TOESP_MSG_RND_GET_WORD = 17 ; // Get random word
-uint16_t const TOESP_MSG_RND_GET_WORD_RANGE = 18 ; // Get random word between custom min/max
+uint16_t const TOESP_MSG_RND_GET_BYTE = 16 ; // Get random byte
+uint16_t const TOESP_MSG_RND_GET_BYTE_RANGE = 17 ; // Get random byte between custom min/max
+uint16_t const TOESP_MSG_RND_GET_WORD = 18 ; // Get random word
+uint16_t const TOESP_MSG_RND_GET_WORD_RANGE = 19 ; // Get random word between custom min/max
 
 // SERVER CMDS
-uint16_t const TOESP_MSG_SERVER_GET_STATUS = 19 ; // Get server connection status
-uint16_t const TOESP_MSG_SERVER_PING = 20 ; // Get ping between ESP and server
-uint16_t const TOESP_MSG_SERVER_SET_PROTOCOL = 21 ; // Set protocol to be used to communicate (WS/UDP)
-uint16_t const TOESP_MSG_SERVER_GET_SETTINGS = 22 ; // Get current server host name and port
-uint16_t const TOESP_MSG_SERVER_GET_CONFIG_SETTINGS = 23 ; // Get server host name and port defined in the Rainbow config file
+uint16_t const TOESP_MSG_SERVER_GET_STATUS = 20 ; // Get server connection status
+uint16_t const TOESP_MSG_SERVER_PING = 21 ; // Get ping between ESP and server
+uint16_t const TOESP_MSG_SERVER_SET_PROTOCOL = 22 ; // Set protocol to be used to communicate (WS/UDP)
+uint16_t const TOESP_MSG_SERVER_GET_SETTINGS = 23 ; // Get current server host name and port
 uint16_t const TOESP_MSG_SERVER_SET_SETTINGS = 24 ; // Set current server host name and port
-uint16_t const TOESP_MSG_SERVER_RESTORE_SETTINGS = 25 ; // Restore server host name and port to values defined in the Rainbow config
-uint16_t const TOESP_MSG_SERVER_CONNECT = 26 ; // Connect to server
-uint16_t const TOESP_MSG_SERVER_DISCONNECT = 27 ; // Disconnect from server
-uint16_t const TOESP_MSG_SERVER_SEND_MESSAGE = 28 ; // Send message to server
+uint16_t const TOESP_MSG_SERVER_GET_SAVED_SETTINGS = 25 ; // Get server host name and port defined in the Rainbow config file
+uint16_t const TOESP_MSG_SERVER_SET_SAVED_SETTINGS = 26 ; // Set server host name and port defined in the Rainbow config file
+uint16_t const TOESP_MSG_SERVER_RESTORE_SAVED_SETTINGS = 27 ; // Restore server host name and port to values defined in the Rainbow config
+uint16_t const TOESP_MSG_SERVER_CONNECT = 28 ; // Connect to server
+uint16_t const TOESP_MSG_SERVER_DISCONNECT = 29 ; // Disconnect from server
+uint16_t const TOESP_MSG_SERVER_SEND_MESSAGE = 30 ; // Send message to server
 
 // NETWORK CMDS
-uint16_t const TOESP_MSG_NETWORK_SCAN = 29 ; // Scan networks around and return count
-uint16_t const TOESP_MSG_NETWORK_GET_SCANNED_DETAILS = 30 ; // Get scanned network details
-uint16_t const TOESP_MSG_NETWORK_GET_REGISTERED = 31 ; // Get registered networks status
-uint16_t const TOESP_MSG_NETWORK_GET_REGISTERED_DETAILS = 32 ; // Get registered network SSID
-uint16_t const TOESP_MSG_NETWORK_REGISTER = 33 ; // Register network
-uint16_t const TOESP_MSG_NETWORK_UNREGISTER = 34 ; // Unregister network
+uint16_t const TOESP_MSG_NETWORK_SCAN = 31 ; // Scan networks around and return count
+uint16_t const TOESP_MSG_NETWORK_GET_SCANNED_DETAILS = 32 ; // Get scanned network details
+uint16_t const TOESP_MSG_NETWORK_GET_REGISTERED = 33 ; // Get registered networks status
+uint16_t const TOESP_MSG_NETWORK_GET_REGISTERED_DETAILS = 34 ; // Get registered network SSID
+uint16_t const TOESP_MSG_NETWORK_REGISTER = 35 ; // Register network
+uint16_t const TOESP_MSG_NETWORK_UNREGISTER = 36 ; // Unregister network
+uint16_t const TOESP_MSG_NETWORK_SET_ACTIVE = 37 ; // Set active network
 
 // FILE COMMANDS
-uint16_t const TOESP_MSG_FILE_OPEN = 35 ; // Open working file
-uint16_t const TOESP_MSG_FILE_CLOSE = 36 ; // Close working file
-uint16_t const TOESP_MSG_FILE_STATUS = 37 ; // Get working file status
-uint16_t const TOESP_MSG_FILE_EXISTS = 38 ; // Check if file exists
-uint16_t const TOESP_MSG_FILE_DELETE = 39 ; // Delete a file
-uint16_t const TOESP_MSG_FILE_SET_CUR = 40 ; // Set working file cursor position a file
-uint16_t const TOESP_MSG_FILE_READ = 41 ; // Read working file (at specific position)
-uint16_t const TOESP_MSG_FILE_WRITE = 42 ; // Write working file (at specific position)
-uint16_t const TOESP_MSG_FILE_APPEND = 43 ; // Append data to working file
-uint16_t const TOESP_MSG_FILE_COUNT = 44 ; // Count files in a specific path
-uint16_t const TOESP_MSG_FILE_GET_LIST = 45 ; // Get list of existing files in a path
-uint16_t const TOESP_MSG_FILE_GET_FREE_ID = 46 ; // Get an unexisting file ID in a specific path
-uint16_t const TOESP_MSG_FILE_GET_INFO = 47 ; // Get file info (size + crc32)
-uint16_t const TOESP_MSG_FILE_DOWNLOAD = 48 ; // Download a file from a giving URL to a specific path index / file index
-uint16_t const TOESP_MSG_FILE_FORMAT = 49 ; // Format file system
+uint16_t const TOESP_MSG_FILE_OPEN = 38 ; // Open working file
+uint16_t const TOESP_MSG_FILE_CLOSE = 39 ; // Close working file
+uint16_t const TOESP_MSG_FILE_STATUS = 40 ; // Get working file status
+uint16_t const TOESP_MSG_FILE_EXISTS = 41 ; // Check if file exists
+uint16_t const TOESP_MSG_FILE_DELETE = 42 ; // Delete a file
+uint16_t const TOESP_MSG_FILE_SET_CUR = 43 ; // Set working file cursor position a file
+uint16_t const TOESP_MSG_FILE_READ = 44 ; // Read working file (at specific position)
+uint16_t const TOESP_MSG_FILE_WRITE = 45 ; // Write working file (at specific position)
+uint16_t const TOESP_MSG_FILE_APPEND = 46 ; // Append data to working file
+uint16_t const TOESP_MSG_FILE_COUNT = 47 ; // Count files in a specific path
+uint16_t const TOESP_MSG_FILE_GET_LIST = 48 ; // Get list of existing files in a path
+uint16_t const TOESP_MSG_FILE_GET_FREE_ID = 49 ; // Get an unexisting file ID in a specific path
+uint16_t const TOESP_MSG_FILE_GET_FS_INFO = 50 ; // Get file system details (ESP flash or SD card)
+uint16_t const TOESP_MSG_FILE_GET_INFO = 51 ; // Get file info (size + crc32)
+uint16_t const TOESP_MSG_FILE_DOWNLOAD = 52 ; // Download a file from a giving URL to a specific path index / file index
+uint16_t const TOESP_MSG_FILE_FORMAT = 53 ; // Format file system
 
 //-------------------------------------------------------------------------------
 // Commands from ESP to NES
@@ -882,50 +895,50 @@ uint16_t const TOESP_MSG_FILE_FORMAT = 49 ; // Format file system
 uint16_t const FROMESP_MSG_READY = 0  ; // ESP is ready
 uint16_t const FROMESP_MSG_DEBUG_LEVEL = 1  ; // Returns debug configuration
 uint16_t const FROMESP_MSG_ESP_FIRMWARE_VERSION = 2  ; // Returns the Rainbow firmware version
+uint16_t const FROMESP_MSG_ESP_FACTORY_RESET = 3  ; // Returns ESP reset's return code
 
 // WIFI / AP CMDS
-uint16_t const FROMESP_MSG_WIFI_STATUS = 3  ; // Returns WiFi connection status
-uint16_t const FROMESP_MSG_SSID = 4  ; // WiFi/AccessPoint SSID
-uint16_t const FROMESP_MSG_IP_ADDRESS = 5  ; // WiFi/AccessPoint IP address
-uint16_t const FROMESP_MSG_AP_CONFIG = 6  ; // Returns AP config
+uint16_t const FROMESP_MSG_WIFI_STATUS = 4  ; // Returns WiFi connection status
+uint16_t const FROMESP_MSG_SSID = 5  ; // WiFi/AccessPoint SSID
+uint16_t const FROMESP_MSG_IP_ADDRESS = 6  ; // WiFi/AccessPoint IP address
+uint16_t const FROMESP_MSG_WIFI_CONFIG = 7  ; // Returns WiFi config
 
 // RND CMDS
-uint16_t const FROMESP_MSG_RND_BYTE = 7  ; // Returns random byte value
-uint16_t const FROMESP_MSG_RND_WORD = 8  ; // Returns random word value
+uint16_t const FROMESP_MSG_RND_BYTE = 8  ; // Returns random byte value
+uint16_t const FROMESP_MSG_RND_WORD = 9  ; // Returns random word value
 
 // SERVER CMDS
-uint16_t const FROMESP_MSG_SERVER_STATUS = 9  ; // Returns server connection status
-uint16_t const FROMESP_MSG_SERVER_PING = 10 ; // Returns min, max and average round-trip time and number of lost packets
-uint16_t const FROMESP_MSG_SERVER_SETTINGS = 11 ; // Returns server settings (host name + port)
-uint16_t const FROMESP_MSG_MESSAGE_FROM_SERVER = 12 ; // Message from server
+uint16_t const FROMESP_MSG_SERVER_STATUS = 10 ; // Returns server connection status
+uint16_t const FROMESP_MSG_SERVER_PING = 11 ; // Returns min, max and average round-trip time and number of lost packets
+uint16_t const FROMESP_MSG_SERVER_SETTINGS = 12 ; // Returns server settings (host name + port)
+uint16_t const FROMESP_MSG_MESSAGE_FROM_SERVER = 13 ; // Message from server
 
 // NETWORK CMDS
-uint16_t const FROMESP_MSG_NETWORK_COUNT = 13 ; // Returns number of networks found
-uint16_t const FROMESP_MSG_NETWORK_SCANNED_DETAILS = 14 ; // Returns details for a scanned network
-uint16_t const FROMESP_MSG_NETWORK_REGISTERED_DETAILS = 15 ; // Returns SSID for a registered network
-uint16_t const FROMESP_MSG_NETWORK_REGISTERED = 16 ; // Returns registered networks status
+uint16_t const FROMESP_MSG_NETWORK_COUNT = 14 ; // Returns number of networks found
+uint16_t const FROMESP_MSG_NETWORK_SCANNED_DETAILS = 15 ; // Returns details for a scanned network
+uint16_t const FROMESP_MSG_NETWORK_REGISTERED_DETAILS = 16 ; // Returns SSID for a registered network
+uint16_t const FROMESP_MSG_NETWORK_REGISTERED = 17 ; // Returns registered networks status
 
 // FILE CMDS
-uint16_t const FROMESP_MSG_FILE_STATUS = 17 ; // Returns the working file status
-uint16_t const FROMESP_MSG_FILE_EXISTS = 18 ; // Returns if file exists or not
-uint16_t const FROMESP_MSG_FILE_DELETE = 19 ; // Returns when trying to delete a file
-uint16_t const FROMESP_MSG_FILE_LIST = 20 ; // Returns path file list (FILE_GET_LIST)
-uint16_t const FROMESP_MSG_FILE_DATA = 21 ; // Returns file data (FILE_READ)
-uint16_t const FROMESP_MSG_FILE_COUNT = 22 ; // Returns file count in a specific path
-uint16_t const FROMESP_MSG_FILE_ID = 23 ; // Returns a free file ID (FILE_GET_FREE_ID)
-uint16_t const FROMESP_MSG_FILE_INFO = 24 ; // Returns file info (size + CRC32) (FILE_GET_INFO)
-uint16_t const FROMESP_MSG_FILE_DOWNLOAD = 25 ; // Returns download result code
+uint16_t const FROMESP_MSG_FILE_STATUS = 18 ; // Returns the working file status
+uint16_t const FROMESP_MSG_FILE_EXISTS = 19 ; // Returns if file exists or not
+uint16_t const FROMESP_MSG_FILE_DELETE = 20 ; // Returns when trying to delete a file
+uint16_t const FROMESP_MSG_FILE_LIST = 21 ; // Returns path file list (FILE_GET_LIST)
+uint16_t const FROMESP_MSG_FILE_DATA = 22 ; // Returns file data (FILE_READ)
+uint16_t const FROMESP_MSG_FILE_COUNT = 23 ; // Returns file count in a specific path
+uint16_t const FROMESP_MSG_FILE_ID = 24 ; // Returns a free file ID (FILE_GET_FREE_ID)
+uint16_t const FROMESP_MSG_FILE_FS_INFO = 25 ; // Returns file system info (FILE_GET_FS_INFO)
+uint16_t const FROMESP_MSG_FILE_INFO = 26 ; // Returns file info (size + CRC32) (FILE_GET_INFO)
+uint16_t const FROMESP_MSG_FILE_DOWNLOAD = 27 ; // Returns download result code
 
 //-------------------------------------------------------------------------------
 // Constants to be used in commands
 //-------------------------------------------------------------------------------
 
 // Server protocol
-uint16_t const ESP_PROTOCOL_WEBSOCKET = 0;
-uint16_t const ESP_PROTOCOL_WEBSOCKET_SECURED = 1;
-uint16_t const ESP_PROTOCOL_TCP = 2;
-uint16_t const ESP_PROTOCOL_TCP_SECURED = 3;
-uint16_t const ESP_PROTOCOL_UDP = 4;
+uint16_t const ESP_PROTOCOL_TCP = 0;
+uint16_t const ESP_PROTOCOL_TCP_SECURED = 1;
+uint16_t const ESP_PROTOCOL_UDP = 2;
 
 // Wi-Fi status
 uint16_t const ESP_WIFI_STATUS_IDLE_STATUS = 0;
@@ -934,7 +947,8 @@ uint16_t const ESP_WIFI_STATUS_SCAN_COMPLETED = 2;
 uint16_t const ESP_WIFI_STATUS_CONNECTED = 3;
 uint16_t const ESP_WIFI_STATUS_CONNECT_FAILED = 4;
 uint16_t const ESP_WIFI_STATUS_CONNECTION_LOST = 5;
-uint16_t const ESP_WIFI_STATUS_DISCONNECTED = 6;
+uint16_t const ESP_WIFI_STATUS_WRONG_PASSWORD = 6;
+uint16_t const ESP_WIFI_STATUS_DISCONNECTED = 7;
 
 // Filesystem directories
 uint16_t const ESP_FILE_PATH_SAVE = 0;
@@ -971,52 +985,127 @@ uint16_t const ESP_FILE_DOWNLOAD_NETWORK_ERROR_ENCODING = 247; // Encoding
 uint16_t const ESP_FILE_DOWNLOAD_NETWORK_ERROR_STREAM_WRITE = 246; // Stream write
 uint16_t const ESP_FILE_DOWNLOAD_NETWORK_ERROR_READ_TIMEOUT = 245; // Read timeout
 
+// ESP reset results
+uint16_t const ESP_FACTORY_RESET_SUCCESS = 0;
+uint16_t const ESP_FACTORY_RESET_ERROR_WHILE_RESETTING_CONFIG = 1;
+uint16_t const ESP_FACTORY_RESET_ERROR_WHILE_DELETING_TWEB = 2;
+uint16_t const ESP_FACTORY_RESET_ERROR_WHILE_DELETING_WEB = 3;
+
 //-------------------------------------------------------------------------------
 // Rainbow registers
 //-------------------------------------------------------------------------------
 
-uint16_t const RAINBOW_WIFI_CONF = 0x4100;
-uint16_t const RAINBOW_WIFI_RX = 0x4101;
-uint16_t const RAINBOW_WIFI_TX = 0x4102;
-uint16_t const RAINBOW_WIFI_RX_DEST = 0x4103;
-uint16_t const RAINBOW_WIFI_TX_SOURCE = 0x4104;
+uint16_t const RAINBOW_PRG_BANKING_MODE = 0x4100;
 
-uint16_t const RAINBOW_CONFIGURATION = 0x4110;
-uint16_t const RAINBOW_MAPPER_VERSION = 0x4113;
+uint16_t const RAINBOW_PRG_ROM_BANKING_1_HI = 0x4108;
+uint16_t const RAINBOW_PRG_ROM_BANKING_2_HI = 0x4109;
+uint16_t const RAINBOW_PRG_ROM_BANKING_3_HI = 0x410a;
+uint16_t const RAINBOW_PRG_ROM_BANKING_4_HI = 0x410b;
+uint16_t const RAINBOW_PRG_ROM_BANKING_5_HI = 0x410c;
+uint16_t const RAINBOW_PRG_ROM_BANKING_6_HI = 0x410d;
+uint16_t const RAINBOW_PRG_ROM_BANKING_7_HI = 0x410e;
+uint16_t const RAINBOW_PRG_ROM_BANKING_8_HI = 0x410f;
+uint16_t const RAINBOW_PRG_ROM_BANKING_1_LO = 0x4118;
+uint16_t const RAINBOW_PRG_ROM_BANKING_2_LO = 0x4119;
+uint16_t const RAINBOW_PRG_ROM_BANKING_3_LO = 0x411a;
+uint16_t const RAINBOW_PRG_ROM_BANKING_4_LO = 0x411b;
+uint16_t const RAINBOW_PRG_ROM_BANKING_5_LO = 0x411c;
+uint16_t const RAINBOW_PRG_ROM_BANKING_6_LO = 0x411d;
+uint16_t const RAINBOW_PRG_ROM_BANKING_7_LO = 0x411e;
+uint16_t const RAINBOW_PRG_ROM_BANKING_8_LO = 0x411f;
 
-uint16_t const RAINBOW_PRG_BANKING_1 = 0x4120;
-uint16_t const RAINBOW_PRG_BANKING_2 = 0x4121;
-uint16_t const RAINBOW_PRG_BANKING_3 = 0x4122;
-uint16_t const RAINBOW_FPGA_WRAM_BANKING = 0x4123;
-uint16_t const RAINBOW_WRAM_BANKING = 0x4124;
+uint16_t const RAINBOW_PRG_RAM_BANKING_1_HI = 0x4106;
+uint16_t const RAINBOW_PRG_RAM_BANKING_2_HI = 0x4107;
+uint16_t const RAINBOW_PRG_RAM_BANKING_1_LO = 0x4116;
+uint16_t const RAINBOW_PRG_RAM_BANKING_2_LO = 0x4117;
 
-uint16_t const RAINBOW_CHR_BANKING_1 = 0x4130;
-uint16_t const RAINBOW_CHR_BANKING_2 = 0x4131;
-uint16_t const RAINBOW_CHR_BANKING_3 = 0x4132;
-uint16_t const RAINBOW_CHR_BANKING_4 = 0x4133;
-uint16_t const RAINBOW_CHR_BANKING_5 = 0x4134;
-uint16_t const RAINBOW_CHR_BANKING_6 = 0x4135;
-uint16_t const RAINBOW_CHR_BANKING_7 = 0x4136;
-uint16_t const RAINBOW_CHR_BANKING_8 = 0x4137;
-uint16_t const RAINBOW_CHR_BANKING_UPPER = 0x4138;
+uint16_t const RAINBOW_FPGA_RAM_BANKING = 0x4115;
 
-uint16_t const RAINBOW_IRQ_LATCH = 0x4140;
-uint16_t const RAINBOW_IRQ_RELOAD = 0x4141;
-uint16_t const RAINBOW_IRQ_DISABLE = 0x4142;
-uint16_t const RAINBOW_IRQ_ENABLE = 0x4143;
+uint16_t const RAINBOW_CHR_CONTROL = 0x4120;
 
-uint16_t const RAINBOW_PULSE_CHANNEL_1_CONTROL = 0x4150;
-uint16_t const RAINBOW_PULSE_CHANNEL_1_FREQ_LOW = 0x4151;
-uint16_t const RAINBOW_PULSE_CHANNEL_1_FREQ_HIGH = 0x4152;
-uint16_t const RAINBOW_PULSE_CHANNEL_2_CONTROL = 0x4153;
-uint16_t const RAINBOW_PULSE_CHANNEL_2_FREQ_LOW = 0x4154;
-uint16_t const RAINBOW_PULSE_CHANNEL_2_FREQ_HIGH = 0x4155;
-uint16_t const RAINBOW_SAW_CHANNEL_ACCUMULATOR = 0x4156;
-uint16_t const RAINBOW_SAW_CHANNEL_FREQ_LOW = 0x4157;
-uint16_t const RAINBOW_SAW_CHANNEL_FREQ_HIGH = 0x4158;
+uint16_t const RAINBOW_EXT_BG_BANK_HI = 0x4121;
 
-uint16_t const RAINBOW_MULTIPLY_A = 0x4160;
-uint16_t const RAINBOW_MULTIPLY_B = 0x4161;
+uint16_t const RAINBOW_NAMETABLES_BANK_1 = 0x4126;
+uint16_t const RAINBOW_NAMETABLES_BANK_2 = 0x4127;
+uint16_t const RAINBOW_NAMETABLES_BANK_3 = 0x4128;
+uint16_t const RAINBOW_NAMETABLES_BANK_4 = 0x4129;
+
+uint16_t const RAINBOW_NAMETBALES_CTRL_1 = 0x412a;
+uint16_t const RAINBOW_NAMETBALES_CTRL_2 = 0x412b;
+uint16_t const RAINBOW_NAMETBALES_CTRL_3 = 0x412c;
+uint16_t const RAINBOW_NAMETBALES_CTRL_4 = 0x412d;
+
+uint16_t const RAINBOW_CHR_BANKING_1_HI = 0x4130;
+uint16_t const RAINBOW_CHR_BANKING_2_HI = 0x4131;
+uint16_t const RAINBOW_CHR_BANKING_3_HI = 0x4132;
+uint16_t const RAINBOW_CHR_BANKING_4_HI = 0x4133;
+uint16_t const RAINBOW_CHR_BANKING_5_HI = 0x4134;
+uint16_t const RAINBOW_CHR_BANKING_6_HI = 0x4135;
+uint16_t const RAINBOW_CHR_BANKING_7_HI = 0x4136;
+uint16_t const RAINBOW_CHR_BANKING_8_HI = 0x4137;
+uint16_t const RAINBOW_CHR_BANKING_9_HI = 0x4138;
+uint16_t const RAINBOW_CHR_BANKING_10_HI = 0x4139;
+uint16_t const RAINBOW_CHR_BANKING_11_HI = 0x413a;
+uint16_t const RAINBOW_CHR_BANKING_12_HI = 0x413b;
+uint16_t const RAINBOW_CHR_BANKING_13_HI = 0x413c;
+uint16_t const RAINBOW_CHR_BANKING_14_HI = 0x413d;
+uint16_t const RAINBOW_CHR_BANKING_15_HI = 0x413e;
+uint16_t const RAINBOW_CHR_BANKING_16_HI = 0x413f;
+uint16_t const RAINBOW_CHR_BANKING_1_LO = 0x4140;
+uint16_t const RAINBOW_CHR_BANKING_2_LO = 0x4141;
+uint16_t const RAINBOW_CHR_BANKING_3_LO = 0x4142;
+uint16_t const RAINBOW_CHR_BANKING_4_LO = 0x4143;
+uint16_t const RAINBOW_CHR_BANKING_5_LO = 0x4144;
+uint16_t const RAINBOW_CHR_BANKING_6_LO = 0x4145;
+uint16_t const RAINBOW_CHR_BANKING_7_LO = 0x4146;
+uint16_t const RAINBOW_CHR_BANKING_8_LO = 0x4147;
+uint16_t const RAINBOW_CHR_BANKING_9_LO = 0x4148;
+uint16_t const RAINBOW_CHR_BANKING_10_LO = 0x4149;
+uint16_t const RAINBOW_CHR_BANKING_11_LO = 0x414a;
+uint16_t const RAINBOW_CHR_BANKING_12_LO = 0x414b;
+uint16_t const RAINBOW_CHR_BANKING_13_LO = 0x414c;
+uint16_t const RAINBOW_CHR_BANKING_14_LO = 0x414d;
+uint16_t const RAINBOW_CHR_BANKING_15_LO = 0x414e;
+uint16_t const RAINBOW_CHR_BANKING_16_LO = 0x414f;
+
+uint16_t const RAINBOW_SCANLINE_IRQ_LATCH = 0x4150;
+uint16_t const RAINBOW_SCANLINE_IRQ_CONTROL = 0x4151;
+uint16_t const RAINBOW_SCANLINE_IRQ_DISABLE = 0x4152;
+uint16_t const RAINBOW_SCANLINE_IRQ_OFFSET = 0x4153;
+
+uint16_t const RAINBOW_CPU_CYCLES_IRQ_COUNTER_LO = 0x4158;
+uint16_t const RAINBOW_CPU_CYCLES_IRQ_COUNTER_HI = 0x4159;
+uint16_t const RAINBOW_CPU_CYCLES_IRQ_CONTROL = 0x415a;
+uint16_t const RAINBOW_CPU_CYCLES_IRQ_ACK = 0x415b;
+
+uint16_t const RAINBOW_MAPPER_VERSION = 0x4160;
+
+uint16_t const RAINBOW_MULTIPLY_A = 0x4161;
+uint16_t const RAINBOW_MULTIPLY_B = 0x4162;
+
+uint16_t const RAINBOW_PULSE_CHANNEL_1_CONTROL = 0x41a0;
+uint16_t const RAINBOW_PULSE_CHANNEL_1_FREQ_LOW = 0x41a1;
+uint16_t const RAINBOW_PULSE_CHANNEL_1_FREQ_HIGH = 0x41a2;
+uint16_t const RAINBOW_PULSE_CHANNEL_2_CONTROL = 0x41a3;
+uint16_t const RAINBOW_PULSE_CHANNEL_2_FREQ_LOW = 0x41a4;
+uint16_t const RAINBOW_PULSE_CHANNEL_2_FREQ_HIGH = 0x41a5;
+uint16_t const RAINBOW_SAW_CHANNEL_ACCUMULATOR = 0x41a6;
+uint16_t const RAINBOW_SAW_CHANNEL_FREQ_LOW = 0x41a7;
+uint16_t const RAINBOW_SAW_CHANNEL_FREQ_HIGH = 0x41a8;
+
+uint16_t const RAINBOW_AUDIO_OUTPUT_CONTROL = 0x41a9;
+
+uint16_t const RAINBOW_WIFI_CONF = 0x4170;
+uint16_t const RAINBOW_WIFI_RX = 0x4171;
+uint16_t const RAINBOW_WIFI_TX = 0x4172;
+uint16_t const RAINBOW_WIFI_RX_DEST = 0x4173;
+uint16_t const RAINBOW_WIFI_TX_SOURCE = 0x4174;
+
+// Aliases
+uint16_t const RAINBOW_PRG_BANK_8000_MODE_1_HI = RAINBOW_PRG_ROM_BANKING_1_HI;
+uint16_t const RAINBOW_PRG_BANK_8000_MODE_1_LO = RAINBOW_PRG_ROM_BANKING_1_LO;
+uint16_t const RAINBOW_PRG_BANK_C000_MODE_1_HI = RAINBOW_PRG_ROM_BANKING_5_HI;
+uint16_t const RAINBOW_PRG_BANK_C000_MODE_1_LO = RAINBOW_PRG_ROM_BANKING_5_LO;
 
 //-------------------------------------------------------------------------------
 // Message parsing constants
@@ -1027,17 +1116,11 @@ uint16_t const ESP_MSG_TYPE = 1;
 uint16_t const ESP_MSG_PAYLOAD = 2;
 
 //-------------------------------------------------------------------------------
-// Invariable messages
-//-------------------------------------------------------------------------------
-
-
-
-
-//-------------------------------------------------------------------------------
-// Utility routines
+// Utility macros
 //-------------------------------------------------------------------------------
 
 // Hardcoded position of the buffers for convenience routines
 //  If you change buffers positions (RAINBOW_WIFI_RX_DEST/TX_DEST), you should update it
 uint16_t const esp_rx_buffer = 0x4800;
 uint16_t const esp_tx_buffer = 0x4900;
+uint16_t const fixed_bank_index = 35;
