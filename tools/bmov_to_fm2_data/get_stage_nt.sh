@@ -4,6 +4,8 @@
 tilt_dir="$1"
 stage_name="$2"
 
+xa_bin="${XA_BIN:-xa}"
+
 # Determine name of the interesting labels
 palette_lbl="stage_${stage_name}_palette"
 nametable_lbl="stage_${stage_name}_nametable"
@@ -30,7 +32,7 @@ cat "$tilt_dir"/game/data/stages/"$stage_name"/screen.asm | grep -zEo "$nametabl
 echo >> "$truncated_file"
 
 # Assemble the file to get a binary resource
-xa -DTILE_CHAR_PCT=219 -DTFP=219 "$tilt_dir"/nine/macros.asm "$truncated_file" -o nt_"$stage_name".dat
+$xa_bin -DTILE_CHAR_PCT=219 -DTFP=219 "$tilt_dir"/nine/macros.asm "$truncated_file" -o nt_"$stage_name".dat
 
 # Clean
 rm "$truncated_file"

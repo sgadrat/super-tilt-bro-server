@@ -9,13 +9,15 @@ if [ ! -d "$tilt_dir" ]; then
 	exit 1
 fi
 
+xa_bin="${XA_BIN:-xa}"
+
 # Stages "screen" file (palettes + zipped nametable)
 for stage in plateau pit shelf gem theplank deeprock; do
 	./get_stage_nt.sh "$tilt_dir" "$stage"
 done
 
 # Common tilesets
-xa -DCURRENT_BANK_NUMBER=0 -DCHARACTERS_END_TILES_OFFSET=2*96*16 "$tilt_dir"/game/banks/chr_data.asm -o chr_data.dat
+$xa_bin -DCURRENT_BANK_NUMBER=0 -DCHARACTERS_END_TILES_OFFSET=2*96*16 "$tilt_dir"/game/banks/chr_data.asm -o chr_data.dat
 
 set +x
 echo "; The tiles constructed by extra_init_game_state, in a convenient tileset file" > /tmp/ts_common.asm
@@ -59,8 +61,8 @@ set -x
 ./get_tileset.sh "$tilt_dir"/game/data/tilesets/magma.asm ts_magma.dat
 
 # Stage-specific tilesets
-xa -DCURRENT_BANK_NUMBER=0 -DSTAGE_FIRST_SPRITE_TILE_OFFSET=2*96*16 -DSTAGE_NUM_SPRITE_TILES=241-2*96 "$tilt_dir"/game/data/stages/gem/tilesets.asm -o gem_ts_sprites.dat
-xa -DCURRENT_BANK_NUMBER=0 -DSTAGE_FIRST_SPRITE_TILE_OFFSET=2*96*16 -DSTAGE_NUM_SPRITE_TILES=241-2*96 "$tilt_dir"/game/data/stages/pit/tilesets.asm -o pit_ts_sprites.dat
+$xa_bin -DCURRENT_BANK_NUMBER=0 -DSTAGE_FIRST_SPRITE_TILE_OFFSET=2*96*16 -DSTAGE_NUM_SPRITE_TILES=241-2*96 "$tilt_dir"/game/data/stages/gem/tilesets.asm -o gem_ts_sprites.dat
+$xa_bin -DCURRENT_BANK_NUMBER=0 -DSTAGE_FIRST_SPRITE_TILE_OFFSET=2*96*16 -DSTAGE_NUM_SPRITE_TILES=241-2*96 "$tilt_dir"/game/data/stages/pit/tilesets.asm -o pit_ts_sprites.dat
 
 # Characters sprites and illustrations
 for char in sinbad kiki pepper vgsage; do
