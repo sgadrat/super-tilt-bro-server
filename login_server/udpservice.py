@@ -68,7 +68,7 @@ def parse_login_request(message):
 		return None
 
 	user = parse_stnp_str(2)
-	password = parse_stnp_str(18)
+	password = message[18:18+16].hex()
 	if user is None or password is None:
 		return None
 
@@ -93,14 +93,6 @@ def check_login_request(message):
 			"user name shall   "+
 			"have at least     "+
 			"three characters  "+
-			"                  "
-		)
-	elif len(client_credential['password']) < 1:
-		return (
-			False,
-			"password shall    "+
-			"not be empty      "+
-			"                  "+
 			"                  "
 		)
 
