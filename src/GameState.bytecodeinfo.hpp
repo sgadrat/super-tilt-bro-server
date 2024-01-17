@@ -427,6 +427,17 @@ uint16_t const online_mode_selection_ship_anim = 0x05cd; // $05cd to $05d9
 uint16_t const online_mode_selection_monster_anim = 0x05da; // $05da to $05e6
 uint16_t const online_mode_selection_satellite_anim = 0x05e7; // $05e7 to $05e3
 
+// Update screen
+//  Technically ONLINE_MODE_SELECTION state, but can overide any online screen's field
+
+uint16_t const update_screen_txtx = last_c_label+1; // $39
+uint16_t const update_screen_txty = update_screen_txtx+1; // $3a
+uint16_t const update_screen_scroll_state = update_screen_txty+1; // $3b
+uint16_t const update_screen_log_position = update_screen_scroll_state+1; // 3d
+uint16_t const update_screen_erase_sector_result = update_screen_log_position+1; // $3e
+uint16_t const update_screen_program_page_result_flags = update_screen_erase_sector_result+1; // $3f
+uint16_t const update_screen_program_page_result_count = update_screen_program_page_result_flags+1; // $40
+
 //
 // WIFI_SETTINGS labels
 //
@@ -536,10 +547,18 @@ uint16_t const jukebox_zp_mem = last_c_label+1; // $39
 uint16_t const jukebox_mem = 0x0580;
 
 //
-// DONATION labels
+// SOCIAL labels
 //
 
-uint16_t const support_method = 0x00;
+uint16_t const social_link = 0x00;
+uint16_t const social_draw_step = 0x01;
+uint16_t const social_draw_line_addr_lsb = 0x02;
+uint16_t const social_draw_line_addr_msb = 0x03;
+uint16_t const social_link_state = 0x04; // 0 - showing links page, 1 showing a link
+
+uint16_t const social_mem_buffer = 0x0560; // max usage - 4 bytes
+uint16_t const social_cursor_anim = 0x580;
+
 //
 // Common menus labels
 //  Common to TITLE, CONFIG, MODE_SELECTION and CREDITS
@@ -760,6 +779,13 @@ uint16_t const stage_data = 0x0400;
 uint16_t const player_a_objects = 0x0480; // Objects independent to character's state like floating hitboxes, temporary platforms, etc
 uint16_t const player_b_objects = 0x04c0; //
 
+uint16_t const sha_w = 0x0400; // $0400 to $04ff - One page, completely garbaged by sha256_sum routine
+uint16_t const sha_msg = 0x0440; // $0440 to $047f - Overlaps sha_w, will be overwriten by computations
+uint16_t const sha_h = 0x0700; // $0700 to $071f - 32 bytes hash result
+uint16_t const sha_working_variables = 0x0720; // $0720 to $073f
+uint16_t const sha_length_lsb = 0x0740;
+uint16_t const sha_length_msb = 0x0741;
+
 uint16_t const particle_blocks = 0x0500;
 uint16_t const particle_block_0 = 0x0500;
 uint16_t const particle_block_1 = 0x0520;
@@ -806,7 +832,6 @@ uint16_t const screen_shake_speed_v = 0x055f;
 //$0600 to $067f may be used by audio engine, see "Audio engine labels"
 //$0680 to $06ff may be used by game states
 
-uint16_t const virtual_frame_cnt = 0x0700;
 uint16_t const network_last_known_remote_input = 0x07bf;
 uint16_t const network_player_local_btns_history = 0x07c0; // one byte per frame, circular buffers, 32 entries
 uint16_t const network_player_remote_btns_history = 0x07e0; //
@@ -862,30 +887,31 @@ uint16_t const TOESP_MSG_SERVER_SEND_MESSAGE = 30 ; // Send message to server
 
 // NETWORK CMDS
 uint16_t const TOESP_MSG_NETWORK_SCAN = 31 ; // Scan networks around and return count
-uint16_t const TOESP_MSG_NETWORK_GET_SCANNED_DETAILS = 32 ; // Get scanned network details
-uint16_t const TOESP_MSG_NETWORK_GET_REGISTERED = 33 ; // Get registered networks status
-uint16_t const TOESP_MSG_NETWORK_GET_REGISTERED_DETAILS = 34 ; // Get registered network SSID
-uint16_t const TOESP_MSG_NETWORK_REGISTER = 35 ; // Register network
-uint16_t const TOESP_MSG_NETWORK_UNREGISTER = 36 ; // Unregister network
-uint16_t const TOESP_MSG_NETWORK_SET_ACTIVE = 37 ; // Set active network
+uint16_t const TOESP_MSG_NETWORK_GET_SCAN_RESULT = 32 ; // Get result of the last scan
+uint16_t const TOESP_MSG_NETWORK_GET_SCANNED_DETAILS = 33 ; // Get scanned network details
+uint16_t const TOESP_MSG_NETWORK_GET_REGISTERED = 34 ; // Get registered networks status
+uint16_t const TOESP_MSG_NETWORK_GET_REGISTERED_DETAILS = 35 ; // Get registered network SSID
+uint16_t const TOESP_MSG_NETWORK_REGISTER = 36 ; // Register network
+uint16_t const TOESP_MSG_NETWORK_UNREGISTER = 37 ; // Unregister network
+uint16_t const TOESP_MSG_NETWORK_SET_ACTIVE = 38 ; // Set active network
 
 // FILE COMMANDS
-uint16_t const TOESP_MSG_FILE_OPEN = 38 ; // Open working file
-uint16_t const TOESP_MSG_FILE_CLOSE = 39 ; // Close working file
-uint16_t const TOESP_MSG_FILE_STATUS = 40 ; // Get working file status
-uint16_t const TOESP_MSG_FILE_EXISTS = 41 ; // Check if file exists
-uint16_t const TOESP_MSG_FILE_DELETE = 42 ; // Delete a file
-uint16_t const TOESP_MSG_FILE_SET_CUR = 43 ; // Set working file cursor position a file
-uint16_t const TOESP_MSG_FILE_READ = 44 ; // Read working file (at specific position)
-uint16_t const TOESP_MSG_FILE_WRITE = 45 ; // Write working file (at specific position)
-uint16_t const TOESP_MSG_FILE_APPEND = 46 ; // Append data to working file
-uint16_t const TOESP_MSG_FILE_COUNT = 47 ; // Count files in a specific path
-uint16_t const TOESP_MSG_FILE_GET_LIST = 48 ; // Get list of existing files in a path
-uint16_t const TOESP_MSG_FILE_GET_FREE_ID = 49 ; // Get an unexisting file ID in a specific path
-uint16_t const TOESP_MSG_FILE_GET_FS_INFO = 50 ; // Get file system details (ESP flash or SD card)
-uint16_t const TOESP_MSG_FILE_GET_INFO = 51 ; // Get file info (size + crc32)
-uint16_t const TOESP_MSG_FILE_DOWNLOAD = 52 ; // Download a file from a giving URL to a specific path index / file index
-uint16_t const TOESP_MSG_FILE_FORMAT = 53 ; // Format file system
+uint16_t const TOESP_MSG_FILE_OPEN = 39 ; // Open working file
+uint16_t const TOESP_MSG_FILE_CLOSE = 40 ; // Close working file
+uint16_t const TOESP_MSG_FILE_STATUS = 41 ; // Get working file status
+uint16_t const TOESP_MSG_FILE_EXISTS = 42 ; // Check if file exists
+uint16_t const TOESP_MSG_FILE_DELETE = 43 ; // Delete a file
+uint16_t const TOESP_MSG_FILE_SET_CUR = 44 ; // Set working file cursor position a file
+uint16_t const TOESP_MSG_FILE_READ = 45 ; // Read working file (at specific position)
+uint16_t const TOESP_MSG_FILE_WRITE = 46 ; // Write working file (at specific position)
+uint16_t const TOESP_MSG_FILE_APPEND = 47 ; // Append data to working file
+uint16_t const TOESP_MSG_FILE_COUNT = 48 ; // Count files in a specific path
+uint16_t const TOESP_MSG_FILE_GET_LIST = 49 ; // Get list of existing files in a path
+uint16_t const TOESP_MSG_FILE_GET_FREE_ID = 50 ; // Get an unexisting file ID in a specific path
+uint16_t const TOESP_MSG_FILE_GET_FS_INFO = 51 ; // Get file system details (ESP flash or SD card)
+uint16_t const TOESP_MSG_FILE_GET_INFO = 52 ; // Get file info (size + crc32)
+uint16_t const TOESP_MSG_FILE_DOWNLOAD = 53 ; // Download a file from a giving URL to a specific path index / file index
+uint16_t const TOESP_MSG_FILE_FORMAT = 54 ; // Format file system
 
 //-------------------------------------------------------------------------------
 // Commands from ESP to NES
@@ -914,7 +940,7 @@ uint16_t const FROMESP_MSG_SERVER_SETTINGS = 12 ; // Returns server settings (ho
 uint16_t const FROMESP_MSG_MESSAGE_FROM_SERVER = 13 ; // Message from server
 
 // NETWORK CMDS
-uint16_t const FROMESP_MSG_NETWORK_COUNT = 14 ; // Returns number of networks found
+uint16_t const FROMESP_MSG_NETWORK_SCAN_RESULT = 14 ; // Returns number of networks found
 uint16_t const FROMESP_MSG_NETWORK_SCANNED_DETAILS = 15 ; // Returns details for a scanned network
 uint16_t const FROMESP_MSG_NETWORK_REGISTERED_DETAILS = 16 ; // Returns SSID for a registered network
 uint16_t const FROMESP_MSG_NETWORK_REGISTERED = 17 ; // Returns registered networks status
@@ -1035,6 +1061,9 @@ uint16_t const RAINBOW_NAMETBALES_CTRL_2 = 0x412b;
 uint16_t const RAINBOW_NAMETBALES_CTRL_3 = 0x412c;
 uint16_t const RAINBOW_NAMETBALES_CTRL_4 = 0x412d;
 
+uint16_t const RAINBOW_NAMETABLES_SPLIT_BANK = 0x412e;
+uint16_t const RAINBOW_NAMETABLES_SPLIT_CTRL = 0x412f;
+
 uint16_t const RAINBOW_CHR_BANKING_1_HI = 0x4130;
 uint16_t const RAINBOW_CHR_BANKING_2_HI = 0x4131;
 uint16_t const RAINBOW_CHR_BANKING_3_HI = 0x4132;
@@ -1072,6 +1101,7 @@ uint16_t const RAINBOW_SCANLINE_IRQ_LATCH = 0x4150;
 uint16_t const RAINBOW_SCANLINE_IRQ_CONTROL = 0x4151;
 uint16_t const RAINBOW_SCANLINE_IRQ_DISABLE = 0x4152;
 uint16_t const RAINBOW_SCANLINE_IRQ_OFFSET = 0x4153;
+uint16_t const RAINBOW_SCANLINE_IRQ_JITTER_CNT = 0x4154;
 
 uint16_t const RAINBOW_CPU_CYCLES_IRQ_COUNTER_LO = 0x4158;
 uint16_t const RAINBOW_CPU_CYCLES_IRQ_COUNTER_HI = 0x4159;
@@ -1080,8 +1110,20 @@ uint16_t const RAINBOW_CPU_CYCLES_IRQ_ACK = 0x415b;
 
 uint16_t const RAINBOW_MAPPER_VERSION = 0x4160;
 
-uint16_t const RAINBOW_MULTIPLY_A = 0x4161;
-uint16_t const RAINBOW_MULTIPLY_B = 0x4162;
+uint16_t const RAINBOW_IRQ_STATUS = 0x4161;
+
+uint16_t const RAINBOW_WINDOW_SPLIT_X_START = 0x4170;
+uint16_t const RAINBOW_WINDOW_SPLIT_X_END = 0x4171;
+uint16_t const RAINBOW_WINDOW_SPLIT_Y_START = 0x4172;
+uint16_t const RAINBOW_WINDOW_SPLIT_Y_END = 0x4173;
+uint16_t const RAINBOW_WINDOW_SPLIT_X_SCROLL = 0x4174;
+uint16_t const RAINBOW_WINDOW_SPLIT_Y_SCROLL = 0x4175;
+
+uint16_t const RAINBOW_WIFI_CONF = 0x4190;
+uint16_t const RAINBOW_WIFI_RX = 0x4191;
+uint16_t const RAINBOW_WIFI_TX = 0x4192;
+uint16_t const RAINBOW_WIFI_RX_DEST = 0x4193;
+uint16_t const RAINBOW_WIFI_TX_SOURCE = 0x4194;
 
 uint16_t const RAINBOW_PULSE_CHANNEL_1_CONTROL = 0x41a0;
 uint16_t const RAINBOW_PULSE_CHANNEL_1_FREQ_LOW = 0x41a1;
@@ -1094,12 +1136,6 @@ uint16_t const RAINBOW_SAW_CHANNEL_FREQ_LOW = 0x41a7;
 uint16_t const RAINBOW_SAW_CHANNEL_FREQ_HIGH = 0x41a8;
 
 uint16_t const RAINBOW_AUDIO_OUTPUT_CONTROL = 0x41a9;
-
-uint16_t const RAINBOW_WIFI_CONF = 0x4170;
-uint16_t const RAINBOW_WIFI_RX = 0x4171;
-uint16_t const RAINBOW_WIFI_TX = 0x4172;
-uint16_t const RAINBOW_WIFI_RX_DEST = 0x4173;
-uint16_t const RAINBOW_WIFI_TX_SOURCE = 0x4174;
 
 // Aliases
 uint16_t const RAINBOW_PRG_BANK_8000_MODE_1_HI = RAINBOW_PRG_ROM_BANKING_1_HI;
