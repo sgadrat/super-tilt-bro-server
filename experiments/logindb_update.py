@@ -32,6 +32,7 @@ else:
 
 	for login in db['registered_logins']:
 		user = db['registered_logins'][login]
-		user['password'] = hash_pass(login, user['password'])
+		if len(user['password']) != 32:
+			user['password'] = hash_pass(login, user['password'])
 
 	print(json.dumps(db))
