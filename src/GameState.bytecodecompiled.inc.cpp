@@ -62,9 +62,9 @@ void seg_c086_characters_onground_routines_table_msb(mos6502<GameState::Emulator
 	if (emu.stopped) { return; }
 }
 void seg_c0ce_c0ce(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_ORA_ABY();
+	++emu.pc; emu.Op_ROL_ZEX();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_CLV_IMP();
+	++emu.pc; emu.Op_AND_INX();
 	if (emu.stopped) { return; }
 }
 void seg_c10f_c10f(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -82,7 +82,17 @@ void seg_c10f_c10f(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ABX();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_IMM();
+	++emu.pc; emu.Op_LDX_ZEY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDY_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_DEC_ABX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDA_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_CLV_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_SBC_INY();
 	if (emu.stopped) { return; }
 }
 void seg_c19e_c19e(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -6919,18 +6929,60 @@ void seg_c1c0_stages_bank(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_PHP_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_c1cb_c1cb(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_ORA_ABS();
-	if (emu.stopped) { return; }
-}
 void seg_c1cc_c1cc(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ASL_ABS();
 	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ORA_ZEX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ORA_ZEX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ROL_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ORA_ZEX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ORA_ZEX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_PHP_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_PHP_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_PHP_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_PHP_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDX_ZEY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDX_ZEY();
+	if (emu.stopped) { return; }
+}
+void seg_c1cf_stages_tileset_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_ORA_ZEX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ORA_ZEX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ROL_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ORA_ZEX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ORA_ZEX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_PHP_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_PHP_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_PHP_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_PHP_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDX_ZEY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDX_ZEY();
+	if (emu.stopped) { return; }
 }
 void seg_c1de_stages_tileset_msb(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_LDA_ZEX();
+	++emu.pc; emu.Op_LDX_ZEY();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_ZEX();
+	++emu.pc; emu.Op_LDX_ZEY();
 	if (emu.stopped) { return; }
 }
 void seg_c1ed_stages_tileset_bank(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -25581,11 +25633,11 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_c1cb_c1cb,
+	nullptr,
 	&emulator_compiled_segments_funcs::seg_c1cc_c1cc,
 	nullptr,
 	nullptr,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_c1cf_stages_tileset_lsb,
 	nullptr,
 	nullptr,
 	nullptr,
