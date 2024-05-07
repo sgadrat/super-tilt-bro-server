@@ -92,15 +92,51 @@ void seg_c10f_c10f(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CLV_IMP();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_ASL_ACC_ACC();
+	++emu.pc; emu.Op_BPL_REL();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_ZEX();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_CLV_IMP();
+}
+void seg_c14e_c14e(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_DEC_ABX();
 	if (emu.stopped) { return; }
 }
 void seg_c19e_c19e(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BRK_IMP();
+	if (emu.stopped) { return; }
+}
+void seg_c1af_c1af(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_DEC_ABX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDX_ZEY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_DEY_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INX_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INX_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INX_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INX_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INX_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INX_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INX_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INX_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INX_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INX_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INX_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ASL_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_PHP_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_PHP_IMP();
 	if (emu.stopped) { return; }
 }
 void seg_c1be_c1be(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -912,7 +948,7 @@ void seg_c910_clbl_42(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 }
 void seg_c91c_clbl_13(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_ROL_ABX();
+	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STY_ZEX();
 	if (emu.stopped) { return; }
@@ -940,6 +976,8 @@ void seg_c923_unamed_lbl_122(mos6502<GameState::EmulatorRunContext>& emu) {
 void seg_c927_c927(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_EOR_INX();
 	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_BEQ_REL();
+	if (emu.stopped) { return; }
 }
 void seg_c92a_unamed_lbl_126(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABY();
@@ -954,7 +992,15 @@ void seg_c92a_unamed_lbl_126(mos6502<GameState::EmulatorRunContext>& emu) {
 void seg_c931_unamed_lbl_130(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_EOR_INX();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_CLV_IMP();
+	++emu.pc; emu.Op_DEC_ZEX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDA_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_STA_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_STA_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
 void seg_c937_c937(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -970,31 +1016,11 @@ void seg_c93a_unamed_lbl_135(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_EOR_INX();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_EOR_INY();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STA_ZER();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STA_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_JMP_ABS();
-	if (emu.stopped) { return; }
 }
 void seg_c944_c944(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_EOR_INX();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_ZEX();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STA_ZER();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STA_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
 void seg_c948_clbl_16(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -1154,9 +1180,15 @@ void seg_c96a_unamed_lbl_164(mos6502<GameState::EmulatorRunContext>& emu) {
 void seg_c978_unamed_lbl_172(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_SBC_INY();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_AND_IMM();
+	++emu.pc; emu.Op_SEC_IMP();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_BCC_REL();
+	++emu.pc; emu.Op_SBC_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ORA_INX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDA_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
 void seg_c97e_c97e(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -1328,9 +1360,9 @@ void seg_c9e4_clbl_9(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_SBC_INY();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_AND_IMM();
+	++emu.pc; emu.Op_SEC_IMP();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_JSR_ABS();
+	++emu.pc; emu.Op_SBC_IMM();
 	if (emu.stopped) { return; }
 }
 void seg_c9f9_c9f9(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -1380,7 +1412,7 @@ void seg_ca10_unamed_lbl_261(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 }
 void seg_ca15_clbl_14(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_DEC_ZER();
+	++emu.pc; emu.Op_CMP_ZEX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDX_IMM();
 	if (emu.stopped) { return; }
@@ -1864,9 +1896,11 @@ void seg_cbd3_cbd3(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 }
 void seg_cbda_cbda(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_ADC_ABY();
+	++emu.pc; emu.Op_DEY_IMP();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_EOR_ZER();
+	++emu.pc; emu.Op_CPX_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_DEX_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BPL_REL();
 	if (emu.stopped) { return; }
@@ -2969,6 +3003,14 @@ void seg_d01c_clbl_c_20(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
+void seg_d037_clbl_c_21(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_DEC_ABX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_EOR_INX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_BNE_REL();
+	if (emu.stopped) { return; }
+}
 void seg_d052_clbl_c_22(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CMP_ABY();
 	if (emu.stopped) { return; }
@@ -3097,6 +3139,12 @@ void seg_d1b7_d1b7(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_SBC_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BRK_IMP();
+	if (emu.stopped) { return; }
+}
+void seg_d1bb_platform_specific_handlers_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_DEC_ABX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ORA_ZEX();
 	if (emu.stopped) { return; }
 }
 void seg_d1ce_clbl_114(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -4032,15 +4080,11 @@ void seg_d6a3_d6a3(mos6502<GameState::EmulatorRunContext>& emu) {
 void seg_d6aa_d6aa(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_SBC_IMM();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_CMP_ABY();
+	++emu.pc; emu.Op_INX_IMP();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_ORA_ZER();
+	++emu.pc; emu.Op_NOP_IMP();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_ZER();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_DEX_IMP();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_BMI_REL();
+	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
 void seg_d6ad_unamed_lbl_1736(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -4216,18 +4260,6 @@ void seg_d7b6_clbl_225(mos6502<GameState::EmulatorRunContext>& emu) {
 void seg_d7ba_d7ba(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_EOR_INX();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STX_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STY_ZEX();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STA_ZER();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STA_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_JMP_ABS();
-	if (emu.stopped) { return; }
 }
 void seg_d7bf_clbl_138(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STY_ZEX();
@@ -4293,6 +4325,16 @@ void seg_d7e2_clbl_139(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_DEY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BPL_REL();
+	if (emu.stopped) { return; }
+}
+void seg_d80c_d80c(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_LDX_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ORA_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_STA_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
 void seg_d831_d831(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -4568,7 +4610,7 @@ void seg_da65_clbl_244(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 }
 void seg_da76_da76(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_LDX_ABS();
+	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_INC_ZER();
 	if (emu.stopped) { return; }
@@ -6338,11 +6380,11 @@ void seg_e144_clbl_178(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 }
 void seg_e16e_e16e(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_AND_IMM();
+	++emu.pc; emu.Op_SEC_IMP();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_ZER();
+	++emu.pc; emu.Op_SBC_IMM();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_TYA_IMP();
+	++emu.pc; emu.Op_SBC_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_PHA_IMP();
 	if (emu.stopped) { return; }
@@ -6875,6 +6917,12 @@ void seg_c05e_characters_weapon_palettes_msb(mos6502<GameState::EmulatorRunConte
 	++emu.pc; emu.Op_TAX_IMP();
 	if (emu.stopped) { return; }
 }
+void seg_c062_characters_netload_routine_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_DEC_ABX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_DEC_ABX();
+	if (emu.stopped) { return; }
+}
 void seg_c066_characters_netload_routine_msb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INX_IMP();
 	if (emu.stopped) { return; }
@@ -6946,27 +6994,21 @@ void seg_c0ae_player_animation_state_vectors_lsb(mos6502<GameState::EmulatorRunC
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ORA_ZER();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_AND_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_ZEY();
-	if (emu.stopped) { return; }
 }
 void seg_c0b0_player_animation_state_vectors_msb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ORA_ZER();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_AND_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_ZEY();
-	if (emu.stopped) { return; }
 }
-void seg_c0b2_stages_init_routine(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_AND_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_ZEY();
+void seg_c0d0_stages_tick_routine(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_RTI_IMP();
 	if (emu.stopped) { return; }
 }
 void seg_c0d8_c0d8(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ORA_INX();
+	if (emu.stopped) { return; }
+}
+void seg_c0ee_stages_freezed_tick_routine_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_DEC_ABX();
 	if (emu.stopped) { return; }
 }
 void seg_c0fd_stages_freezed_tick_routine_msb(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -6977,16 +7019,56 @@ void seg_c0fd_stages_freezed_tick_routine_msb(mos6502<GameState::EmulatorRunCont
 	++emu.pc; emu.Op_INX_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_c12a_stage_palettes(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_ASL_ACC_ACC();
+void seg_c10c_stages_nametable(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ZEX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDA_ABY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_CMP_ZEX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDX_ZEY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ADC_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ORA_INX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_DEC_ZEX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ROR_ABX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDX_ZEY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDY_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_DEC_ABX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDA_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_CLV_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_BPL_REL();
+	if (emu.stopped) { return; }
+}
+void seg_c12a_stage_palettes(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_BPL_REL();
+	if (emu.stopped) { return; }
+}
+void seg_c140_c140(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_AND_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_STY_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CLV_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_c148_stage_routine_fadeout_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_SBC_ABX();
+void seg_c157_stage_routine_fadeout_msb(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_CLV_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDX_ZEY();
 	if (emu.stopped) { return; }
 }
 void seg_c16a_c16a(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -6997,8 +7079,8 @@ void seg_c16a_c16a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ADC_ABX();
 	if (emu.stopped) { return; }
 }
-void seg_c184_stages_illustration(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_AND_ABX();
+void seg_c1a2_stages_netload_routine_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_DEC_ABX();
 	if (emu.stopped) { return; }
 }
 void seg_c1b1_stages_netload_routine_msb(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -7058,18 +7140,6 @@ void seg_c1cc_c1cc(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ORA_ZEX();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_PHP_IMP();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_PHP_IMP();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_PHP_IMP();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_PHP_IMP();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_ZEY();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_ZEY();
-	if (emu.stopped) { return; }
 }
 void seg_c1cf_stages_tileset_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ORA_ZEX();
@@ -7081,18 +7151,6 @@ void seg_c1cf_stages_tileset_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ORA_ZEX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ORA_ZEX();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_PHP_IMP();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_PHP_IMP();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_PHP_IMP();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_PHP_IMP();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_ZEY();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_ZEY();
 	if (emu.stopped) { return; }
 }
 void seg_c1de_stages_tileset_msb(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -12025,6 +12083,10 @@ void seg_d027_move_player_handle_one_platform_left(mos6502<GameState::EmulatorRu
 	++emu.pc; emu.Op_JMP_ABI();
 	if (emu.stopped) { return; }
 }
+void seg_d035_platform_specific_handlers_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_DEC_ABX();
+	if (emu.stopped) { return; }
+}
 void seg_d03b_platform_specific_handlers_msb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INX_IMP();
 	if (emu.stopped) { return; }
@@ -12263,6 +12325,12 @@ void seg_d0ea_move_player_handle_one_platform_right(mos6502<GameState::EmulatorR
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABI();
+	if (emu.stopped) { return; }
+}
+void seg_d0f8_platform_specific_handlers_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_DEC_ABX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LSR_ZEX();
 	if (emu.stopped) { return; }
 }
 void seg_d0fe_platform_specific_handlers_msb(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -12727,6 +12795,12 @@ void seg_d268_move_player_handle_one_platform_down(mos6502<GameState::EmulatorRu
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABI();
+	if (emu.stopped) { return; }
+}
+void seg_d276_platform_specific_handlers_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_DEC_ABX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
 void seg_d27c_platform_specific_handlers_msb(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -19837,7 +19911,37 @@ void seg_e6a5_e6a5(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e6a6_process_nt_buffers(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e6a6_lighten_color(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_CMP_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_BEQ_REL();
+	if (emu.stopped) { return; }
+}
+void seg_e6aa_e6aa(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_CMP_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_BCS_REL();
+	if (emu.stopped) { return; }
+}
+void seg_e6ae_ligthen_normal(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_CLC_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ADC_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_RTS_IMP();
+	if (emu.stopped) { return; }
+}
+void seg_e6b2_lighten_black(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_LDA_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_RTS_IMP();
+	if (emu.stopped) { return; }
+}
+void seg_e6b4_end(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_RTS_IMP();
+	if (emu.stopped) { return; }
+}
+void seg_e6b5_process_nt_buffers(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_PHA_IMP();
@@ -19869,7 +19973,7 @@ void seg_e6a6_process_nt_buffers(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABI();
 	if (emu.stopped) { return; }
 }
-void seg_e6b6_handle_nt_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e6c5_handle_nt_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_INX_IMP();
@@ -19885,7 +19989,7 @@ void seg_e6b6_handle_nt_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABI();
 	if (emu.stopped) { return; }
 }
-void seg_e6c7_vertical_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e6d6_vertical_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ORA_IMM();
@@ -19897,7 +20001,7 @@ void seg_e6c7_vertical_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e6d3_horizontal_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e6e2_horizontal_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -19939,7 +20043,7 @@ void seg_e6d3_horizontal_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e6dc_basic_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e6eb_basic_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -19973,7 +20077,7 @@ void seg_e6dc_basic_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e6fb_e6fb(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e70a_e70a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ABX();
@@ -19987,7 +20091,7 @@ void seg_e6fb_e6fb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e6fd_write_one_tile(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e70c_write_one_tile(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -19999,13 +20103,13 @@ void seg_e6fd_write_one_tile(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e707_e707(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e716_e716(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STX_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e70d_end_buffers(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e71c_end_buffers(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_PLA_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -20017,7 +20121,7 @@ void seg_e70d_end_buffers(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e714_attributes_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e723_attributes_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CLC_IMP();
@@ -20027,7 +20131,7 @@ void seg_e714_attributes_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e71b_e71b(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e72a_e72a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ZER();
@@ -20075,7 +20179,7 @@ void seg_e71b_e71b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e730_one_step(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e73f_one_step(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -20105,13 +20209,13 @@ void seg_e730_one_step(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e74f_e74f(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e75e_e75e(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STX_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e755_step_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e764_step_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_INX_IMP();
@@ -20129,7 +20233,7 @@ void seg_e755_step_buffer(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e762_e762(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e771_e771(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ZER();
@@ -20189,7 +20293,7 @@ void seg_e762_e762(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e77f_write_one_tile(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e78e_write_one_tile(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -20221,7 +20325,7 @@ void seg_e77f_write_one_tile(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e79e_e79e(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e7ad_e7ad(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STX_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_PLA_IMP();
@@ -20231,17 +20335,13 @@ void seg_e79e_e79e(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e7a7_buffer_handlers_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_ORA_ABS();
-	if (emu.stopped) { return; }
-}
-void seg_e7b3_smart_keep_input_dirty(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e7c2_smart_keep_input_dirty(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZEX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e7b7_dumb_keep_input_dirty(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e7c6_dumb_keep_input_dirty(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZEX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZEX();
@@ -20249,11 +20349,11 @@ void seg_e7b7_dumb_keep_input_dirty(mos6502<GameState::EmulatorRunContext>& emu)
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e7bb_keep_input_dirty_rts(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e7ca_keep_input_dirty_rts(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e7bc_get_transition_id(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e7cb_get_transition_id(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ASL_ACC_ACC();
@@ -20269,7 +20369,7 @@ void seg_e7bc_get_transition_id(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e7c6_change_global_game_state(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e7d5_change_global_game_state(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TAX_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ZER();
@@ -20283,7 +20383,7 @@ void seg_e7c6_change_global_game_state(mos6502<GameState::EmulatorRunContext>& e
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e7d2_e7d2(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e7e1_e7e1(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -20301,7 +20401,7 @@ void seg_e7d2_e7d2(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e7e5_e7e5(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e7f4_e7f4(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -20311,7 +20411,7 @@ void seg_e7e5_e7e5(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e7ee_e7ee(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e7fd_e7fd(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -20323,7 +20423,7 @@ void seg_e7ee_e7ee(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e7f0_clr_sprites(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e7ff_clr_sprites(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABX();
@@ -20333,7 +20433,7 @@ void seg_e7f0_clr_sprites(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e7f8_e7f8(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e807_e807(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ASL_ACC_ACC();
@@ -20351,11 +20451,11 @@ void seg_e7f8_e7f8(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e809_e809(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e818_e818(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e80c_e80c(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e81b_e81b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_TXS_IMP();
@@ -20363,11 +20463,11 @@ void seg_e80c_e80c(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e812_find_transition_index(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e821_find_transition_index(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e815_e815(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e824_e824(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDX_IMM();
@@ -20377,45 +20477,45 @@ void seg_e815_e815(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e819_check_one_entry(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e828_check_one_entry(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e81e_e81e(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e82d_e82d(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CMP_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e822_e822(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e831_e831(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INX_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e826_not_found(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e835_not_found(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e828_found(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e837_found(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e829_pre_transition(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e838_pre_transition(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e82c_e82c(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e83b_e83b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CPX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e830_e830(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e83f_e83f(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -20427,21 +20527,21 @@ void seg_e830_e830(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e83d_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e84c_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e83e_post_transition(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e84d_post_transition(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e841_e841(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e850_e850(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CPX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e845_e845(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e854_e854(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -20453,11 +20553,11 @@ void seg_e845_e845(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e852_e852(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e861_e861(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e855_no_transition(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e864_no_transition(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -20467,7 +20567,7 @@ void seg_e855_no_transition(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e85f_e85f(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e86e_e86e(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -20475,11 +20575,11 @@ void seg_e85f_e85f(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e864_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e873_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e865_fetch_controllers(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e874_fetch_controllers(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -20513,7 +20613,7 @@ void seg_e865_fetch_controllers(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e871_fetch_one_controller(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e880_fetch_one_controller(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZEX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZEX();
@@ -20537,7 +20637,7 @@ void seg_e871_fetch_one_controller(mos6502<GameState::EmulatorRunContext>& emu) 
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e87b_next_btn(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e88a_next_btn(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -20551,7 +20651,7 @@ void seg_e87b_next_btn(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e887_e887(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e896_e896(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INX_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CPX_IMM();
@@ -20559,11 +20659,11 @@ void seg_e887_e887(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e88c_e88c(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e89b_e89b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e88d_wait_next_frame(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e89c_wait_next_frame(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -20573,23 +20673,23 @@ void seg_e88d_wait_next_frame(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e891_waiting(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8a0_waiting(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e895_e895(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8a4_e8a4(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e896_absolute_a(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8a5_absolute_a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CMP_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BPL_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e89a_e89a(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8a9_e8a9(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_EOR_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CLC_IMP();
@@ -20599,11 +20699,11 @@ void seg_e89a_e89a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e89f_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8ae_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e8a0_multiply(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8af_multiply(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TXA_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_PHA_IMP();
@@ -20623,13 +20723,13 @@ void seg_e8a0_multiply(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e8ab_additions_loop(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8ba_additions_loop(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CPX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e8af_e8af(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8be_e8be(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CLC_IMP();
@@ -20649,7 +20749,7 @@ void seg_e8af_e8af(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e8c0_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8cf_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_PLA_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_TAX_IMP();
@@ -20657,7 +20757,7 @@ void seg_e8c0_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e8c3_clear_nt_buffers(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8d2_clear_nt_buffers(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -20669,11 +20769,11 @@ void seg_e8c3_clear_nt_buffers(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e8cf_dummy_routine(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8de_dummy_routine(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e8d0_change_global_game_state_lite(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8df_change_global_game_state_lite(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -20699,7 +20799,7 @@ void seg_e8d0_change_global_game_state_lite(mos6502<GameState::EmulatorRunContex
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e8dd_clr_sprites(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8ec_clr_sprites(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_INX_IMP();
@@ -20713,11 +20813,11 @@ void seg_e8dd_clr_sprites(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e8e6_e8e6(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8f5_e8f5(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e8e9_e8e9(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8f8_e8f8(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_TXS_IMP();
@@ -20725,7 +20825,7 @@ void seg_e8e9_e8e9(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e8ef_draw_zipped_nametable(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e8fe_draw_zipped_nametable(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -20743,7 +20843,7 @@ void seg_e8ef_draw_zipped_nametable(mos6502<GameState::EmulatorRunContext>& emu)
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e8fc_draw_zipped_vram(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e90b_draw_zipped_vram(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -20751,33 +20851,33 @@ void seg_e8fc_draw_zipped_vram(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e8fe_load_background(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e90d_load_background(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e902_normal_byte(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e911_normal_byte(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e908_e908(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e917_e917(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e90b_opcode(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e91a_opcode(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e90e_e90e(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e91d_e91d(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e912_e912(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e921_e921(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TAX_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -20789,7 +20889,7 @@ void seg_e912_e912(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e915_write_one_byte(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e924_write_one_byte(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_DEX_IMP();
@@ -20797,39 +20897,39 @@ void seg_e915_write_one_byte(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e91b_e91b(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e92a_e92a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e91e_e91e(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e92d_e92d(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e921_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e930_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e922_next_byte(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e931_next_byte(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INC_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e926_e926(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e935_e935(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INC_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e928_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e937_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e929_call_pointed_subroutine(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e938_call_pointed_subroutine(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABI();
 	if (emu.stopped) { return; }
 }
-void seg_e92c_copy_palette_to_ppu(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e93b_copy_palette_to_ppu(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -20861,7 +20961,7 @@ void seg_e92c_copy_palette_to_ppu(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e940_copy_one_color(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e94f_copy_one_color(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -20873,11 +20973,11 @@ void seg_e940_copy_one_color(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e949_e949(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e958_e958(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e94a_shake_screen(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e959_shake_screen(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDX_IMM();
@@ -20887,17 +20987,17 @@ void seg_e94a_shake_screen(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e94e_move_one_component(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e95d_move_one_component(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZEX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e952_e952(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e961_e961(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BPL_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e954_inc_component(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e963_inc_component(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZEX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CLC_IMP();
@@ -20909,7 +21009,7 @@ void seg_e954_inc_component(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e95f_dec_component(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e96e_dec_component(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZEX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_SEC_IMP();
@@ -20937,7 +21037,7 @@ void seg_e95f_dec_component(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e967_ok(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e976_ok(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LSR_ACC_ACC();
@@ -20957,7 +21057,7 @@ void seg_e967_ok(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e97b_e97b(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e98a_e98a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_SEC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_SBC_ZER();
@@ -20973,19 +21073,19 @@ void seg_e97b_e97b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BPL_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e986_e986(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e995_e995(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e98a_e98a(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e999_e999(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e98f_set_screen_two(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e99e_set_screen_two(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ADC_IMM();
@@ -21001,7 +21101,7 @@ void seg_e98f_set_screen_two(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e996_set_screen(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e9a5_set_screen(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_DEC_ZER();
@@ -21009,7 +21109,7 @@ void seg_e996_set_screen(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e99c_e99c(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e9ab_e9ab(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -21023,11 +21123,11 @@ void seg_e99c_e99c(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e9a6_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e9b5_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_e9a7_get_unzipped_bytes(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e9b6_get_unzipped_bytes(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -21041,71 +21141,71 @@ void seg_e9a7_get_unzipped_bytes(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e9af_skip_bytes(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e9be_skip_bytes(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e9b3_carry(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e9c2_carry(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
-	if (emu.stopped) { return; }
-}
-void seg_e9b7_e9b7(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_DEC_ZER();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_DEC_ZER();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_CPX_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_BNE_REL();
-	if (emu.stopped) { return; }
-}
-void seg_e9b9_no_carry(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_DEC_ZER();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_CPX_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_BNE_REL();
-	if (emu.stopped) { return; }
-}
-void seg_e9bb_loop_without_dec(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_CPX_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_BNE_REL();
-	if (emu.stopped) { return; }
-}
-void seg_e9bf_e9bf(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_LDA_INY();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_BEQ_REL();
-	if (emu.stopped) { return; }
-}
-void seg_e9c3_normal_byte(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_INY_IMP();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
 void seg_e9c6_e9c6(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_INC_ZER();
+	++emu.pc; emu.Op_DEC_ZER();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_JMP_ABS();
+	++emu.pc; emu.Op_DEC_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_CPX_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e9c8_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_JMP_ABS();
+void seg_e9c8_no_carry(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_DEC_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_CPX_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e9cb_opcode(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_INY_IMP();
+void seg_e9ca_loop_without_dec(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_CPX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
 void seg_e9ce_e9ce(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_LDA_INY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_BEQ_REL();
+	if (emu.stopped) { return; }
+}
+void seg_e9d2_normal_byte(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_INY_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_BNE_REL();
+	if (emu.stopped) { return; }
+}
+void seg_e9d5_e9d5(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_INC_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_JMP_ABS();
+	if (emu.stopped) { return; }
+}
+void seg_e9d7_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_JMP_ABS();
+	if (emu.stopped) { return; }
+}
+void seg_e9da_opcode(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_INY_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_BNE_REL();
+	if (emu.stopped) { return; }
+}
+void seg_e9dd_e9dd(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INC_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -21117,7 +21217,7 @@ void seg_e9ce_e9ce(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e9d0_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e9df_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_TAX_IMP();
@@ -21127,7 +21227,7 @@ void seg_e9d0_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e9d6_e9d6(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e9e5_e9e5(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INC_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ZER();
@@ -21135,13 +21235,13 @@ void seg_e9d6_e9d6(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e9d8_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e9e7_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e9dc_skip_all(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e9eb_skip_all(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STX_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDX_IMM();
@@ -21163,29 +21263,29 @@ void seg_e9dc_skip_all(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e9ed_done(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e9fc_done(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e9f0_compressed_zero(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_e9ff_compressed_zero(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_DEX_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_e9f4_get_bytes(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea03_get_bytes(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CPX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e9f8_e9f8(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea07_ea07(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_e9fc_normal_byte(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea0b_normal_byte(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STY_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDY_ZER();
@@ -21201,7 +21301,7 @@ void seg_e9fc_normal_byte(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea09_ea09(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea18_ea18(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INC_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDX_IMM();
@@ -21209,19 +21309,19 @@ void seg_ea09_ea09(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ea0b_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea1a_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ea10_opcode(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea1f_opcode(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea13_ea13(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea22_ea22(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INC_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -21233,7 +21333,7 @@ void seg_ea13_ea13(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea15_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea24_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_TAX_IMP();
@@ -21243,17 +21343,17 @@ void seg_ea15_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea1b_ea1b(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea2a_ea2a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INC_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ea1d_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea2c_end_inc_vector(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ea20_compressed_zero(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea2f_compressed_zero(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STX_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -21277,21 +21377,21 @@ void seg_ea20_compressed_zero(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea31_loop_get_bytes(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea40_loop_get_bytes(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_DEC_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea33_force_loop_get_bytes(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea42_force_loop_get_bytes(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea35_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea44_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ea36_multiply8(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea45_multiply8(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LSR_ZER();
@@ -21299,7 +21399,7 @@ void seg_ea36_multiply8(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea3c_ea3c(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea4b_ea4b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ADC_ZER();
@@ -21311,7 +21411,7 @@ void seg_ea3c_ea3c(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea3f_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea4e_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ZER();
@@ -21319,7 +21419,7 @@ void seg_ea3f_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea44_ea44(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea53_ea53(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ADC_ZER();
@@ -21331,7 +21431,7 @@ void seg_ea44_ea44(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea47_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea56_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ZER();
@@ -21339,7 +21439,7 @@ void seg_ea47_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea4c_ea4c(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea5b_ea5b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ADC_ZER();
@@ -21351,7 +21451,7 @@ void seg_ea4c_ea4c(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea4f_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea5e_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ZER();
@@ -21359,7 +21459,7 @@ void seg_ea4f_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea54_ea54(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea63_ea63(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ADC_ZER();
@@ -21371,7 +21471,7 @@ void seg_ea54_ea54(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea57_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea66_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ZER();
@@ -21379,7 +21479,7 @@ void seg_ea57_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea5c_ea5c(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea6b_ea6b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ADC_ZER();
@@ -21391,7 +21491,7 @@ void seg_ea5c_ea5c(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea5f_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea6e_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ZER();
@@ -21399,7 +21499,7 @@ void seg_ea5f_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea64_ea64(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea73_ea73(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ADC_ZER();
@@ -21411,7 +21511,7 @@ void seg_ea64_ea64(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea67_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea76_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ZER();
@@ -21419,7 +21519,7 @@ void seg_ea67_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea6c_ea6c(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea7b_ea7b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ADC_ZER();
@@ -21431,7 +21531,7 @@ void seg_ea6c_ea6c(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea6f_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea7e_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ZER();
@@ -21439,7 +21539,7 @@ void seg_ea6f_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ea74_ea74(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea83_ea83(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ADC_ZER();
@@ -21451,7 +21551,7 @@ void seg_ea74_ea74(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ea77_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea86_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ZER();
@@ -21459,7 +21559,7 @@ void seg_ea77_no_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ea7b_animation_init_state(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ea8a_animation_init_state(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDY_IMM();
@@ -21523,7 +21623,7 @@ void seg_ea7b_animation_init_state(mos6502<GameState::EmulatorRunContext>& emu) 
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_eab8_animation_state_change_animation(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eac7_animation_state_change_animation(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDY_IMM();
@@ -21559,7 +21659,7 @@ void seg_eab8_animation_state_change_animation(mos6502<GameState::EmulatorRunCon
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ead9_animation_draw(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eae8_animation_draw(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -21619,7 +21719,7 @@ void seg_ead9_animation_draw(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eb00_animation_draw_pre_initialized(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb0f_animation_draw_pre_initialized(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -21637,7 +21737,7 @@ void seg_eb00_animation_draw_pre_initialized(mos6502<GameState::EmulatorRunConte
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eb10_eb10(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb1f_eb1f(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -21645,7 +21745,7 @@ void seg_eb10_eb10(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_eb17_default_direction(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb26_default_direction(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -21661,7 +21761,7 @@ void seg_eb17_default_direction(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eb1b_ok(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb2a_ok(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -21673,7 +21773,7 @@ void seg_eb1b_ok(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eb24_eb24(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb33_eb33(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ZER();
@@ -21699,13 +21799,13 @@ void seg_eb24_eb24(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_eb39_end_foreground_sprites(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb48_end_foreground_sprites(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eb3d_eb3d(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb4c_eb4c(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_INY_IMP();
@@ -21715,7 +21815,7 @@ void seg_eb3d_eb3d(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eb44_eb44(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb53_eb53(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ASL_ACC_ACC();
@@ -21737,7 +21837,7 @@ void seg_eb44_eb44(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_eb55_default_direction(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb64_default_direction(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ASL_ACC_ACC();
@@ -21761,13 +21861,13 @@ void seg_eb55_default_direction(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_eb63_ok(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb72_ok(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_eb68_clear_unused_sprites(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb77_clear_unused_sprites(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INC_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ZER();
@@ -21779,7 +21879,7 @@ void seg_eb68_clear_unused_sprites(mos6502<GameState::EmulatorRunContext>& emu) 
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eb71_eb71(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb80_eb80(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TAY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ZER();
@@ -21807,7 +21907,7 @@ void seg_eb71_eb71(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eb79_clear_one_unused_sprite(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb88_clear_one_unused_sprite(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_INX_IMP();
@@ -21823,11 +21923,11 @@ void seg_eb79_clear_one_unused_sprite(mos6502<GameState::EmulatorRunContext>& em
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eb83_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb92_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_eb84_animation_handle_sprites(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb93_animation_handle_sprites(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_PHA_IMP();
@@ -21835,13 +21935,13 @@ void seg_eb84_animation_handle_sprites(mos6502<GameState::EmulatorRunContext>& e
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eb89_eb89(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb98_eb98(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_eb8e_set_relative_msb_neg(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb9d_set_relative_msb_neg(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -21861,7 +21961,7 @@ void seg_eb8e_set_relative_msb_neg(mos6502<GameState::EmulatorRunContext>& emu) 
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eb90_set_relative_msb(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eb9f_set_relative_msb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_PLA_IMP();
@@ -21879,7 +21979,7 @@ void seg_eb90_set_relative_msb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eb9f_eb9f(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebae_ebae(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ZER();
@@ -21887,13 +21987,13 @@ void seg_eb9f_eb9f(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eba4_eba4(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebb3_ebb3(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_eba9_player_b(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebb8_player_b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CMP_IMM();
@@ -21901,7 +22001,7 @@ void seg_eba9_player_b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCS_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ebaf_ebaf(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebbe_ebbe(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ADC_IMM();
@@ -21929,7 +22029,7 @@ void seg_ebaf_ebaf(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ebb2_end_anim_hook(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebc1_end_anim_hook(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_INY_IMP();
@@ -21953,13 +22053,13 @@ void seg_ebb2_end_anim_hook(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ebc6_ebc6(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebd5_ebd5(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ebcb_flip_x(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebda_flip_x(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_EOR_IMM();
@@ -21973,19 +22073,19 @@ void seg_ebcb_flip_x(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ebd2_got_relative_pos(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebe1_got_relative_pos(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_PHA_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ebd5_ebd5(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebe4_ebe4(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ebda_set_relative_msb_neg(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebe9_set_relative_msb_neg(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -22005,7 +22105,7 @@ void seg_ebda_set_relative_msb_neg(mos6502<GameState::EmulatorRunContext>& emu) 
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ebdc_set_relative_msb(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebeb_set_relative_msb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_PLA_IMP();
@@ -22023,11 +22123,11 @@ void seg_ebdc_set_relative_msb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ebeb_ebeb(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebfa_ebfa(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ebee_continue(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebfd_continue(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_TXA_IMP();
@@ -22043,7 +22143,7 @@ void seg_ebee_continue(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ebef_loop(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ebfe_loop(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TXA_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CLC_IMP();
@@ -22057,11 +22157,11 @@ void seg_ebef_loop(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ebf8_ebf8(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec07_ec07(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ebf9_skip(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec08_skip(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_INY_IMP();
@@ -22077,7 +22177,7 @@ void seg_ebf9_skip(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ebfc_skip2(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec0b_skip2(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -22087,13 +22187,13 @@ void seg_ebfc_skip2(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ec05_animation_tick(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec14_animation_tick(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec09_ec09(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec18_ec18(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -22105,17 +22205,17 @@ void seg_ec09_ec09(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec12_ec12(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec21_ec21(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec14_skip_tick(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec23_skip_tick(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ec17_reset_cnt(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec26_reset_cnt(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_INY();
@@ -22149,7 +22249,7 @@ void seg_ec17_reset_cnt(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec19_ok(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec28_ok(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDY_IMM();
@@ -22181,7 +22281,7 @@ void seg_ec19_ok(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec1b_skip(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec2a_skip(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -22211,7 +22311,7 @@ void seg_ec1b_skip(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec35_ec35(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec44_ec44(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STY_ZER();
@@ -22257,7 +22357,7 @@ void seg_ec35_ec35(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec5c_ec5c(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec6b_ec6b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -22291,7 +22391,7 @@ void seg_ec5c_ec5c(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ec67_store_frame_vector(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec76_store_frame_vector(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ZER();
@@ -22313,11 +22413,11 @@ void seg_ec67_store_frame_vector(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ec78_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec87_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ec79_boxes_overlap(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec88_boxes_overlap(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CMP_ZER();
@@ -22329,17 +22429,17 @@ void seg_ec79_boxes_overlap(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BVC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec83_ec83(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec92_ec92(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_EOR_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec85_end_signed_cmp(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec94_end_signed_cmp(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec87_ec87(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ec96_ec96(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CMP_ZER();
@@ -22351,17 +22451,17 @@ void seg_ec87_ec87(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BVC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec91_ec91(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eca0_eca0(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_EOR_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec93_end_signed_cmp(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eca2_end_signed_cmp(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec95_ec95(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eca4_eca4(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CMP_ZER();
@@ -22373,17 +22473,17 @@ void seg_ec95_ec95(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BVC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ec9f_ec9f(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecae_ecae(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_EOR_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eca1_end_signed_cmp(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecb0_end_signed_cmp(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eca3_eca3(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecb2_ecb2(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CMP_ZER();
@@ -22395,37 +22495,37 @@ void seg_eca3_eca3(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BVC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ecad_ecad(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecbc_ecbc(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_EOR_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ecaf_end_signed_cmp(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecbe_end_signed_cmp(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ecb1_ecb1(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecc0_ecc0(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ecb6_no_overlap(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecc5_no_overlap(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ecb8_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecc7_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ecb9_audio_init(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecc8_audio_init(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ecbc_ecbc(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eccb_eccb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -22437,7 +22537,7 @@ void seg_ecbc_ecbc(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ecc1_audio_cut_sfx(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecd0_audio_cut_sfx(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -22445,7 +22545,7 @@ void seg_ecc1_audio_cut_sfx(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ecc7_audio_play_sfx(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecd6_audio_play_sfx(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STY_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STX_ABS();
@@ -22469,7 +22569,7 @@ void seg_ecc7_audio_play_sfx(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ecd0_audio_play_sfx_direct(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecdf_audio_play_sfx_direct(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -22487,7 +22587,7 @@ void seg_ecd0_audio_play_sfx_direct(mos6502<GameState::EmulatorRunContext>& emu)
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ece3_audio_play_music(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecf2_audio_play_music(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STY_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STX_ZER();
@@ -22511,7 +22611,7 @@ void seg_ece3_audio_play_music(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ece9_audio_play_music_direct(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ecf8_audio_play_music_direct(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -22529,13 +22629,13 @@ void seg_ece9_audio_play_music_direct(mos6502<GameState::EmulatorRunContext>& em
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ecfb_ecfb(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ed0a_ed0a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ed00_ed00(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ed0f_ed0f(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -22547,28 +22647,6 @@ void seg_ed00_ed00(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STA_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_JSR_ABS();
-	if (emu.stopped) { return; }
-}
-void seg_ed18_ed18(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_LDA_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STA_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STA_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STA_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
 	if (emu.stopped) { return; }
@@ -22577,11 +22655,33 @@ void seg_ed18_ed18(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ed31_ed31(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ed27_ed27(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_LDA_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_STA_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDA_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_STA_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDA_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_STA_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDA_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_STA_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDX_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_JSR_ABS();
+	if (emu.stopped) { return; }
+}
+void seg_ed40_ed40(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ed32_init_channel(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ed41_init_channel(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZEX();
@@ -22593,7 +22693,7 @@ void seg_ed32_init_channel(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCS_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ed3d_ed3d(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ed4c_ed4c(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABX();
@@ -22609,13 +22709,13 @@ void seg_ed3d_ed3d(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ed4d_ed4d(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ed5c_ed5c(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ed53_pulse_2(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ed62_pulse_2(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -22663,7 +22763,7 @@ void seg_ed53_pulse_2(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ed56_ok(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ed65_ok(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABX();
@@ -22709,7 +22809,7 @@ void seg_ed56_ok(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ed64_end_pulse_specifics(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ed73_end_pulse_specifics(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TXA_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ASL_ACC_ACC();
@@ -22745,7 +22845,7 @@ void seg_ed64_end_pulse_specifics(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ed81_audio_mute_music(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ed90_audio_mute_music(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -22773,7 +22873,7 @@ void seg_ed81_audio_mute_music(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_eda2_audio_unmute_music(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_edb1_audio_unmute_music(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -22809,7 +22909,7 @@ void seg_eda2_audio_unmute_music(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BPL_REL();
 	if (emu.stopped) { return; }
 }
-void seg_edaa_square_reinit_loop(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_edb9_square_reinit_loop(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABY();
@@ -22837,29 +22937,29 @@ void seg_edaa_square_reinit_loop(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BPL_REL();
 	if (emu.stopped) { return; }
 }
-void seg_edc6_edc6(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_edd5_edd5(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_edc7_audio_music_extra_tick(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_edd6_audio_music_extra_tick(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_edcb_edcb(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_edda_edda(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_edcf_edcf(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_edde_edde(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_DEC_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BPL_REL();
 	if (emu.stopped) { return; }
 }
-void seg_edd3_edd3(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ede2_ede2(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -22867,11 +22967,11 @@ void seg_edd3_edd3(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_edda_ok(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ede9_ok(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_eddb_audio_music_tick(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_edea_audio_music_tick(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -22883,61 +22983,61 @@ void seg_eddb_audio_music_tick(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ede6_ede6(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_LDX_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_JSR_ABS();
-	if (emu.stopped) { return; }
-}
-void seg_edeb_edeb(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_LDX_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_JSR_ABS();
-	if (emu.stopped) { return; }
-}
-void seg_edf0_edf0(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_LDX_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_JSR_ABS();
-	if (emu.stopped) { return; }
-}
 void seg_edf5_edf5(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_LDX_IMM();
+	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_edf8_music_ok(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_edfa_edfa(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_LDX_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_JSR_ABS();
+	if (emu.stopped) { return; }
+}
+void seg_edff_edff(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_LDX_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_JSR_ABS();
+	if (emu.stopped) { return; }
+}
+void seg_ee04_ee04(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_JSR_ABS();
+	if (emu.stopped) { return; }
+}
+void seg_ee07_music_ok(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_edfd_play_sfx(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ee0c_play_sfx(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ee00_ee00(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ee0f_ee0f(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ee03_ee03(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ee12_ee12(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ee04_apply_music(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ee13_apply_music(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ee08_ee08(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ee17_ee17(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ee0b_sfx_ok(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ee1a_sfx_ok(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ee0c_noise_fx_tick(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ee1b_noise_fx_tick(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_PHA_IMP();
@@ -22989,11 +23089,11 @@ void seg_ee0c_noise_fx_tick(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ee4b_ee4b(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ee5a_ee5a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ee4e_ee4e(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ee5d_ee5d(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -23045,7 +23145,7 @@ void seg_ee4e_ee4e(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ee8b_noise_tick(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ee9a_noise_tick(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -23059,7 +23159,7 @@ void seg_ee8b_noise_tick(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCS_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ee98_ee98(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eea7_eea7(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ABS();
@@ -23073,13 +23173,13 @@ void seg_ee98_ee98(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_eea7_overflow(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eeb6_overflow(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eeac_eeac(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eebb_eebb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ORA_ABS();
@@ -23087,7 +23187,7 @@ void seg_eeac_eeac(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_eeb4_negative(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eec3_negative(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_ABS();
@@ -23099,7 +23199,7 @@ void seg_eeb4_negative(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eeb9_store_result(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eec8_store_result(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ABS();
@@ -23107,13 +23207,13 @@ void seg_eeb9_store_result(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eebc_end_effects(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eecb_end_effects(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eec1_execute_current_opcode(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eed0_execute_current_opcode(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -23149,7 +23249,7 @@ void seg_eec1_execute_current_opcode(mos6502<GameState::EmulatorRunContext>& emu
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_eee3_eee3(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_eef2_eef2(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ADC_ABS();
@@ -23167,19 +23267,19 @@ void seg_eee3_eee3(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_eef7_end_opcodes_execution(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef06_end_opcodes_execution(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_DEC_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_eefb_noise_apply_mirrored_apu(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef0a_noise_apply_mirrored_apu(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BIT_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BVC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ef00_ef00(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef0f_ef0f(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -23187,7 +23287,7 @@ void seg_ef00_ef00(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ef08_regular_write(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef17_regular_write(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -23203,17 +23303,17 @@ void seg_ef08_regular_write(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ef19_end_write_apu(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef28_end_write_apu(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_ef1a_pulse_tick(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef29_pulse_tick(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ef1f_ef1f(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef2e_ef2e(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -23221,7 +23321,7 @@ void seg_ef1f_ef1f(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ef26_do_effects(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef35_do_effects(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CLC_IMP();
@@ -23239,7 +23339,7 @@ void seg_ef26_do_effects(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ef38_positive(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef47_positive(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TYA_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -23247,7 +23347,7 @@ void seg_ef38_positive(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ef3e_negative(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef4d_negative(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TYA_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ORA_IMM();
@@ -23267,7 +23367,7 @@ void seg_ef3e_negative(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ef41_end_byte_extend(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef50_end_byte_extend(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ADC_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ORA_IMM();
@@ -23283,7 +23383,7 @@ void seg_ef41_end_byte_extend(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ef49_end_effects(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef58_end_effects(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TXA_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -23293,7 +23393,7 @@ void seg_ef49_end_effects(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ef51_execute_current_opcode(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef60_execute_current_opcode(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -23329,7 +23429,7 @@ void seg_ef51_execute_current_opcode(mos6502<GameState::EmulatorRunContext>& emu
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_ef74_ef74(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef83_ef83(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CMP_IMM();
@@ -23337,7 +23437,7 @@ void seg_ef74_ef74(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ef7a_ef7a(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef89_ef89(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLC_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ADC_ABX();
@@ -23355,13 +23455,13 @@ void seg_ef7a_ef7a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ef89_skip_opcode_update(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef98_skip_opcode_update(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ef8e_end_opcodes_execution(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_ef9d_end_opcodes_execution(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_DEC_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_TXA_IMP();
@@ -23379,7 +23479,7 @@ void seg_ef8e_end_opcodes_execution(mos6502<GameState::EmulatorRunContext>& emu)
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_ef9b_ef9b(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_efaa_efaa(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABY();
@@ -23395,7 +23495,7 @@ void seg_ef9b_ef9b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_efaf_efaf(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_efbe_efbe(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABX();
@@ -23403,25 +23503,25 @@ void seg_efaf_efaf(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_efb8_triangle(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_efc7_triangle(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_efbd_efbd(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_efcc_efcc(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_efc2_efc2(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_efd1_efd1(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_efc7_unmute(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_efd6_unmute(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -23437,17 +23537,17 @@ void seg_efc7_unmute(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_efd5_write_linear_cnt(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_efe4_write_linear_cnt(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_efd8_end_write_apu(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_efe7_end_write_apu(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_efd9_opcode_noise_sample_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_efe8_opcode_noise_sample_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_TXA_IMP();
@@ -23493,7 +23593,7 @@ void seg_efd9_opcode_noise_sample_end(mos6502<GameState::EmulatorRunContext>& em
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_efdb_opcode_sample_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_efea_opcode_sample_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TXA_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ASL_ACC_ACC();
@@ -23537,7 +23637,7 @@ void seg_efdb_opcode_sample_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f000_f000(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f00f_f00f(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABX();
@@ -23553,7 +23653,7 @@ void seg_f000_f000(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f010_no_track_loop(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f01f_no_track_loop(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABX();
@@ -23569,13 +23669,13 @@ void seg_f010_no_track_loop(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f01b_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f02a_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f01e_opcode_chan_params(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f02d_opcode_chan_params(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -23609,7 +23709,7 @@ void seg_f01e_opcode_chan_params(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f03b_set_volume(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f04a_set_volume(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -23627,7 +23727,7 @@ void seg_f03b_set_volume(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f04d_opcode_chan_volume_low(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f05c_opcode_chan_volume_low(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -23637,7 +23737,7 @@ void seg_f04d_opcode_chan_volume_low(mos6502<GameState::EmulatorRunContext>& emu
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f055_opcode_chan_volume_high(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f064_opcode_chan_volume_high(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -23649,7 +23749,7 @@ void seg_f055_opcode_chan_volume_high(mos6502<GameState::EmulatorRunContext>& em
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f05f_opcode_noise_set_volume(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f06e_opcode_noise_set_volume(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_TAY_IMP();
@@ -23659,7 +23759,7 @@ void seg_f05f_opcode_noise_set_volume(mos6502<GameState::EmulatorRunContext>& em
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f067_opcode_set_duty(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f076_opcode_set_duty(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ASL_ACC_ACC();
@@ -23687,7 +23787,7 @@ void seg_f067_opcode_set_duty(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f07d_opcode_pulse_frequency_add(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f08c_opcode_pulse_frequency_add(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -23717,7 +23817,7 @@ void seg_f07d_opcode_pulse_frequency_add(mos6502<GameState::EmulatorRunContext>&
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f09a_f09a(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f0a9_f0a9(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -23745,7 +23845,7 @@ void seg_f09a_f09a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f0a3_value_computed(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f0b2_value_computed(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -23765,7 +23865,7 @@ void seg_f0a3_value_computed(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f0b6_opcode_pulse_frequency_sub(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f0c5_opcode_pulse_frequency_sub(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -23795,7 +23895,7 @@ void seg_f0b6_opcode_pulse_frequency_sub(mos6502<GameState::EmulatorRunContext>&
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f0d3_f0d3(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f0e2_f0e2(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -23821,7 +23921,7 @@ void seg_f0d3_f0d3(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f0da_value_computed(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f0e9_value_computed(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -23841,7 +23941,7 @@ void seg_f0da_value_computed(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f0ed_opcode_play_timed_freq(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f0fc_opcode_play_timed_freq(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -23867,7 +23967,7 @@ void seg_f0ed_opcode_play_timed_freq(mos6502<GameState::EmulatorRunContext>& emu
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f105_note_table_lookup(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f114_note_table_lookup(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TAX_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ABX();
@@ -23883,7 +23983,7 @@ void seg_f105_note_table_lookup(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f113_opcode_play_note(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f122_opcode_play_note(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -23903,7 +24003,7 @@ void seg_f113_opcode_play_note(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f123_left_shift(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f132_left_shift(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_DEX_IMP();
@@ -23911,19 +24011,19 @@ void seg_f123_left_shift(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f125_one_left_shift(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f134_one_left_shift(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_DEX_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f128_f128(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f137_f137(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ASL_ACC_ACC();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f12c_right_shift(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f13b_right_shift(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_DEX_IMP();
@@ -23931,19 +24031,19 @@ void seg_f12c_right_shift(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f12e_one_right_shift(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f13d_one_right_shift(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_DEX_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f131_f131(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f140_f140(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LSR_ACC_ACC();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f135_end_wait_compute(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f144_end_wait_compute(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABX();
@@ -23955,7 +24055,7 @@ void seg_f135_end_wait_compute(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f140_f140(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f14f_f14f(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ZER();
@@ -23975,7 +24075,7 @@ void seg_f140_f140(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f154_opcode_play_timed_note(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f163_opcode_play_timed_note(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -23985,7 +24085,7 @@ void seg_f154_opcode_play_timed_note(mos6502<GameState::EmulatorRunContext>& emu
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f15c_f15c(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f16b_f16b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROL_ACC_ACC();
@@ -24019,7 +24119,7 @@ void seg_f15c_f15c(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f17a_opcode_wait(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f189_opcode_wait(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -24033,7 +24133,7 @@ void seg_f17a_opcode_wait(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f187_opcode_noise_wait(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f196_opcode_noise_wait(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -24045,7 +24145,7 @@ void seg_f187_opcode_noise_wait(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f192_opcode_noise_long_wait(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f1a1_opcode_noise_long_wait(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_INY_IMP();
@@ -24059,7 +24159,7 @@ void seg_f192_opcode_noise_long_wait(mos6502<GameState::EmulatorRunContext>& emu
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f194_opcode_long_wait(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f1a3_opcode_long_wait(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -24071,7 +24171,7 @@ void seg_f194_opcode_long_wait(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f19d_opcode_halt(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f1ac_opcode_halt(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -24091,7 +24191,7 @@ void seg_f19d_opcode_halt(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f1b2_opcode_noise_halt(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f1c1_opcode_noise_halt(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -24111,7 +24211,7 @@ void seg_f1b2_opcode_noise_halt(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f1c7_opcode_pitch_slide(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f1d6_opcode_pitch_slide(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -24119,7 +24219,7 @@ void seg_f1c7_opcode_pitch_slide(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f1cd_f1cd(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f1dc_f1dc(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABX();
@@ -24135,7 +24235,7 @@ void seg_f1cd_f1cd(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f1cf_set_value(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f1de_set_value(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_INY_IMP();
@@ -24149,7 +24249,7 @@ void seg_f1cf_set_value(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f1db_opcode_pulse_meta_uslide(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f1ea_opcode_pulse_meta_uslide(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -24157,7 +24257,7 @@ void seg_f1db_opcode_pulse_meta_uslide(mos6502<GameState::EmulatorRunContext>& e
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f1e2_opcode_pulse_meta_dslide(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f1f1_opcode_pulse_meta_dslide(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -24173,7 +24273,7 @@ void seg_f1e2_opcode_pulse_meta_dslide(mos6502<GameState::EmulatorRunContext>& e
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f1e6_opcode_pulse_meta_common(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f1f5_opcode_pulse_meta_common(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ZER();
@@ -24185,13 +24285,13 @@ void seg_f1e6_opcode_pulse_meta_common(mos6502<GameState::EmulatorRunContext>& e
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f1f0_f1f0(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f1ff_f1ff(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CMP_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f1f4_f1f4(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f203_f203(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -24199,7 +24299,7 @@ void seg_f1f4_f1f4(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f1fa_f1fa(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f209_f209(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ZER();
@@ -24223,7 +24323,7 @@ void seg_f1fa_f1fa(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f206_end_note(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f215_end_note(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -24237,7 +24337,7 @@ void seg_f206_end_note(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f212_f212(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f221_f221(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -24247,13 +24347,13 @@ void seg_f212_f212(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f219_f219(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f228_f228(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f21e_keep_volume(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f22d_keep_volume(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -24265,7 +24365,7 @@ void seg_f21e_keep_volume(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f220_set_volume_mask(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f22f_set_volume_mask(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -24275,7 +24375,7 @@ void seg_f220_set_volume_mask(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f228_f228(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f237_f237(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ORA_ZER();
@@ -24297,7 +24397,7 @@ void seg_f228_f228(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f22e_replace_duty(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f23d_replace_duty(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_ZER();
@@ -24313,7 +24413,7 @@ void seg_f22e_replace_duty(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f238_end_volume_duty(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f247_end_volume_duty(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -24321,7 +24421,7 @@ void seg_f238_end_volume_duty(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f23e_f23e(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f24d_f24d(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABX();
@@ -24339,7 +24439,7 @@ void seg_f23e_f23e(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f249_end_pitch_slide(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f258_end_pitch_slide(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_TYA_IMP();
@@ -24347,13 +24447,13 @@ void seg_f249_end_pitch_slide(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f24c_opcode_noise_set_periodic(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f25b_opcode_noise_set_periodic(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f250_f250(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f25f_f25f(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ORA_IMM();
@@ -24361,7 +24461,7 @@ void seg_f250_f250(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f258_unset(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f267_unset(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
@@ -24373,7 +24473,7 @@ void seg_f258_unset(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f25d_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f26c_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -24381,7 +24481,7 @@ void seg_f25d_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f263_opcode_noise_play_timed_freq(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f272_opcode_noise_play_timed_freq(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -24405,7 +24505,7 @@ void seg_f263_opcode_noise_play_timed_freq(mos6502<GameState::EmulatorRunContext
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f27a_opcode_noise_pitch_slide_up(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f289_opcode_noise_pitch_slide_up(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_EOR_IMM();
@@ -24421,7 +24521,7 @@ void seg_f27a_opcode_noise_pitch_slide_up(mos6502<GameState::EmulatorRunContext>
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f287_opcode_noise_pitch_slide_down(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f296_opcode_noise_pitch_slide_down(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -24431,11 +24531,11 @@ void seg_f287_opcode_noise_pitch_slide_down(mos6502<GameState::EmulatorRunContex
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f28f_opcode_noise_end_sfx(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f29e_opcode_noise_end_sfx(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f292_f292(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f2a1_f2a1(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ORA_IMM();
@@ -24449,7 +24549,13 @@ void seg_f292_f292(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f2be_f2be(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f2af_pulse1_opcode_routines_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_NOP_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_AND_ABS();
+	if (emu.stopped) { return; }
+}
+void seg_f2cd_f2cd(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_SBC_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_SBC_INY();
@@ -24457,11 +24563,19 @@ void seg_f2be_f2be(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f2c4_noise_opcode_routines_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_CMP_ABY();
+void seg_f2d3_noise_opcode_routines_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_INX_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ROR_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_STX_ZEY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_CMP_INX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_STX_ZEY();
 	if (emu.stopped) { return; }
 }
-void seg_f2d8_particle_draw(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f2e7_particle_draw(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -24473,21 +24587,21 @@ void seg_f2d8_particle_draw(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f2de_process_one_block(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f2ed_process_one_block(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f2e3_f2e3(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f2f2_f2f2(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f2e6_f2e6(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f2f5_f2f5(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f2e9_skip_block(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f2f8_skip_block(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TXA_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CLC_IMP();
@@ -24509,7 +24623,7 @@ void seg_f2e9_skip_block(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f2ee_next_block(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f2fd_next_block(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CLC_IMP();
@@ -24523,11 +24637,11 @@ void seg_f2ee_next_block(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f2f9_f2f9(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f308_f308(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f2fa_process_block(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f309_process_block(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -24557,7 +24671,7 @@ void seg_f2fa_process_block(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f30a_next_particle(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f319_next_particle(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INX_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_INX_IMP();
@@ -24573,7 +24687,7 @@ void seg_f30a_next_particle(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f314_f314(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f323_f323(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INC_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ABX();
@@ -24581,13 +24695,13 @@ void seg_f314_f314(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f31b_f31b(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f32a_f32a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f320_f320(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f32f_f32f(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABY();
@@ -24607,7 +24721,7 @@ void seg_f320_f320(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f339_hide_particle(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f348_hide_particle(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABY();
@@ -24623,7 +24737,7 @@ void seg_f339_hide_particle(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f33e_particle_drawn(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f34d_particle_drawn(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_INY_IMP();
@@ -24635,11 +24749,11 @@ void seg_f33e_particle_drawn(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f345_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f354_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f346_particle_handlers_reinit(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f355_particle_handlers_reinit(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -24651,11 +24765,11 @@ void seg_f346_particle_handlers_reinit(mos6502<GameState::EmulatorRunContext>& e
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f351_f351(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f360_f360(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f352_loop_on_particle_boxes(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f361_loop_on_particle_boxes(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_TYA_IMP();
@@ -24665,7 +24779,7 @@ void seg_f352_loop_on_particle_boxes(mos6502<GameState::EmulatorRunContext>& emu
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f354_loop(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f363_loop(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TYA_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_PHA_IMP();
@@ -24673,7 +24787,7 @@ void seg_f354_loop(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f359_f359(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f368_f368(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_PLA_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CLC_IMP();
@@ -24687,11 +24801,11 @@ void seg_f359_f359(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f362_f362(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f371_f371(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f363_loop_on_particles(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f372_loop_on_particles(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -24703,7 +24817,7 @@ void seg_f363_loop_on_particles(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f367_next_particle(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f376_next_particle(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CMP_IMM();
@@ -24711,7 +24825,7 @@ void seg_f367_next_particle(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f36d_f36d(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f37c_f37c(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INC_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_INY_IMP();
@@ -24725,15 +24839,15 @@ void seg_f36d_f36d(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f376_f376(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f385_f385(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f379_end(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f388_end(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f37a_deactivate_particle_block(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f389_deactivate_particle_block(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABY();
@@ -24741,23 +24855,23 @@ void seg_f37a_deactivate_particle_block(mos6502<GameState::EmulatorRunContext>& 
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f382_f382(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f391_f391(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f383_hide_particles(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f392_hide_particles(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CPY_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f387_f387(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f396_f396(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f38c_second_block(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f39b_second_block(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -24773,7 +24887,7 @@ void seg_f38c_second_block(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f38e_set_sprite_offset(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f39d_set_sprite_offset(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_IMM();
@@ -24787,11 +24901,11 @@ void seg_f38e_set_sprite_offset(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f39b_f39b(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f3aa_f3aa(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f39c_hide_one_particle(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f3ab_hide_one_particle(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_CLC_IMP();
@@ -24809,7 +24923,7 @@ void seg_f39c_hide_one_particle(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f3aa_mapper_init(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f3b9_mapper_init(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_SEI_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDX_IMM();
@@ -24893,7 +25007,7 @@ void seg_f3aa_mapper_init(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f40d_esp_cmd_clear_buffers(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f41c_esp_cmd_clear_buffers(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ORA_INX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ORA_INX();
@@ -24907,7 +25021,7 @@ void seg_f40d_esp_cmd_clear_buffers(mos6502<GameState::EmulatorRunContext>& emu)
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f40f_esp_cmd_connect(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f41e_esp_cmd_connect(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ORA_INX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ORA_INX();
@@ -24919,7 +25033,7 @@ void seg_f40f_esp_cmd_connect(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f411_esp_cmd_get_esp_status(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f420_esp_cmd_get_esp_status(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ORA_INX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -24929,7 +25043,7 @@ void seg_f411_esp_cmd_get_esp_status(mos6502<GameState::EmulatorRunContext>& emu
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f413_esp_send_cmd_short(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f422_esp_send_cmd_short(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STX_ZER();
@@ -24937,11 +25051,11 @@ void seg_f413_esp_send_cmd_short(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f417_esp_send_cmd(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f426_esp_send_cmd(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f41a_f41a(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f429_f429(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -24961,7 +25075,7 @@ void seg_f41a_f41a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f422_copy_payload_byte(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f431_copy_payload_byte(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_INY();
@@ -24973,13 +25087,13 @@ void seg_f422_copy_payload_byte(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f42b_f42b(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f43a_f43a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f42f_esp_get_msg(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f43e_esp_get_msg(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDY_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BIT_ABS();
@@ -24987,7 +25101,7 @@ void seg_f42f_esp_get_msg(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f436_f436(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f445_f445(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_INY();
@@ -24995,7 +25109,7 @@ void seg_f436_f436(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f43b_store_msg(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f44a_store_msg(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_INY();
@@ -25013,7 +25127,7 @@ void seg_f43b_store_msg(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f441_store_payload(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f450_store_payload(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_INY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDA_ABY();
@@ -25025,71 +25139,71 @@ void seg_f441_store_payload(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f44a_f44a(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f459_f459(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_STA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f44e_wait_ready_bit(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f45d_wait_ready_bit(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BIT_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BPL_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f453_f453(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f462_f462(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f454_wait_ready_bit(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f463_wait_ready_bit(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BIT_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f459_f459(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f468_f468(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_DEX_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f45c_f45c(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f46b_f46b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_DEY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BMI_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f45f_ok(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f46e_ok(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JMP_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f462_timeout(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f471_timeout(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f465_got_rx(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f474_got_rx(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f468_wait_ready_bit(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f477_wait_ready_bit(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BIT_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_BPL_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f46d_f46d(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f47c_f47c(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f46e_esp_wait_ready(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f47d_esp_wait_ready(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f471_f471(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f480_f480(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -25107,7 +25221,7 @@ void seg_f471_f471(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f47e_wait_loop(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f48d_wait_loop(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDY_IMM();
@@ -25115,11 +25229,11 @@ void seg_f47e_wait_loop(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_f485_f485(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f494_f494(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f487_f487(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f496_f496(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ABS();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -25129,35 +25243,43 @@ void seg_f487_f487(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BNE_REL();
 	if (emu.stopped) { return; }
 }
-void seg_f491_f491(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f4a0_f4a0(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_LDA_IMM();
+	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_RTS_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f612_pal_to_ntsc_velocity_high_byte(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f4a3_timeout(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_LDA_IMM();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_RTS_IMP();
+	if (emu.stopped) { return; }
+}
+void seg_f626_pal_to_ntsc_velocity_high_byte(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BRK_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f674_f674(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f688_f688(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_EOR_INY();
 	if (emu.stopped) { return; }
 }
-void seg_f712_pal_to_ntsc_velocity_low_byte(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f726_pal_to_ntsc_velocity_low_byte(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BRK_IMP();
 	if (emu.stopped) { return; }
 }
-void seg_f812_pal_to_ntsc_velocity_neg_high_byte(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f826_pal_to_ntsc_velocity_neg_high_byte(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ROL_ACC_ACC();
 	if (emu.stopped) { return; }
 }
-void seg_f8b4_f8b4(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_f8c8_f8c8(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_INY();
 	if (emu.stopped) { return; }
 }
-void seg_fa12_random_table(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_fa26_random_table(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CMP_ZER();
 	if (emu.stopped) { return; }
 }
-void seg_fa54_fa54(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_fa68_fa68(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_EOR_INY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ORA_ZEX();
@@ -25167,7 +25289,7 @@ void seg_fa54_fa54(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_BCC_REL();
 	if (emu.stopped) { return; }
 }
-void seg_fb12_server_bytecode_error(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_fb26_server_bytecode_error(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -25175,11 +25297,11 @@ void seg_fb12_server_bytecode_error(mos6502<GameState::EmulatorRunContext>& emu)
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_fb17_server_bytecode_init(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_fb2b_server_bytecode_init(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_fb1a_fb1a(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_fb2e_fb2e(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_ZER();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ZER();
@@ -25215,11 +25337,11 @@ void seg_fb1a_fb1a(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_fb3f_fb3f(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_fb53_fb53(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_fb42_fb42(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_fb56_fb56(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -25227,11 +25349,11 @@ void seg_fb42_fb42(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_fb47_server_bytecode_tick(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_fb5b_server_bytecode_tick(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
-void seg_fb4a_fb4a(mos6502<GameState::EmulatorRunContext>& emu) {
+void seg_fb5e_fb5e(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDA_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_STA_ABS();
@@ -25338,7 +25460,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_c062_characters_netload_routine_lsb,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -25418,7 +25540,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_c0b0_player_animation_state_vectors_msb,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_c0b2_stages_init_routine,
+	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -25448,7 +25570,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_c0ce_c0ce,
 	nullptr,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_c0d0_stages_tick_routine,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -25478,7 +25600,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_c0ee_stages_freezed_tick_routine_lsb,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -25508,7 +25630,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_c10c_stages_nametable,
 	nullptr,
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_c10f_c10f,
@@ -25560,16 +25682,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	&emulator_compiled_segments_funcs::seg_c148_stage_routine_fadeout_lsb,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_c140_c140,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -25583,7 +25696,16 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_c14e_c14e,
 	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	&emulator_compiled_segments_funcs::seg_c157_stage_routine_fadeout_msb,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -25628,7 +25750,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_c184_stages_illustration,
+	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -25658,6 +25780,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_c1a2_stages_netload_routine_lsb,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -25670,8 +25793,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_c1af_c1af,
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_c1b1_stages_netload_routine_msb,
 	nullptr,
@@ -29389,9 +29511,9 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_d035_platform_specific_handlers_lsb,
 	nullptr,
-	nullptr,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_d037_clbl_c_21,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -29584,7 +29706,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_d0f7_d0f7,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_d0f8_platform_specific_handlers_lsb,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -29779,7 +29901,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_d1bb_platform_specific_handlers_lsb,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -29966,7 +30088,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_d276_platform_specific_handlers_lsb,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -31396,7 +31518,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_d80c_d80c,
 	&emulator_compiled_segments_funcs::seg_d80d_title_screen_tick,
 	nullptr,
 	nullptr,
@@ -35134,23 +35256,27 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_e6a5_e6a5,
-	&emulator_compiled_segments_funcs::seg_e6a6_process_nt_buffers,
+	&emulator_compiled_segments_funcs::seg_e6a6_lighten_color,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e6aa_e6aa,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e6ae_ligthen_normal,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e6b2_lighten_black,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e6b4_end,
+	&emulator_compiled_segments_funcs::seg_e6b5_process_nt_buffers,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e6b6_handle_nt_buffer,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35161,13 +35287,13 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e6c5_handle_nt_buffer,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e6c7_vertical_buffer,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35178,8 +35304,8 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e6d6_vertical_buffer,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e6d3_horizontal_buffer,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35188,9 +35314,9 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e6dc_basic_buffer,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e6e2_horizontal_buffer,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35199,6 +35325,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e6eb_basic_buffer,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35219,9 +35346,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e6fb_e6fb,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e6fd_write_one_tile,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35231,37 +35356,39 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e707_e707,
+	&emulator_compiled_segments_funcs::seg_e70a_e70a,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e70c_write_one_tile,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e70d_end_buffers,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e716_e716,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e714_attributes_buffer,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e71c_end_buffers,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e71b_e71b,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e723_attributes_buffer,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e72a_e72a,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35272,7 +35399,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e730_one_step,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35283,6 +35409,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e73f_one_step,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35303,26 +35430,25 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e74f_e74f,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e755_step_buffer,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e75e_e75e,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e764_step_buffer,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e762_e762,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35333,6 +35459,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e771_e771,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35351,7 +35478,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e77f_write_one_tile,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35362,6 +35488,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e78e_write_one_tile,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35382,7 +35509,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e79e_e79e,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35391,9 +35517,9 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e7a7_buffer_handlers_lsb,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e7ad_e7ad,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35403,28 +35529,27 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e7b3_smart_keep_input_dirty,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e7b7_dumb_keep_input_dirty,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e7bb_keep_input_dirty_rts,
-	&emulator_compiled_segments_funcs::seg_e7bc_get_transition_id,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e7c2_smart_keep_input_dirty,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e7c6_dumb_keep_input_dirty,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e7c6_change_global_game_state,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e7ca_keep_input_dirty_rts,
+	&emulator_compiled_segments_funcs::seg_e7cb_get_transition_id,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35434,7 +35559,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e7d2_e7d2,
+	&emulator_compiled_segments_funcs::seg_e7d5_change_global_game_state,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35446,6 +35571,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e7e1_e7e1,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35453,7 +35579,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e7e5_e7e5,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35462,21 +35587,21 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e7ee_e7ee,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e7f0_clr_sprites,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e7f4_e7f4,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e7f8_e7f8,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e7fd_e7fd,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e7ff_clr_sprites,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35484,88 +35609,87 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e807_e807,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e809_e809,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e80c_e80c,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e812_find_transition_index,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e815_e815,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e818_e818,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e819_check_one_entry,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e81b_e81b,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e81e_e81e,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e821_find_transition_index,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e822_e822,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e824_e824,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e826_not_found,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e828_found,
-	&emulator_compiled_segments_funcs::seg_e829_pre_transition,
+	&emulator_compiled_segments_funcs::seg_e828_check_one_entry,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e82c_e82c,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e82d_e82d,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e830_e830,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e831_e831,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e835_not_found,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e837_found,
+	&emulator_compiled_segments_funcs::seg_e838_pre_transition,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e83b_e83b,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e83f_e83f,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e83d_end,
-	&emulator_compiled_segments_funcs::seg_e83e_post_transition,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e841_e841,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e845_e845,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e84c_end,
+	&emulator_compiled_segments_funcs::seg_e84d_post_transition,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e850_e850,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e854_e854,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e852_e852,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e855_no_transition,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35575,13 +35699,12 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e85f_e85f,
+	&emulator_compiled_segments_funcs::seg_e861_e861,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e864_no_transition,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e864_end,
-	&emulator_compiled_segments_funcs::seg_e865_fetch_controllers,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35589,11 +35712,13 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e86e_e86e,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e871_fetch_one_controller,
+	&emulator_compiled_segments_funcs::seg_e873_end,
+	&emulator_compiled_segments_funcs::seg_e874_fetch_controllers,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35603,9 +35728,9 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e87b_next_btn,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e880_fetch_one_controller,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35615,47 +35740,46 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e887_e887,
+	&emulator_compiled_segments_funcs::seg_e88a_next_btn,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e88c_e88c,
-	&emulator_compiled_segments_funcs::seg_e88d_wait_next_frame,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e891_waiting,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e895_e895,
-	&emulator_compiled_segments_funcs::seg_e896_absolute_a,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e896_e896,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e89a_e89a,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e89b_e89b,
+	&emulator_compiled_segments_funcs::seg_e89c_wait_next_frame,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e89f_end,
-	&emulator_compiled_segments_funcs::seg_e8a0_multiply,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e8a0_waiting,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e8a4_e8a4,
+	&emulator_compiled_segments_funcs::seg_e8a5_absolute_a,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e8a9_e8a9,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e8ab_additions_loop,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e8ae_end,
+	&emulator_compiled_segments_funcs::seg_e8af_multiply,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e8af_e8af,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35664,18 +35788,18 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e8ba_additions_loop,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e8be_e8be,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e8c0_end,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e8c3_clear_nt_buffers,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35685,10 +35809,10 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e8cf_end,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e8cf_dummy_routine,
-	&emulator_compiled_segments_funcs::seg_e8d0_change_global_game_state_lite,
+	&emulator_compiled_segments_funcs::seg_e8d2_clear_nt_buffers,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35700,8 +35824,9 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e8de_dummy_routine,
+	&emulator_compiled_segments_funcs::seg_e8df_change_global_game_state_lite,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e8dd_clr_sprites,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35710,88 +35835,89 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e8e6_e8e6,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e8e9_e8e9,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e8ec_clr_sprites,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e8ef_draw_zipped_nametable,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e8f5_e8f5,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e8f8_e8f8,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e8fe_draw_zipped_nametable,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e8fc_draw_zipped_vram,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e8fe_load_background,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e902_normal_byte,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e908_e908,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e90b_opcode,
+	&emulator_compiled_segments_funcs::seg_e90b_draw_zipped_vram,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e90d_load_background,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e90e_e90e,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e911_normal_byte,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e912_e912,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e915_write_one_byte,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e917_e917,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e91a_opcode,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e91b_e91b,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e91d_e91d,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e91e_e91e,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e921_end,
-	&emulator_compiled_segments_funcs::seg_e922_next_byte,
+	&emulator_compiled_segments_funcs::seg_e921_e921,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e924_write_one_byte,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e926_e926,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e928_end_inc_vector,
-	&emulator_compiled_segments_funcs::seg_e929_call_pointed_subroutine,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e92c_copy_palette_to_ppu,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e92a_e92a,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e92d_e92d,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e930_end,
+	&emulator_compiled_segments_funcs::seg_e931_next_byte,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e935_e935,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e937_end_inc_vector,
+	&emulator_compiled_segments_funcs::seg_e938_call_pointed_subroutine,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e93b_copy_palette_to_ppu,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35800,7 +35926,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e940_copy_one_color,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35809,41 +35934,41 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e949_e949,
-	&emulator_compiled_segments_funcs::seg_e94a_shake_screen,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e94e_move_one_component,
+	&emulator_compiled_segments_funcs::seg_e94f_copy_one_color,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e952_e952,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e954_inc_component,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e958_e958,
+	&emulator_compiled_segments_funcs::seg_e959_shake_screen,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e95d_move_one_component,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e95f_dec_component,
+	&emulator_compiled_segments_funcs::seg_e961_e961,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e963_inc_component,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e967_ok,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e96e_dec_component,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35851,6 +35976,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e976_ok,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35859,7 +35985,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e97b_e97b,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35868,9 +35993,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
-	nullptr,
-	&emulator_compiled_segments_funcs::seg_e986_e986,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -35879,253 +36001,258 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e98f_set_screen_two,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e996_set_screen,
+	&emulator_compiled_segments_funcs::seg_e995_e995,
+	nullptr,
+	nullptr,
+	nullptr,
+	&emulator_compiled_segments_funcs::seg_e999_e999,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
-	&emulator_compiled_segments_funcs::seg_e99c_e99c,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9a6_end,
-	&emulator_compiled_segments_funcs::seg_e9a7_get_unzipped_bytes,
+	&emulator_compiled_segments_funcs::seg_e99e_set_screen_two,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9af_skip_bytes,
-	nullptr,
-	nullptr,
-	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9b3_carry,
+	&emulator_compiled_segments_funcs::seg_e9a5_set_screen,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9b7_e9b7,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9b9_no_carry,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9bb_loop_without_dec,
+	&emulator_compiled_segments_funcs::seg_e9ab_e9ab,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9bf_e9bf,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9c3_normal_byte,
+	nullptr,
+	nullptr,
+	nullptr,
+	&emulator_compiled_segments_funcs::seg_e9b5_end,
+	&emulator_compiled_segments_funcs::seg_e9b6_get_unzipped_bytes,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
+	&emulator_compiled_segments_funcs::seg_e9be_skip_bytes,
+	nullptr,
+	nullptr,
+	nullptr,
+	&emulator_compiled_segments_funcs::seg_e9c2_carry,
+	nullptr,
 	nullptr,
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_e9c6_e9c6,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9c8_end_inc_vector,
+	&emulator_compiled_segments_funcs::seg_e9c8_no_carry,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e9ca_loop_without_dec,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9cb_opcode,
 	nullptr,
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_e9ce_e9ce,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9d0_end_inc_vector,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e9d2_normal_byte,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e9d5_e9d5,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9d6_e9d6,
+	&emulator_compiled_segments_funcs::seg_e9d7_end_inc_vector,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9d8_end_inc_vector,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e9da_opcode,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9dc_skip_all,
+	&emulator_compiled_segments_funcs::seg_e9dd_e9dd,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e9df_end_inc_vector,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e9e5_e9e5,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e9e7_end_inc_vector,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e9eb_skip_all,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9ed_done,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9f0_compressed_zero,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9f4_get_bytes,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9f8_e9f8,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e9fc_done,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_e9fc_normal_byte,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_e9ff_compressed_zero,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea03_get_bytes,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea07_ea07,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea0b_normal_byte,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea09_ea09,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea0b_end_inc_vector,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea10_opcode,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea13_ea13,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea15_end_inc_vector,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea18_ea18,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea1a_end_inc_vector,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea1b_ea1b,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea1d_end_inc_vector,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea1f_opcode,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea20_compressed_zero,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea22_ea22,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea24_end_inc_vector,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea2a_ea2a,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea2c_end_inc_vector,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea2f_compressed_zero,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea31_loop_get_bytes,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea33_force_loop_get_bytes,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea35_end,
-	&emulator_compiled_segments_funcs::seg_ea36_multiply8,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea3c_ea3c,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea3f_no_add,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea40_loop_get_bytes,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea42_force_loop_get_bytes,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea44_end,
+	&emulator_compiled_segments_funcs::seg_ea45_multiply8,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea44_ea44,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea47_no_add,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea4b_ea4b,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea4c_ea4c,
+	&emulator_compiled_segments_funcs::seg_ea4e_no_add,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea4f_no_add,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea53_ea53,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea54_ea54,
+	&emulator_compiled_segments_funcs::seg_ea56_no_add,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea57_no_add,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea5b_ea5b,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea5c_ea5c,
+	&emulator_compiled_segments_funcs::seg_ea5e_no_add,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea5f_no_add,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea63_ea63,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea64_ea64,
+	&emulator_compiled_segments_funcs::seg_ea66_no_add,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea67_no_add,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea6b_ea6b,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea6c_ea6c,
+	&emulator_compiled_segments_funcs::seg_ea6e_no_add,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea6f_no_add,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea73_ea73,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea74_ea74,
+	&emulator_compiled_segments_funcs::seg_ea76_no_add,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea77_no_add,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea7b_ea7b,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ea7b_animation_init_state,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea7e_no_add,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea83_ea83,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea86_no_add,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ea8a_animation_init_state,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36176,7 +36303,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eab8_animation_state_change_animation,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36187,6 +36313,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eac7_animation_state_change_animation,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36209,7 +36336,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ead9_animation_draw,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36220,6 +36346,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eae8_animation_draw,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36248,7 +36375,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb00_animation_draw_pre_initialized,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36259,34 +36385,34 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb0f_animation_draw_pre_initialized,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb10_eb10,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb17_default_direction,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb1b_ok,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb1f_eb1f,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb26_default_direction,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb24_eb24,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb2a_ok,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36295,6 +36421,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb33_eb33,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36305,35 +36432,34 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb39_end_foreground_sprites,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb3d_eb3d,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb44_eb44,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb48_end_foreground_sprites,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb4c_eb4c,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb53_eb53,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb55_default_direction,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36344,99 +36470,100 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb64_default_direction,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb63_ok,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb68_clear_unused_sprites,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb72_ok,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb71_eb71,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb77_clear_unused_sprites,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb79_clear_one_unused_sprite,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb80_eb80,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb83_end,
-	&emulator_compiled_segments_funcs::seg_eb84_animation_handle_sprites,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb88_clear_one_unused_sprite,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb89_eb89,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb8e_set_relative_msb_neg,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb90_set_relative_msb,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb92_end,
+	&emulator_compiled_segments_funcs::seg_eb93_animation_handle_sprites,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb98_eb98,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb9d_set_relative_msb_neg,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eb9f_set_relative_msb,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eb9f_eb9f,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eba4_eba4,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eba9_player_b,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ebae_ebae,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ebaf_ebaf,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ebb3_ebb3,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ebb2_end_anim_hook,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ebb8_player_b,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ebbe_ebbe,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ebc1_end_anim_hook,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36446,19 +36573,14 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ebc6_ebc6,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ebcb_flip_x,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	nullptr,
-	nullptr,
-	&emulator_compiled_segments_funcs::seg_ebd2_got_relative_pos,
 	nullptr,
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_ebd5_ebd5,
@@ -36466,28 +36588,28 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ebda_set_relative_msb_neg,
+	&emulator_compiled_segments_funcs::seg_ebda_flip_x,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ebdc_set_relative_msb,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ebe1_got_relative_pos,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ebe4_ebe4,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ebe9_set_relative_msb_neg,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ebeb_set_relative_msb,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ebeb_ebeb,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ebee_continue,
-	&emulator_compiled_segments_funcs::seg_ebef_loop,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36496,25 +36618,26 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ebf8_ebf8,
-	&emulator_compiled_segments_funcs::seg_ebf9_skip,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ebfc_skip2,
+	&emulator_compiled_segments_funcs::seg_ebfa_ebfa,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ebfd_continue,
+	&emulator_compiled_segments_funcs::seg_ebfe_loop,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec05_animation_tick,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ec07_ec07,
+	&emulator_compiled_segments_funcs::seg_ec08_skip,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec09_ec09,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ec0b_skip2,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36522,16 +36645,13 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec12_ec12,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec14_skip_tick,
+	&emulator_compiled_segments_funcs::seg_ec14_animation_tick,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec17_reset_cnt,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec19_ok,
+	&emulator_compiled_segments_funcs::seg_ec18_ec18,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec1b_skip,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36539,11 +36659,16 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ec21_ec21,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ec23_skip_tick,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ec26_reset_cnt,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ec28_ok,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ec2a_skip,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36557,7 +36682,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec35_ec35,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36570,6 +36694,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ec44_ec44,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36596,7 +36721,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec5c_ec5c,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36607,9 +36731,9 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec67_store_frame_vector,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ec6b_ec6b,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36620,12 +36744,11 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ec76_store_frame_vector,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec78_end,
-	&emulator_compiled_segments_funcs::seg_ec79_boxes_overlap,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36635,12 +36758,11 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec83_ec83,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec85_end_signed_cmp,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec87_ec87,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ec87_end,
+	&emulator_compiled_segments_funcs::seg_ec88_boxes_overlap,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36649,12 +36771,12 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec91_ec91,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec93_end_signed_cmp,
+	&emulator_compiled_segments_funcs::seg_ec92_ec92,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec95_ec95,
+	&emulator_compiled_segments_funcs::seg_ec94_end_signed_cmp,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ec96_ec96,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36663,12 +36785,12 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ec9f_ec9f,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eca1_end_signed_cmp,
+	&emulator_compiled_segments_funcs::seg_eca0_eca0,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eca3_eca3,
+	&emulator_compiled_segments_funcs::seg_eca2_end_signed_cmp,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eca4_eca4,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36677,43 +36799,48 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ecad_ecad,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ecaf_end_signed_cmp,
+	&emulator_compiled_segments_funcs::seg_ecae_ecae,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ecb1_ecb1,
+	&emulator_compiled_segments_funcs::seg_ecb0_end_signed_cmp,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ecb2_ecb2,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ecb6_no_overlap,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ecb8_end,
-	&emulator_compiled_segments_funcs::seg_ecb9_audio_init,
+	nullptr,
+	nullptr,
+	nullptr,
 	nullptr,
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_ecbc_ecbc,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ecbe_end_signed_cmp,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ecc0_ecc0,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ecc1_audio_cut_sfx,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ecc5_no_overlap,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ecc7_end,
+	&emulator_compiled_segments_funcs::seg_ecc8_audio_init,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ecc7_audio_play_sfx,
+	&emulator_compiled_segments_funcs::seg_eccb_eccb,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ecd0_audio_cut_sfx,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ecd0_audio_play_sfx_direct,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ecd6_audio_play_sfx,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36722,6 +36849,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ecdf_audio_play_sfx_direct,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36731,22 +36859,22 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ece3_audio_play_music,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ece9_audio_play_music_direct,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ecf2_audio_play_music,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ecf8_audio_play_music_direct,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36755,21 +36883,21 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ecfb_ecfb,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ed00_ed00,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ed0a_ed0a,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ed0f_ed0f,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36784,7 +36912,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ed18_ed18,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36794,6 +36921,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ed27_ed27,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36809,8 +36937,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ed31_ed31,
-	&emulator_compiled_segments_funcs::seg_ed32_init_channel,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36820,8 +36946,9 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ed40_ed40,
+	&emulator_compiled_segments_funcs::seg_ed41_init_channel,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ed3d_ed3d,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36831,36 +36958,36 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ed4c_ed4c,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ed4d_ed4d,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ed53_pulse_2,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ed56_ok,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ed5c_ed5c,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ed62_pulse_2,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ed65_ok,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ed64_end_pulse_specifics,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36870,6 +36997,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ed73_end_pulse_specifics,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36889,7 +37017,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ed81_audio_mute_music,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36899,6 +37026,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ed90_audio_mute_music,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36922,7 +37050,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eda2_audio_unmute_music,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36930,9 +37057,9 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_edaa_square_reinit_loop,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_edb1_audio_unmute_music,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36940,6 +37067,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_edb9_square_reinit_loop,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -36958,49 +37086,43 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_edc6_edc6,
-	&emulator_compiled_segments_funcs::seg_edc7_audio_music_extra_tick,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_edcb_edcb,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_edcf_edcf,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_edd3_edd3,
+	&emulator_compiled_segments_funcs::seg_edd5_edd5,
+	&emulator_compiled_segments_funcs::seg_edd6_audio_music_extra_tick,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_edda_edda,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_edda_ok,
-	&emulator_compiled_segments_funcs::seg_eddb_audio_music_tick,
+	&emulator_compiled_segments_funcs::seg_edde_edde,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ede2_ede2,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ede9_ok,
+	&emulator_compiled_segments_funcs::seg_edea_audio_music_tick,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ede6_ede6,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_edeb_edeb,
 	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	&emulator_compiled_segments_funcs::seg_edf0_edf0,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37008,39 +37130,42 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	&emulator_compiled_segments_funcs::seg_edf5_edf5,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_edf8_music_ok,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_edfa_edfa,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_edfd_play_sfx,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ee00_ee00,
+	&emulator_compiled_segments_funcs::seg_edff_edff,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ee03_ee03,
-	&emulator_compiled_segments_funcs::seg_ee04_apply_music,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ee04_ee04,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ee08_ee08,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ee07_music_ok,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ee0b_sfx_ok,
-	&emulator_compiled_segments_funcs::seg_ee0c_noise_fx_tick,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ee0c_play_sfx,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ee0f_ee0f,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ee12_ee12,
+	&emulator_compiled_segments_funcs::seg_ee13_apply_music,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ee17_ee17,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ee1a_sfx_ok,
+	&emulator_compiled_segments_funcs::seg_ee1b_noise_fx_tick,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37091,10 +37216,8 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ee4b_ee4b,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ee4e_ee4e,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37105,8 +37228,10 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ee5a_ee5a,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ee5d_ee5d,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37155,7 +37280,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ee8b_noise_tick,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37168,7 +37292,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ee98_ee98,
+	&emulator_compiled_segments_funcs::seg_ee9a_noise_tick,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37181,14 +37305,13 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eea7_eea7,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eea7_overflow,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eeac_eeac,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37196,32 +37319,34 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eeb4_negative,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eeb6_overflow,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eeb9_store_result,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eebb_eebb,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eebc_end_effects,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eec1_execute_current_opcode,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eec3_negative,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eec8_store_result,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eecb_end_effects,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eed0_execute_current_opcode,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37243,7 +37368,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eee3_eee3,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37256,6 +37380,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_eef2_eef2,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37263,29 +37388,28 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eef7_end_opcodes_execution,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_eefb_noise_apply_mirrored_apu,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef00_ef00,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef06_end_opcodes_execution,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef08_regular_write,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef0a_noise_apply_mirrored_apu,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef0f_ef0f,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37293,72 +37417,72 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef17_regular_write,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef19_end_write_apu,
-	&emulator_compiled_segments_funcs::seg_ef1a_pulse_tick,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef1f_ef1f,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef26_do_effects,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef28_end_write_apu,
+	&emulator_compiled_segments_funcs::seg_ef29_pulse_tick,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef2e_ef2e,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef35_do_effects,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef38_positive,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef3e_negative,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef41_end_byte_extend,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef47_positive,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef49_end_effects,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef4d_negative,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef50_end_byte_extend,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef51_execute_current_opcode,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef58_end_effects,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37366,6 +37490,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef60_execute_current_opcode,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37388,13 +37513,11 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef74_ef74,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef7a_ef7a,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37402,19 +37525,19 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef83_ef83,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef89_ef89,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef89_skip_opcode_update,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef8e_end_opcodes_execution,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37423,11 +37546,12 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_ef98_skip_opcode_update,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_ef9b_ef9b,
+	&emulator_compiled_segments_funcs::seg_ef9d_end_opcodes_execution,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37440,6 +37564,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_efaa_efaa,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37447,7 +37572,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_efaf_efaf,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37456,42 +37580,39 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_efb8_triangle,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_efbd_efbd,
+	&emulator_compiled_segments_funcs::seg_efbe_efbe,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_efc2_efc2,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_efc7_unmute,
+	&emulator_compiled_segments_funcs::seg_efc7_triangle,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_efcc_efcc,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_efd1_efd1,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_efd6_unmute,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_efd5_write_linear_cnt,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_efd8_end_write_apu,
-	&emulator_compiled_segments_funcs::seg_efd9_opcode_noise_sample_end,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_efdb_opcode_sample_end,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37501,9 +37622,13 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_efe4_write_linear_cnt,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_efe7_end_write_apu,
+	&emulator_compiled_segments_funcs::seg_efe8_opcode_noise_sample_end,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_efea_opcode_sample_end,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37528,7 +37653,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f000_f000,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37541,10 +37665,10 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f00f_f00f,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f010_no_track_loop,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37555,10 +37679,9 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f01b_end,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f01e_opcode_chan_params,
+	&emulator_compiled_segments_funcs::seg_f01f_no_track_loop,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37569,8 +37692,10 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f02a_end,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f02d_opcode_chan_params,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37587,7 +37712,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f03b_set_volume,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37600,12 +37724,12 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f04a_set_volume,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f04d_opcode_chan_volume_low,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37613,30 +37737,30 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f055_opcode_chan_volume_high,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f05c_opcode_chan_volume_low,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f05f_opcode_noise_set_volume,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f064_opcode_chan_volume_high,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f067_opcode_set_duty,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f06e_opcode_noise_set_volume,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37644,6 +37768,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f076_opcode_set_duty,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37653,7 +37778,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f07d_opcode_pulse_frequency_add,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37666,6 +37790,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f08c_opcode_pulse_frequency_add,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37682,7 +37807,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f09a_f09a,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37691,11 +37815,11 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f0a3_value_computed,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f0a9_f0a9,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37704,13 +37828,13 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f0b2_value_computed,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f0b6_opcode_pulse_frequency_sub,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37723,6 +37847,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f0c5_opcode_pulse_frequency_sub,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37739,33 +37864,32 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f0d3_f0d3,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f0da_value_computed,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f0e2_f0e2,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f0e9_value_computed,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f0ed_opcode_play_timed_freq,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37778,6 +37902,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f0fc_opcode_play_timed_freq,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37789,7 +37914,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f105_note_table_lookup,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37802,8 +37926,8 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f114_note_table_lookup,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f113_opcode_play_note,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37816,42 +37940,41 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f122_opcode_play_note,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f123_left_shift,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f125_one_left_shift,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f128_f128,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f12c_right_shift,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f12e_one_right_shift,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f131_f131,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f135_end_wait_compute,
+	&emulator_compiled_segments_funcs::seg_f132_left_shift,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f134_one_left_shift,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f137_f137,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f13b_right_shift,
 	nullptr,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_f13d_one_right_shift,
 	nullptr,
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_f140_f140,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f144_end_wait_compute,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37862,13 +37985,13 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f14f_f14f,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f154_opcode_play_timed_note,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37876,13 +37999,13 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f15c_f15c,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f163_opcode_play_timed_note,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37890,6 +38013,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f16b_f16b,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37906,7 +38030,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f17a_opcode_wait,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37919,8 +38042,8 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f187_opcode_noise_wait,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f189_opcode_wait,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37930,23 +38053,23 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f192_opcode_noise_long_wait,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f194_opcode_long_wait,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f196_opcode_noise_wait,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f19d_opcode_halt,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f1a1_opcode_noise_long_wait,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f1a3_opcode_long_wait,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37955,6 +38078,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f1ac_opcode_halt,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37962,7 +38086,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f1b2_opcode_noise_halt,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37976,6 +38099,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f1c1_opcode_noise_halt,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37983,15 +38107,12 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f1c7_opcode_pitch_slide,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f1cd_f1cd,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f1cf_set_value,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -37999,56 +38120,58 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f1d6_opcode_pitch_slide,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f1db_opcode_pulse_meta_uslide,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f1dc_f1dc,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f1de_set_value,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f1e2_opcode_pulse_meta_dslide,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f1e6_opcode_pulse_meta_common,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f1ea_opcode_pulse_meta_uslide,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f1f0_f1f0,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f1f1_opcode_pulse_meta_dslide,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f1f4_f1f4,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f1f5_opcode_pulse_meta_common,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f1fa_f1fa,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f1ff_f1ff,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f203_f203,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f206_end_note,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f209_f209,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38058,22 +38181,21 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f212_f212,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f215_end_note,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f219_f219,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f21e_keep_volume,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f220_set_volume_mask,
 	nullptr,
+	nullptr,
+	&emulator_compiled_segments_funcs::seg_f221_f221,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38085,8 +38207,9 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f22d_keep_volume,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f22e_replace_duty,
+	&emulator_compiled_segments_funcs::seg_f22f_set_volume_mask,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38094,15 +38217,15 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f237_f237,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f238_end_volume_duty,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f23d_replace_duty,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f23e_f23e,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38110,17 +38233,16 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f247_end_volume_duty,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f249_end_pitch_slide,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f24c_opcode_noise_set_periodic,
+	&emulator_compiled_segments_funcs::seg_f24d_f24d,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f250_f250,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38128,30 +38250,33 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f258_unset,
+	&emulator_compiled_segments_funcs::seg_f258_end_pitch_slide,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f25b_opcode_noise_set_periodic,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f25d_end,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f25f_f25f,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f263_opcode_noise_play_timed_freq,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f267_unset,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f26c_end,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f272_opcode_noise_play_timed_freq,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38162,7 +38287,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f27a_opcode_noise_pitch_slide_up,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38175,7 +38299,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f287_opcode_noise_pitch_slide_down,
+	&emulator_compiled_segments_funcs::seg_f289_opcode_noise_pitch_slide_up,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38183,13 +38307,12 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f28f_opcode_noise_end_sfx,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f292_f292,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f296_opcode_noise_pitch_slide_down,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38197,8 +38320,10 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f29e_opcode_noise_end_sfx,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f2a1_f2a1,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38212,6 +38337,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f2af_pulse1_opcode_routines_lsb,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38230,24 +38356,24 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f2be_f2be,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f2c4_noise_opcode_routines_lsb,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f2cd_f2cd,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f2d3_noise_opcode_routines_lsb,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38256,42 +38382,40 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f2d8_particle_draw,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f2de_process_one_block,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f2e3_f2e3,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f2e6_f2e6,
+	&emulator_compiled_segments_funcs::seg_f2e7_particle_draw,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f2e9_skip_block,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f2ed_process_one_block,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f2ee_next_block,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f2f2_f2f2,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f2f5_f2f5,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f2f8_skip_block,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f2f9_f2f9,
-	&emulator_compiled_segments_funcs::seg_f2fa_process_block,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f2fd_next_block,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38302,11 +38426,12 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f308_f308,
+	&emulator_compiled_segments_funcs::seg_f309_process_block,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f30a_next_particle,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38316,30 +38441,31 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f314_f314,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f319_next_particle,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f31b_f31b,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f320_f320,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f323_f323,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f32a_f32a,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f32f_f32f,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38353,106 +38479,104 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f339_hide_particle,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f33e_particle_drawn,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f345_end,
-	&emulator_compiled_segments_funcs::seg_f346_particle_handlers_reinit,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f348_hide_particle,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f34d_particle_drawn,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f351_f351,
-	&emulator_compiled_segments_funcs::seg_f352_loop_on_particle_boxes,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f354_loop,
+	&emulator_compiled_segments_funcs::seg_f354_end,
+	&emulator_compiled_segments_funcs::seg_f355_particle_handlers_reinit,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f359_f359,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f360_f360,
+	&emulator_compiled_segments_funcs::seg_f361_loop_on_particle_boxes,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f363_loop,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f362_f362,
-	&emulator_compiled_segments_funcs::seg_f363_loop_on_particles,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f367_next_particle,
+	&emulator_compiled_segments_funcs::seg_f368_f368,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f36d_f36d,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f371_f371,
+	&emulator_compiled_segments_funcs::seg_f372_loop_on_particles,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f376_next_particle,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f376_f376,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f379_end,
-	&emulator_compiled_segments_funcs::seg_f37a_deactivate_particle_block,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f37c_f37c,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f382_f382,
-	&emulator_compiled_segments_funcs::seg_f383_hide_particles,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f385_f385,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f387_f387,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f388_end,
+	&emulator_compiled_segments_funcs::seg_f389_deactivate_particle_block,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f38c_second_block,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f38e_set_sprite_offset,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f391_f391,
+	&emulator_compiled_segments_funcs::seg_f392_hide_particles,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f396_f396,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f39b_second_block,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f39d_set_sprite_offset,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f39b_f39b,
-	&emulator_compiled_segments_funcs::seg_f39c_hide_one_particle,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38464,9 +38588,10 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f3aa_f3aa,
+	&emulator_compiled_segments_funcs::seg_f3ab_hide_one_particle,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f3aa_mapper_init,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38478,6 +38603,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f3b9_mapper_init,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38565,78 +38691,74 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f40d_esp_cmd_clear_buffers,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f40f_esp_cmd_connect,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f411_esp_cmd_get_esp_status,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f413_esp_send_cmd_short,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f417_esp_send_cmd,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f41a_f41a,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f41c_esp_cmd_clear_buffers,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f41e_esp_cmd_connect,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f420_esp_cmd_get_esp_status,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f422_esp_send_cmd_short,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f422_copy_payload_byte,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f426_esp_send_cmd,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f429_f429,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f42b_f42b,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f42f_esp_get_msg,
+	&emulator_compiled_segments_funcs::seg_f431_copy_payload_byte,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f436_f436,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f43a_f43a,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f43b_store_msg,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f43e_esp_get_msg,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f441_store_payload,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f445_f445,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f44a_store_msg,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f44a_f44a,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f44e_wait_ready_bit,
+	&emulator_compiled_segments_funcs::seg_f450_store_payload,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f453_f453,
-	&emulator_compiled_segments_funcs::seg_f454_wait_ready_bit,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38644,62 +38766,65 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	&emulator_compiled_segments_funcs::seg_f459_f459,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f45c_f45c,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f45d_wait_ready_bit,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f45f_ok,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f462_timeout,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f462_f462,
+	&emulator_compiled_segments_funcs::seg_f463_wait_ready_bit,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f465_got_rx,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f468_wait_ready_bit,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f468_f468,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f46b_f46b,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f46d_f46d,
-	&emulator_compiled_segments_funcs::seg_f46e_esp_wait_ready,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f46e_ok,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f471_f471,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f471_timeout,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f474_got_rx,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f477_wait_ready_bit,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f47c_f47c,
+	&emulator_compiled_segments_funcs::seg_f47d_esp_wait_ready,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f480_f480,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f47e_wait_loop,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f485_f485,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f487_f487,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f48d_wait_loop,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f491_f491,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f494_f494,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f496_f496,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -38709,8 +38834,10 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f4a0_f4a0,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f4a3_timeout,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -39082,7 +39209,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f612_pal_to_ntsc_velocity_high_byte,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -39098,6 +39224,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f626_pal_to_ntsc_velocity_high_byte,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -39180,7 +39307,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f674_f674,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -39196,6 +39322,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f688_f688,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -39338,7 +39465,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f712_pal_to_ntsc_velocity_low_byte,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -39354,6 +39480,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f726_pal_to_ntsc_velocity_low_byte,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -39594,7 +39721,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f812_pal_to_ntsc_velocity_neg_high_byte,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -39610,6 +39736,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f826_pal_to_ntsc_velocity_neg_high_byte,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -39756,7 +39883,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_f8b4_f8b4,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -39772,6 +39898,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_f8c8_f8c8,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -40106,7 +40233,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_fa12_random_table,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -40122,6 +40248,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_fa26_random_table,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -40172,7 +40299,6 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_fa54_fa54,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -40188,6 +40314,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_fa68_fa68,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -40362,15 +40489,12 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_fb12_server_bytecode_error,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_fb17_server_bytecode_init,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_fb1a_fb1a,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -40380,12 +40504,15 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_fb26_server_bytecode_error,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_fb2b_server_bytecode_init,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_fb2e_fb2e,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -40407,18 +40534,14 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_fb3f_fb3f,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_fb42_fb42,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_fb47_server_bytecode_tick,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_fb4a_fb4a,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -40426,19 +40549,18 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_fb53_fb53,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_fb56_fb56,
 	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
+	&emulator_compiled_segments_funcs::seg_fb5b_server_bytecode_tick,
 	nullptr,
 	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_fb5e_fb5e,
 	nullptr,
 	nullptr,
 	nullptr,
