@@ -7130,27 +7130,27 @@ void seg_c1c0_stages_bank(mos6502<GameState::EmulatorRunContext>& emu) {
 void seg_c1cc_c1cc(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ASL_ABS();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_ORA_ZEX();
+	++emu.pc; emu.Op_ORA_ABY();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_ORA_ZEX();
+	++emu.pc; emu.Op_ORA_INX();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_ROL_ABS();
+	++emu.pc; emu.Op_ORA_INX();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_ORA_ZEX();
+	++emu.pc; emu.Op_ORA_ABY();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_ORA_ZEX();
+	++emu.pc; emu.Op_STX_ZEY();
 	if (emu.stopped) { return; }
 }
 void seg_c1cf_stages_tileset_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_ORA_ZEX();
+	++emu.pc; emu.Op_ORA_ABY();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_ORA_ZEX();
+	++emu.pc; emu.Op_ORA_INX();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_ROL_ABS();
+	++emu.pc; emu.Op_ORA_INX();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_ORA_ZEX();
+	++emu.pc; emu.Op_ORA_ABY();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_ORA_ZEX();
+	++emu.pc; emu.Op_STX_ZEY();
 	if (emu.stopped) { return; }
 }
 void seg_c1de_stages_tileset_msb(mos6502<GameState::EmulatorRunContext>& emu) {
