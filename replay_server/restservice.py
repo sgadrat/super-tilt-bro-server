@@ -50,6 +50,11 @@ def get_games(request, url_params):
 		game = url_params[0]
 		success(request, replaydb.get_fm2(game))
 
+def get_game_info(request, url_params):
+	if len(url_params) == 1:
+		game = url_params[0]
+		success(request, replaydb.get_game_info(game))
+
 #
 # Server logic
 #
