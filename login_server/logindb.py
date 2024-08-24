@@ -59,7 +59,6 @@ def get_anonymous_id():
 def get_user_info(user_name):
 	global _dbg_mutex, user_db
 	with _db_mutex:
-		_sync_db()
 		return user_db['registered_logins'].get(user_name)
 
 def get_user_name(user_id):
@@ -78,4 +77,20 @@ def register_user(user_name, password):
 			'password': password,
 			'user_id': _new_registered_user_id()
 		}
+		_sync_db()
+
+def is_valid_password(password):
+	if not isinstance(password, str) or len(password) != 32:
+		return False
+	for char in password:
+		if char not in "0123456789abcdef":
+			return False
+	return True
+
+def change_password(user_name, new_password):
+	global _db_mutex, user_db
+	assert is_valid_password(new_password)
+	with _db_mutex:
+		assert user_name in user_db['registered_logins']
+		user_db['registered_logins'][user_name]['password'] = new_password
 		_sync_db()

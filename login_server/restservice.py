@@ -41,6 +41,31 @@ def get_user_name(request, url_params):
 		user_name = logindb.get_user_name(user_id)
 		success(request, user_name)
 
+def post_change_password(request, url_params):
+	debug('post_change_password: "{}"'.format(url_params))
+
+	if len(url_params) != 3:
+		raise InvalidRequest('need 3 parameters')
+
+	user_name = url_params[0]
+	old_password = url_params[1]
+	new_password = url_params[2]
+
+	if not logindb.is_valid_password(old_password):
+		raise InvalidRequest('invalid old password')
+	if not logindb.is_valid_password(new_password):
+		raise InvalidRequest('invalid new password')
+
+	user = logindb.get_user_info(user_name)
+	if user is None:
+		raise InvalidRequest('unknown user name')
+
+	if user['password'] != old_password:
+		raise InvalidRequest('wrong password')
+
+	logindb.change_password(user_name, new_password)
+	success(request, 'password changed sucessfuly')
+
 #
 # Server logic
 #
@@ -91,6 +116,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 			self.handle_request('get')
 		except AuthError:
 			pass
+		except Exception as e:
+			error('failed handling request on "{}": {}'.format(self.path, e))
 
 def serve(port, whitelist=None):
 	server_address = ('', port)
