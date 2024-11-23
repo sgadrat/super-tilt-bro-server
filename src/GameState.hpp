@@ -222,6 +222,23 @@ void GameState::serial(SerializationHandler& s) {
 			case 3:
 				break;
 
+			// Sunny
+			case 4: {
+				s.uint8(this->emulator_ram[player_a_projectile_1_flags + char_num]);
+				if (this->emulator_ram[player_a_projectile_1_flags + char_num] != 0) {
+					s.uint8(this->emulator_ram[player_a_state_extra1 + char_num]);
+					s.uint8(this->emulator_ram[player_a_state_extra2 + char_num]);
+					s.uint8(this->emulator_ram[player_a_state_extra3 + char_num]);
+					s.uint8(this->emulator_ram[player_a_state_extra4 + char_num]);
+					s.uint8(this->emulator_ram[player_a_state_extra5 + char_num]);
+					s.uint8(this->emulator_ram[player_a_state_extra6 + char_num]);
+					s.uint8(this->emulator_ram[player_a_state_extra7 + char_num]);
+					s.uint8(this->emulator_ram[player_a_state_extra8 + char_num]);
+					s.uint8(this->emulator_ram[player_a_state_extra9 + char_num]);
+				}
+				break;
+			}
+
 			default:
 				throw std::runtime_error("tried to serialize unknown character");
 		}

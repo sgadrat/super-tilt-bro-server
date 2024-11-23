@@ -65,7 +65,7 @@ $xa_bin -DCURRENT_BANK_NUMBER=0 -DSTAGE_FIRST_SPRITE_TILE_OFFSET=2*96*16 -DSTAGE
 $xa_bin -DCURRENT_BANK_NUMBER=0 -DSTAGE_FIRST_SPRITE_TILE_OFFSET=2*96*16 -DSTAGE_NUM_SPRITE_TILES=241-2*96 "$tilt_dir"/game/data/stages/pit/tilesets.asm -o pit_ts_sprites.dat
 
 # Characters sprites and illustrations
-for char in sinbad kiki pepper vgsage; do
+for char in sinbad kiki pepper vgsage sunny; do
 	./get_tileset.sh "$tilt_dir"/game/data/characters/characters-data/$char/chr_tiles.asm ${char}_tiles.dat
 	./get_tileset.sh "$tilt_dir"/game/data/characters/characters-data/$char/chr_illustrations.asm ${char}_illustrations.dat
 	./get_character_palettes.sh "$tilt_dir" "$char"
