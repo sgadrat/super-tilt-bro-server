@@ -1,3 +1,4 @@
+#include "argparse.hpp"
 #include "fm2_parser.hpp"
 #include <GameState.hpp>
 
@@ -5,6 +6,7 @@
 #include <chrono>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <sstream>
 
 // g++ -std=c++17 -O3 -DNDEBUG -flto fm2_player.cpp ../src/GameState.cpp -I ../src -I  .. -o fm2_player
@@ -85,17 +87,48 @@ private:
 	size_t n_writes = 0;
 };
 
-GameState initial_gamestate() {
-	const uint8_t STAGE_FLATLAND = 0;
-	const uint8_t STAGE_THEPIT = 1;
-	const uint8_t STAGE_SKYRIDE = 2;
-	const uint8_t STAGE_THEHUNT = 3;
+GameState initial_gamestate(std::string const& char_a, std::string const& char_b, std::string const& stage, std::string const& video_system) {
+	static const uint8_t STAGE_FLATLAND = 0;
+	static const uint8_t STAGE_THEPIT = 1;
+	static const uint8_t STAGE_SKYRIDE = 2;
+	static const uint8_t STAGE_THEHUNT = 3;
+	static const uint8_t STAGE_THEPLANK = 4;
+	static const uint8_t STAGE_DEEPROCK = 5;
 
-	const uint8_t CHAR_SINBAD = 0;
-	const uint8_t CHAR_KIKI = 1;
-	const uint8_t CHAR_PEPPER = 1;
+	static const uint8_t CHAR_SINBAD = 0;
+	static const uint8_t CHAR_KIKI = 1;
+	static const uint8_t CHAR_PEPPER = 2;
+	static const uint8_t CHAR_VGSAGE = 3;
+	static const uint8_t CHAR_SUNNY = 4;
 
-	return GameState(STAGE_FLATLAND, std::array<uint8_t, 2>{CHAR_SINBAD, CHAR_SINBAD}, GameState::VideoSystem::PAL, [](std::string const & m) {std::cerr << m << '\n';});
+	static const std::map<std::string, uint8_t> stage_to_num = {{
+		{"flatland", STAGE_FLATLAND}, {"0", STAGE_FLATLAND},
+		{"thepit", STAGE_THEPIT}, {"1", STAGE_THEPIT},
+		{"skyride", STAGE_SKYRIDE}, {"2", STAGE_SKYRIDE},
+		{"thehunt", STAGE_THEHUNT}, {"3", STAGE_THEHUNT},
+		{"theplank", STAGE_THEPLANK}, {"4", STAGE_THEPLANK},
+		{"deeprock", STAGE_DEEPROCK}, {"5", STAGE_DEEPROCK},
+	}};
+
+	static const std::map<std::string, uint8_t> char_to_num = {{
+		{"sinbad", CHAR_SINBAD}, {"0", CHAR_SINBAD},
+		{"kiki", CHAR_KIKI}, {"1", CHAR_KIKI},
+		{"pepper", CHAR_PEPPER}, {"2", CHAR_PEPPER},
+		{"vgsage", CHAR_VGSAGE}, {"3", CHAR_VGSAGE},
+		{"sunny", CHAR_SUNNY}, {"4", CHAR_SUNNY},
+	}};
+
+	static const std::map<std::string, GameState::VideoSystem> video_to_num = {{
+		{"pal", GameState::VideoSystem::PAL}, {"0", GameState::VideoSystem::PAL},
+		{"ntsc", GameState::VideoSystem::NTSC}, {"1", GameState::VideoSystem::NTSC},
+	}};
+
+	return GameState(
+		stage_to_num.at(stage),
+		std::array<uint8_t, 2>{char_to_num.at(char_a), char_to_num.at(char_b)},
+		video_to_num.at(video_system),
+		[](std::string const & m) {std::cerr << m << '\n';}
+	);
 }
 
 #if PERF_UNITS == PERF_TIME
@@ -137,13 +170,30 @@ static void perf_summary(size_t n_ticks) {
 }
 #endif
 
-int main() {
+int main(int argc, char** argv) {
+	// Parse command line
+	std::string char_a = "sinbad";
+	std::string char_b = "sinbad";
+	std::string stage = "flatland";
+	std::string video_system = "pal";
+	std::string movie_file;
+	args::Args params = args::parse(argc, argv, {"--char-a", "--char-b", "--stage", "--video"});
+	if (params.flags.count("-h") || params.flags.count("--help") || params.positional.size() != 1) {
+		std::cout << "usage: " << argv[0] << " [--char-a CHAR_A] [--char-b CHAR_B] [--stage STAGE] [--video PAL/NTSC] MOVIE_FILE" << '\n';
+		return 0;
+	}
+	if (params.values.count("--char-a")) char_a = params.values.at("--char-a");
+	if (params.values.count("--char-a")) char_b = params.values.at("--char-b");
+	if (params.values.count("--stage")) stage = params.values.at("--stage");
+	if (params.values.count("--video")) video_system = params.values.at("--video");
+	movie_file = params.positional.at(0);
+
 	// Parse the movie
-	fm2::Movie movie = fm2::parse_file("/tmp/movie.fm2");
+	fm2::Movie movie = fm2::parse_file(movie_file);
 
 	// Play movie input log
 	perf_reset();
-	GameState gamestate = initial_gamestate();
+	GameState gamestate = initial_gamestate(char_a, char_b, stage, video_system);
 	bool gameover = false;
 	auto b = [](bool v) {return v ? '1' : '_';};
 	for (size_t frame_cnt = 0; frame_cnt < movie.input_log.size(); ++frame_cnt) {
