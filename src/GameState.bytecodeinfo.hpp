@@ -105,6 +105,7 @@ uint16_t const player_a_y_screen = 0x10;
 uint16_t const player_b_y_screen = 0x11;
 uint16_t const player_a_state_clock = 0x12;
 uint16_t const player_b_state_clock = 0x13;
+
 uint16_t const player_a_hurtbox_left = 0x14;
 uint16_t const player_b_hurtbox_left = 0x15;
 uint16_t const player_a_hurtbox_right = 0x16;
@@ -113,105 +114,106 @@ uint16_t const player_a_hurtbox_top = 0x18;
 uint16_t const player_b_hurtbox_top = 0x19;
 uint16_t const player_a_hurtbox_bottom = 0x1a;
 uint16_t const player_b_hurtbox_bottom = 0x1b;
-uint16_t const player_a_hitbox_left = 0x1c;
-uint16_t const player_b_hitbox_left = 0x1d;
-uint16_t const player_a_hitbox_right = 0x1e;
-uint16_t const player_b_hitbox_right = 0x1f;
-uint16_t const player_a_hitbox_top = 0x20;
-uint16_t const player_b_hitbox_top = 0x21;
-uint16_t const player_a_hitbox_bottom = 0x22;
-uint16_t const player_b_hitbox_bottom = 0x23;
+uint16_t const player_a_hurtbox_left_msb = 0x1c;
+uint16_t const player_b_hurtbox_left_msb = 0x1d;
+uint16_t const player_a_hurtbox_right_msb = 0x1e;
+uint16_t const player_b_hurtbox_right_msb = 0x1f;
+uint16_t const player_a_hurtbox_top_msb = 0x20;
+uint16_t const player_b_hurtbox_top_msb = 0x21;
+uint16_t const player_a_hurtbox_bottom_msb = 0x22;
+uint16_t const player_b_hurtbox_bottom_msb = 0x23;
+
 uint16_t const player_a_hitbox_enabled = 0x24; // 0 - hitbox disabled, 1 - direct hitbox, 2 - custom hitbox
 uint16_t const player_b_hitbox_enabled = 0x25; //
-uint16_t const player_a_hitbox_force_v = 0x26;
-uint16_t const player_b_hitbox_force_v = 0x27;
-uint16_t const player_a_hitbox_force_h = 0x28;
-uint16_t const player_b_hitbox_force_h = 0x29;
-uint16_t const player_a_hitbox_damages = 0x2a;
-uint16_t const player_b_hitbox_damages = 0x2b;
-uint16_t const player_a_damages = 0x2c;
-uint16_t const player_b_damages = 0x2d;
-uint16_t const player_a_x_low = 0x2e;
-uint16_t const player_b_x_low = 0x2f;
-uint16_t const player_a_y_low = 0x30;
-uint16_t const player_b_y_low = 0x31;
-uint16_t const player_a_velocity_v_low = 0x32;
-uint16_t const player_b_velocity_v_low = 0x33;
-uint16_t const player_a_velocity_h_low = 0x34;
-uint16_t const player_b_velocity_h_low = 0x35;
-uint16_t const player_a_hitbox_force_v_low = 0x36;
-uint16_t const player_b_hitbox_force_v_low = 0x37;
-uint16_t const player_a_hitbox_force_h_low = 0x38;
-uint16_t const player_b_hitbox_force_h_low = 0x39;
-uint16_t const player_a_hitbox_base_knock_up_v_high = 0x3a;
-uint16_t const player_b_hitbox_base_knock_up_v_high = 0x3b;
-uint16_t const player_a_hitbox_base_knock_up_h_high = 0x3c;
-uint16_t const player_b_hitbox_base_knock_up_h_high = 0x3d;
-uint16_t const player_a_hitbox_base_knock_up_v_low = 0x3e;
-uint16_t const player_b_hitbox_base_knock_up_v_low = 0x3f;
-uint16_t const player_a_hitbox_base_knock_up_h_low = 0x40;
-uint16_t const player_b_hitbox_base_knock_up_h_low = 0x41;
-uint16_t const player_a_num_aerial_jumps = 0x42;
-uint16_t const player_b_num_aerial_jumps = 0x43;
-uint16_t const player_a_stocks = 0x44;
-uint16_t const player_b_stocks = 0x45;
-uint16_t const player_a_special_jumps = 0x46; // F... ...W - W = wall jump OK, F = footstool OK
-uint16_t const player_b_special_jumps = 0x47;
-uint16_t const player_a_state_field1 = 0x48;
-uint16_t const player_b_state_field1 = 0x49;
-uint16_t const player_a_state_field2 = 0x4a;
-uint16_t const player_b_state_field2 = 0x4b;
-uint16_t const player_a_state_field3 = 0x4c;
-uint16_t const player_b_state_field3 = 0x4d;
-uint16_t const player_a_gravity_lsb = 0x4e;
-uint16_t const player_b_gravity_lsb = 0x4f;
-uint16_t const player_a_gravity_msb = 0x50;
-uint16_t const player_b_gravity_msb = 0x51;
+uint16_t const player_a_hitbox_left = 0x26;
+uint16_t const player_b_hitbox_left = 0x27;
+uint16_t const player_a_hitbox_right = 0x28;
+uint16_t const player_b_hitbox_right = 0x29;
+uint16_t const player_a_hitbox_top = 0x2a;
+uint16_t const player_b_hitbox_top = 0x2b;
+uint16_t const player_a_hitbox_bottom = 0x2c;
+uint16_t const player_b_hitbox_bottom = 0x2d;
+uint16_t const player_a_hitbox_left_msb = 0x2e;
+uint16_t const player_b_hitbox_left_msb = 0x2f;
+uint16_t const player_a_hitbox_right_msb = 0x30;
+uint16_t const player_b_hitbox_right_msb = 0x31;
+uint16_t const player_a_hitbox_top_msb = 0x32;
+uint16_t const player_b_hitbox_top_msb = 0x33;
+uint16_t const player_a_hitbox_bottom_msb = 0x34;
+uint16_t const player_b_hitbox_bottom_msb = 0x35;
+uint16_t const player_a_hitbox_force_v = 0x36;
+uint16_t const player_b_hitbox_force_v = 0x37;
+uint16_t const player_a_hitbox_force_h = 0x38;
+uint16_t const player_b_hitbox_force_h = 0x39;
+uint16_t const player_a_hitbox_damages = 0x3a;
+uint16_t const player_b_hitbox_damages = 0x3b;
+uint16_t const player_a_hitbox_force_v_low = 0x3c;
+uint16_t const player_b_hitbox_force_v_low = 0x3d;
+uint16_t const player_a_hitbox_force_h_low = 0x3e;
+uint16_t const player_b_hitbox_force_h_low = 0x3f;
+uint16_t const player_a_hitbox_base_knock_up_v_high = 0x40;
+uint16_t const player_b_hitbox_base_knock_up_v_high = 0x41;
+uint16_t const player_a_hitbox_base_knock_up_h_high = 0x42;
+uint16_t const player_b_hitbox_base_knock_up_h_high = 0x43;
+uint16_t const player_a_hitbox_base_knock_up_v_low = 0x44;
+uint16_t const player_b_hitbox_base_knock_up_v_low = 0x45;
+uint16_t const player_a_hitbox_base_knock_up_h_low = 0x46;
+uint16_t const player_b_hitbox_base_knock_up_h_low = 0x47;
 
-uint16_t const player_a_grounded = 0x52; // $00 if not grounded, else the offset of grounded platform from stage_data
-uint16_t const player_b_grounded = 0x53;
-uint16_t const player_a_walled = 0x54; // $00 if not touching a wall, else the offset of the platform from stage_data
-uint16_t const player_b_walled = 0x55;
-uint16_t const player_a_walled_direction = 0x56; // DIRECTION_LEFT - player is on the left of the wall
-uint16_t const player_b_walled_direction = 0x57; // DIRECTION_RIGHT - player is on the right of the wall
-uint16_t const player_a_ceiled = 0x58; // $00 if not touching a ceiling, else the offset of the platform from stage_data
-uint16_t const player_b_ceiled = 0x59;
+uint16_t const player_a_custom_hitbox_routine_lsb = player_a_hitbox_base_knock_up_v_low; // $44
+uint16_t const player_b_custom_hitbox_routine_lsb = player_b_hitbox_base_knock_up_v_low; // $45
+uint16_t const player_a_custom_hitbox_routine_msb = player_a_hitbox_base_knock_up_v_high; // $40
+uint16_t const player_b_custom_hitbox_routine_msb = player_b_hitbox_base_knock_up_v_high; // $41
+uint16_t const player_a_custom_hitbox_directional1_lsb = player_a_hitbox_base_knock_up_h_low; // $46
+uint16_t const player_b_custom_hitbox_directional1_lsb = player_b_hitbox_base_knock_up_h_low; // $47
+uint16_t const player_a_custom_hitbox_directional1_msb = player_a_hitbox_base_knock_up_h_high; // $42
+uint16_t const player_b_custom_hitbox_directional1_msb = player_b_hitbox_base_knock_up_h_high; // $43
+uint16_t const player_a_custom_hitbox_directional2_lsb = player_a_hitbox_force_h_low; // $3e
+uint16_t const player_b_custom_hitbox_directional2_lsb = player_b_hitbox_force_h_low; // $3f
+uint16_t const player_a_custom_hitbox_directional2_msb = player_a_hitbox_force_h; // $3e
+uint16_t const player_b_custom_hitbox_directional2_msb = player_b_hitbox_force_h; // $3f
+uint16_t const player_a_custom_hitbox_value1 = player_a_hitbox_force_v_low; // $3c
+uint16_t const player_b_custom_hitbox_value1 = player_b_hitbox_force_v_low; // $3d
+uint16_t const player_a_custom_hitbox_value2 = player_a_hitbox_force_v; // $3c
+uint16_t const player_b_custom_hitbox_value2 = player_b_hitbox_force_v; // $3d
+uint16_t const player_a_custom_hitbox_value3 = player_a_hitbox_damages; // $3a
+uint16_t const player_b_custom_hitbox_value3 = player_b_hitbox_damages; // $3b
 
-uint16_t const player_a_hurtbox_left_msb = 0x5a;
-uint16_t const player_b_hurtbox_left_msb = 0x5b;
-uint16_t const player_a_hurtbox_right_msb = 0x5c;
-uint16_t const player_b_hurtbox_right_msb = 0x5d;
-uint16_t const player_a_hurtbox_top_msb = 0x5e;
-uint16_t const player_b_hurtbox_top_msb = 0x5f;
-uint16_t const player_a_hurtbox_bottom_msb = 0x60;
-uint16_t const player_b_hurtbox_bottom_msb = 0x61;
-uint16_t const player_a_hitbox_left_msb = 0x62;
-uint16_t const player_b_hitbox_left_msb = 0x63;
-uint16_t const player_a_hitbox_right_msb = 0x64;
-uint16_t const player_b_hitbox_right_msb = 0x65;
-uint16_t const player_a_hitbox_top_msb = 0x66;
-uint16_t const player_b_hitbox_top_msb = 0x67;
-uint16_t const player_a_hitbox_bottom_msb = 0x68;
-uint16_t const player_b_hitbox_bottom_msb = 0x69;
+uint16_t const player_a_damages = 0x48;
+uint16_t const player_b_damages = 0x49;
+uint16_t const player_a_x_low = 0x4a;
+uint16_t const player_b_x_low = 0x4b;
+uint16_t const player_a_y_low = 0x4c;
+uint16_t const player_b_y_low = 0x4d;
+uint16_t const player_a_velocity_v_low = 0x4e;
+uint16_t const player_b_velocity_v_low = 0x4f;
+uint16_t const player_a_velocity_h_low = 0x50;
+uint16_t const player_b_velocity_h_low = 0x51;
+uint16_t const player_a_num_aerial_jumps = 0x52;
+uint16_t const player_b_num_aerial_jumps = 0x53;
+uint16_t const player_a_stocks = 0x54;
+uint16_t const player_b_stocks = 0x55;
+uint16_t const player_a_special_jumps = 0x56; // F... ...W - W = wall jump OK, F = footstool OK
+uint16_t const player_b_special_jumps = 0x57;
+uint16_t const player_a_state_field1 = 0x58;
+uint16_t const player_b_state_field1 = 0x59;
+uint16_t const player_a_state_field2 = 0x5a;
+uint16_t const player_b_state_field2 = 0x5b;
+uint16_t const player_a_state_field3 = 0x5c;
+uint16_t const player_b_state_field3 = 0x5d;
+uint16_t const player_a_gravity_lsb = 0x5e;
+uint16_t const player_b_gravity_lsb = 0x5f;
+uint16_t const player_a_gravity_msb = 0x60;
+uint16_t const player_b_gravity_msb = 0x61;
 
-uint16_t const player_a_custom_hitbox_routine_lsb = player_a_hitbox_base_knock_up_v_low; // $3e
-uint16_t const player_b_custom_hitbox_routine_lsb = player_b_hitbox_base_knock_up_v_low; // $3f
-uint16_t const player_a_custom_hitbox_routine_msb = player_a_hitbox_base_knock_up_v_high; // $3a
-uint16_t const player_b_custom_hitbox_routine_msb = player_b_hitbox_base_knock_up_v_high; // $3b
-uint16_t const player_a_custom_hitbox_directional1_lsb = player_a_hitbox_base_knock_up_h_low; // $40
-uint16_t const player_b_custom_hitbox_directional1_lsb = player_b_hitbox_base_knock_up_h_low; // $41
-uint16_t const player_a_custom_hitbox_directional1_msb = player_a_hitbox_base_knock_up_h_high; // $3c
-uint16_t const player_b_custom_hitbox_directional1_msb = player_b_hitbox_base_knock_up_h_high; // $3d
-uint16_t const player_a_custom_hitbox_directional2_lsb = player_a_hitbox_force_h_low; // $38
-uint16_t const player_b_custom_hitbox_directional2_lsb = player_b_hitbox_force_h_low; // $39
-uint16_t const player_a_custom_hitbox_directional2_msb = player_a_hitbox_force_h; // $28
-uint16_t const player_b_custom_hitbox_directional2_msb = player_b_hitbox_force_h; // $29
-uint16_t const player_a_custom_hitbox_value1 = player_a_hitbox_force_v_low; // $36
-uint16_t const player_b_custom_hitbox_value1 = player_b_hitbox_force_v_low; // $37
-uint16_t const player_a_custom_hitbox_value2 = player_a_hitbox_force_v; // $26
-uint16_t const player_b_custom_hitbox_value2 = player_b_hitbox_force_v; // $27
-uint16_t const player_a_custom_hitbox_value3 = player_a_hitbox_damages; // $2a
-uint16_t const player_b_custom_hitbox_value3 = player_b_hitbox_damages; // $2b
+uint16_t const player_a_grounded = 0x62; // $00 if not grounded, else the offset of grounded platform from stage_data
+uint16_t const player_b_grounded = 0x63;
+uint16_t const player_a_walled = 0x64; // $00 if not touching a wall, else the offset of the platform from stage_data
+uint16_t const player_b_walled = 0x65;
+uint16_t const player_a_walled_direction = 0x66; // DIRECTION_LEFT - player is on the left of the wall
+uint16_t const player_b_walled_direction = 0x67; // DIRECTION_RIGHT - player is on the right of the wall
+uint16_t const player_a_ceiled = 0x68; // $00 if not touching a ceiling, else the offset of the platform from stage_data
+uint16_t const player_b_ceiled = 0x69;
 
 uint16_t const player_a_last_shown_damage = 0x6a;
 uint16_t const player_b_last_shown_damage = 0x6b;
@@ -249,6 +251,8 @@ uint16_t const stage_state_begin = 0x80; // $80 to $8f
 uint16_t const directional_indicator_player_a_position_x_low = 0x90; // $90 to $9f - unused $90 and $98
 uint16_t const directional_indicator_player_a_position_y_low = 0xa0; // $a0 to $af - unused $a0 and $a8
 
+//NOTE constant ZERO_PAGE_GLOBAL_FIELDS_BEGIN shall point here ($b0)
+
 //$b0 to $bf used by network engine
 //$c0 to $c9 used by audio engine
 //$d0 to $ff used by global labels, constants and registers ($e5 and $e6 are still free)
@@ -272,7 +276,28 @@ uint16_t const player_b_temporary_velocity_v_low = 0x056a;
 uint16_t const player_a_temporary_velocity_v = 0x056b;
 uint16_t const player_b_temporary_velocity_v = 0x056c;
 
-//$056d-$057f unused
+// Player extra state
+uint16_t const player_a_state_extra1 = 0x056d;
+uint16_t const player_b_state_extra1 = 0x056e;
+uint16_t const player_a_state_extra2 = 0x056f;
+uint16_t const player_b_state_extra2 = 0x0570;
+uint16_t const player_a_state_extra3 = 0x0571;
+uint16_t const player_b_state_extra3 = 0x0572;
+uint16_t const player_a_state_extra4 = 0x0573;
+uint16_t const player_b_state_extra4 = 0x0574;
+uint16_t const player_a_state_extra5 = 0x0575;
+uint16_t const player_b_state_extra5 = 0x0576;
+uint16_t const player_a_state_extra6 = 0x0577;
+uint16_t const player_b_state_extra6 = 0x0578;
+uint16_t const player_a_state_extra7 = 0x0579;
+uint16_t const player_b_state_extra7 = 0x057a;
+uint16_t const player_a_state_extra8 = 0x057b;
+uint16_t const player_b_state_extra8 = 0x057c;
+uint16_t const player_a_state_extra9 = 0x057d;
+uint16_t const player_b_state_extra9 = 0x057e;
+uint16_t const last_player_state_extra = player_b_state_extra9;
+
+//$057f unused
 
 uint16_t const players_palettes = 0x0580; // $0580 to $059f - 4 nametable buffers (8 bytes each) containing avatars palettes in normal and alternate mode
 uint16_t const player_a_animation = 0x05a0; // $05a0 to $05ac - player a's animation state
@@ -306,7 +331,31 @@ uint16_t const arcade_mode_target_break_animation_timer = 0x05ff;
 uint16_t const arcade_mode_run_teleport_animation = 0x05f2; // $05f2 to $05fe
 uint16_t const arcade_mode_run_teleport_timer = 0x05ff;
 
-uint16_t const game_mode_state_end = 0x05ff; // Inclusive (game mode can safely write here)
+uint16_t const player_a_projectile_1_flags = 0x0600;
+uint16_t const player_b_projectile_1_flags = 0x0601;
+uint16_t const player_a_projectile_1_hitbox_left = 0x602;
+uint16_t const player_b_projectile_1_hitbox_left = 0x603;
+uint16_t const player_a_projectile_1_hitbox_right = 0x604;
+uint16_t const player_b_projectile_1_hitbox_right = 0x605;
+uint16_t const player_a_projectile_1_hitbox_top = 0x606;
+uint16_t const player_b_projectile_1_hitbox_top = 0x607;
+uint16_t const player_a_projectile_1_hitbox_bottom = 0x608;
+uint16_t const player_b_projectile_1_hitbox_bottom = 0x609;
+uint16_t const player_a_projectile_1_hitbox_left_msb = 0x60a;
+uint16_t const player_b_projectile_1_hitbox_left_msb = 0x60b;
+uint16_t const player_a_projectile_1_hitbox_right_msb = 0x60c;
+uint16_t const player_b_projectile_1_hitbox_right_msb = 0x60d;
+uint16_t const player_a_projectile_1_hitbox_top_msb = 0x60e;
+uint16_t const player_b_projectile_1_hitbox_top_msb = 0x60f;
+uint16_t const player_a_projectile_1_hitbox_bottom_msb = 0x610;
+uint16_t const player_b_projectile_1_hitbox_bottom_msb = 0x611;
+
+//$0612-$0623 unused (reserved for projectile 2)
+//$0614-$0635 unused (reserved for projectile 3)
+
+//$0636-$067f unused
+
+uint16_t const game_mode_state_end = 0x067f; // Inclusive (game mode can safely write here)
 
 //
 // Stage specific labels
@@ -407,10 +456,10 @@ uint16_t const credits_last_illustration_bank = credits_last_illustration_msb+1;
 uint16_t const credits_mem_buffer = 0x0580; // $0580 to $05bf (64 bytes)
 uint16_t const credits_cursor_anim = 0x05c0; // $05c0 to $05cc
 //$05cd to $05ff - unused
-uint16_t const credits_bubble_anim_1 = 0x068d; // to $0699
-uint16_t const credits_bubble_anim_2 = 0x069a; // to $06a6
-uint16_t const credits_bubble_anim_3 = 0x06a7; // to $06b3
-uint16_t const credits_bubble_anim_4 = 0x06b4; // to $06c0
+uint16_t const credits_bubble_anim_1 = 0x060d; // to $0619
+uint16_t const credits_bubble_anim_2 = 0x061a; // to $0626
+uint16_t const credits_bubble_anim_3 = 0x0627; // to $0633
+uint16_t const credits_bubble_anim_4 = 0x0634; // to $0640
 uint16_t const credits_bubble_anims = credits_bubble_anim_1;
 
 //
@@ -477,8 +526,8 @@ uint16_t const character_selection_player_b_cursor_anim = 0x05cd; // $05cd to $0
 uint16_t const character_selection_player_a_char_anim = 0x05da; // $05da to $05e6
 uint16_t const character_selection_player_b_char_anim = 0x05e7; // $05e7 to $05f3
 //$05f4-$05ff unused
-uint16_t const character_selection_player_a_builder_anim = 0x0680; // $0680 to $068c
-uint16_t const character_selection_player_b_builder_anim = 0x068d; // $068d to $0699
+uint16_t const character_selection_player_a_builder_anim = 0x0600; // $0600 to $060c
+uint16_t const character_selection_player_b_builder_anim = 0x060d; // $060d to $0619
 
 //
 // STAGE_SELECTION labels
@@ -655,50 +704,50 @@ uint16_t const audio_noise_sample_num = 0xc7;
 uint16_t const audio_vframe_cnt = 0xc8; //TODO merge it with the vframe counter for wait_next_frame
 uint16_t const audio_50hz = 0xc9; // 0 - 60 Hz, 1 - 50 Hz
 
-uint16_t const audio_square1_current_opcode = 0x0604;
-uint16_t const audio_square2_current_opcode = 0x0605;
-uint16_t const audio_triangle_current_opcode = 0x0606;
-uint16_t const audio_noise_current_opcode = 0x0607;
-uint16_t const audio_square1_current_opcode_msb = 0x0608;
-uint16_t const audio_square2_current_opcode_msb = 0x0609;
-uint16_t const audio_triangle_current_opcode_msb = 0x060a;
-uint16_t const audio_noise_current_opcode_msb = 0x060b;
-uint16_t const audio_square1_wait_cnt = 0x060c;
-uint16_t const audio_square2_wait_cnt = 0x060d;
-uint16_t const audio_triangle_wait_cnt = 0x060e;
-uint16_t const audio_noise_wait_cnt = 0x060f;
-uint16_t const audio_square1_default_note_duration = 0x0610;
-uint16_t const audio_square2_default_note_duration = 0x0611;
-uint16_t const audio_triangle_default_note_duration = 0x0612;
-uint16_t const audio_square1_apu_envelope_byte = 0x0613;
-uint16_t const audio_square2_apu_envelope_byte = 0x0614;
-uint16_t const audio_square1_apu_timer_low_byte = 0x0615;
-uint16_t const audio_square2_apu_timer_low_byte = 0x0616;
-uint16_t const audio_triangle_apu_timer_low_byte = 0x0617;
-uint16_t const audio_square1_apu_timer_high_byte = 0x0618;
-uint16_t const audio_square2_apu_timer_high_byte = 0x0619;
-uint16_t const audio_triangle_apu_timer_high_byte = 0x061a;
-uint16_t const audio_square1_apu_timer_high_byte_old = 0x061b;
-uint16_t const audio_square2_apu_timer_high_byte_old = 0x061c;
-uint16_t const audio_triangle_apu_timer_high_byte_old = 0x061d; // Actually useless for triangle, but allows to easily merge code for pulse/triangle (unused now, triangle timer is handled in a "if triangle" branch) //TODO remove it once code is stable enough to confidently state that we'll never use it
-uint16_t const audio_square1_pitch_slide_lsb = 0x061e;
-uint16_t const audio_square2_pitch_slide_lsb = 0x061f;
-uint16_t const audio_triangle_pitch_slide_lsb = 0x0620;
-uint16_t const audio_square1_pitch_slide_msb = 0x0621;
-uint16_t const audio_square2_pitch_slide_msb = 0x0622;
-uint16_t const audio_triangle_pitch_slide_msb = 0x0623;
+uint16_t const audio_square1_current_opcode = 0x0684;
+uint16_t const audio_square2_current_opcode = 0x0685;
+uint16_t const audio_triangle_current_opcode = 0x0686;
+uint16_t const audio_noise_current_opcode = 0x0687;
+uint16_t const audio_square1_current_opcode_msb = 0x0688;
+uint16_t const audio_square2_current_opcode_msb = 0x0689;
+uint16_t const audio_triangle_current_opcode_msb = 0x068a;
+uint16_t const audio_noise_current_opcode_msb = 0x068b;
+uint16_t const audio_square1_wait_cnt = 0x068c;
+uint16_t const audio_square2_wait_cnt = 0x068d;
+uint16_t const audio_triangle_wait_cnt = 0x068e;
+uint16_t const audio_noise_wait_cnt = 0x068f;
+uint16_t const audio_square1_default_note_duration = 0x0690;
+uint16_t const audio_square2_default_note_duration = 0x0691;
+uint16_t const audio_triangle_default_note_duration = 0x0692;
+uint16_t const audio_square1_apu_envelope_byte = 0x0693;
+uint16_t const audio_square2_apu_envelope_byte = 0x0694;
+uint16_t const audio_square1_apu_timer_low_byte = 0x0695;
+uint16_t const audio_square2_apu_timer_low_byte = 0x0696;
+uint16_t const audio_triangle_apu_timer_low_byte = 0x0697;
+uint16_t const audio_square1_apu_timer_high_byte = 0x0698;
+uint16_t const audio_square2_apu_timer_high_byte = 0x0699;
+uint16_t const audio_triangle_apu_timer_high_byte = 0x069a;
+uint16_t const audio_square1_apu_timer_high_byte_old = 0x069b;
+uint16_t const audio_square2_apu_timer_high_byte_old = 0x069c;
+uint16_t const audio_triangle_apu_timer_high_byte_old = 0x069d; // Actually useless for triangle, but allows to easily merge code for pulse/triangle (unused now, triangle timer is handled in a "if triangle" branch) //TODO remove it once code is stable enough to confidently state that we'll never use it
+uint16_t const audio_square1_pitch_slide_lsb = 0x069e;
+uint16_t const audio_square2_pitch_slide_lsb = 0x069f;
+uint16_t const audio_triangle_pitch_slide_lsb = 0x06a0;
+uint16_t const audio_square1_pitch_slide_msb = 0x06a1;
+uint16_t const audio_square2_pitch_slide_msb = 0x06a2;
+uint16_t const audio_triangle_pitch_slide_msb = 0x06a3;
 
-uint16_t const audio_noise_apu_envelope_byte = 0x0624;
-uint16_t const audio_noise_apu_period_byte = 0x0625; // bit 4 used to silence the channel, so it is Ls.. PPPP with s handled by the engine
-uint16_t const audio_noise_pitch_slide = 0x0626;
+uint16_t const audio_noise_apu_envelope_byte = 0x06a4;
+uint16_t const audio_noise_apu_period_byte = 0x06a5; // bit 4 used to silence the channel, so it is Ls.. PPPP with s handled by the engine
+uint16_t const audio_noise_pitch_slide = 0x06a6;
 
-uint16_t const audio_fx_noise_pitch_slide = 0x0627;
-uint16_t const audio_fx_noise_wait_cnt = 0x0628;
-uint16_t const audio_fx_noise_current_opcode = 0x0629;
-uint16_t const audio_fx_noise_current_opcode_msb = 0x062a;
-uint16_t const audio_fx_noise_current_opcode_bank = 0x062b;
-uint16_t const audio_fx_noise_apu_envelope_byte = 0x062c;
-uint16_t const audio_fx_noise_apu_period_byte = 0x062d;
+uint16_t const audio_fx_noise_pitch_slide = 0x06a7;
+uint16_t const audio_fx_noise_wait_cnt = 0x06a8;
+uint16_t const audio_fx_noise_current_opcode = 0x06a9;
+uint16_t const audio_fx_noise_current_opcode_msb = 0x06aa;
+uint16_t const audio_fx_noise_current_opcode_bank = 0x06ab;
+uint16_t const audio_fx_noise_apu_envelope_byte = 0x06ac;
+uint16_t const audio_fx_noise_apu_period_byte = 0x06ad;
 
 //
 // Global labels
@@ -831,9 +880,9 @@ uint16_t const screen_shake_speed_h = 0x055e;
 uint16_t const screen_shake_speed_v = 0x055f;
 
 //$0560 to $05ff may be used by game states
+//$0600 to $067f may be used by game states
 
-//$0600 to $067f may be used by audio engine, see "Audio engine labels"
-//$0680 to $06ff may be used by game states
+//$0680 to $06ff may be used by audio engine, see "Audio engine labels"
 
 uint16_t const network_last_known_remote_input = 0x07bf;
 uint16_t const network_player_local_btns_history = 0x07c0; // one byte per frame, circular buffers, 32 entries
