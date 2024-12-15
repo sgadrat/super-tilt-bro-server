@@ -38,13 +38,7 @@ void seg_c04b_characters_properties_msb(mos6502<GameState::EmulatorRunContext>& 
 	if (emu.stopped) { return; }
 }
 void seg_c056_rainbow_trampoline_init(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_TYA_IMP();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_TAX_IMP();
-	if (emu.stopped) { return; }
-}
-void seg_c074_fetch_one_controller(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_TXS_IMP();
+	++emu.pc; emu.Op_STA_ABY();
 	if (emu.stopped) { return; }
 }
 void seg_c07a_next_btn(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -68,6 +62,14 @@ void seg_c07a_next_btn(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_SBC_ABY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INY_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDY_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_TAX_IMP();
+	if (emu.stopped) { return; }
 }
 void seg_c086_c086(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ORA_ABS();
@@ -78,33 +80,43 @@ void seg_c086_c086(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_SBC_ABY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INY_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDY_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_TAX_IMP();
+	if (emu.stopped) { return; }
 }
 void seg_c08b_c08b(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_TAY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_SBC_ABY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INY_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDY_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_TAX_IMP();
+	if (emu.stopped) { return; }
 }
 void seg_c08c_characters_start_routines_table_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_SBC_ABY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INY_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDY_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_TAX_IMP();
+	if (emu.stopped) { return; }
 }
 void seg_c0ce_c0ce(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_DEC_ABX();
-	if (emu.stopped) { return; }
-}
-void seg_c14e_c14e(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_NOP_IMP();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDY_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_DEC_ABX();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_ZER();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_CLV_IMP();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_BPL_REL();
 	if (emu.stopped) { return; }
 }
 void seg_c18c_crc32_table1(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -112,7 +124,7 @@ void seg_c18c_crc32_table1(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_TSX_IMP();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_ZEX();
+	++emu.pc; emu.Op_LDY_ZEX();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_SBC_IMM();
 	if (emu.stopped) { return; }
@@ -1219,12 +1231,6 @@ void seg_c948_clbl_16(mos6502<GameState::EmulatorRunContext>& emu) {
 }
 void seg_c955_c955(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_EOR_INX();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_BEQ_REL();
-	if (emu.stopped) { return; }
-}
-void seg_c957_clbl_45(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_BEQ_REL();
 	if (emu.stopped) { return; }
 }
 void seg_c959_credits_screen_tick(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -4620,7 +4626,7 @@ void seg_db27_db27(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 }
 void seg_db5d_db5d(mos6502<GameState::EmulatorRunContext>& emu) {
-	++emu.pc; emu.Op_LDA_ABS();
+	++emu.pc; emu.Op_LDX_ABS();
 	if (emu.stopped) { return; }
 }
 void seg_db68_db68(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -4640,15 +4646,7 @@ void seg_db6b_arcade_mode_tick(mos6502<GameState::EmulatorRunContext>& emu) {
 void seg_db71_db71(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_EOR_INX();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STA_ZER();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STA_ZER();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_STA_ABS();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_JMP_ABS();
+	++emu.pc; emu.Op_ROR_ABX();
 	if (emu.stopped) { return; }
 }
 void seg_db74_unamed_lbl_2387(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -7382,6 +7380,14 @@ void seg_c078_characters_projectile_hit_routine_lsb(mos6502<GameState::EmulatorR
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_SBC_ABY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INY_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDY_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_TAX_IMP();
+	if (emu.stopped) { return; }
 }
 void seg_c07d_characters_projectile_hit_routine_msb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_SBC_IMM();
@@ -7402,6 +7408,14 @@ void seg_c07d_characters_projectile_hit_routine_msb(mos6502<GameState::EmulatorR
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_SBC_ABY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INY_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDY_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_TAX_IMP();
+	if (emu.stopped) { return; }
 }
 void seg_c082_characters_global_tick_routine_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CMP_ZER();
@@ -7416,6 +7430,14 @@ void seg_c082_characters_global_tick_routine_lsb(mos6502<GameState::EmulatorRunC
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ACC_ACC();
 	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_SBC_ABY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INY_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDY_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_TAX_IMP();
+	if (emu.stopped) { return; }
 }
 void seg_c087_characters_global_tick_routine_msb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_SBC_IMM();
@@ -7425,6 +7447,14 @@ void seg_c087_characters_global_tick_routine_msb(mos6502<GameState::EmulatorRunC
 	++emu.pc; emu.Op_TAY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_ROR_ACC_ACC();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_SBC_ABY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_INY_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDY_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_TAX_IMP();
 	if (emu.stopped) { return; }
 }
 void seg_c091_characters_start_routines_table_msb(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -7441,6 +7471,12 @@ void seg_c09b_characters_update_routines_table_msb(mos6502<GameState::EmulatorRu
 }
 void seg_c0a0_characters_offground_routines_table_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_CLV_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_EOR_INX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_CLV_IMP();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_JSR_ABS();
 	if (emu.stopped) { return; }
 }
 void seg_c0a7_c0a7(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -7461,6 +7497,10 @@ void seg_c0af_characters_onground_routines_table_msb(mos6502<GameState::Emulator
 	++emu.pc; emu.Op_TAY_IMP();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDY_ZER();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDA_ABX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDY_ABX();
 	if (emu.stopped) { return; }
 }
 void seg_c0b4_characters_input_routines_table_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -7672,19 +7712,11 @@ void seg_c1fa_c1fa(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LSR_ABS();
+	++emu.pc; emu.Op_ADC_ABY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_ZEX();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_ZEX();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_ZEY();
-	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_ZEY();
 	if (emu.stopped) { return; }
 }
 void seg_c1fd_stages_tileset_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -7692,25 +7724,41 @@ void seg_c1fd_stages_tileset_lsb(mos6502<GameState::EmulatorRunContext>& emu) {
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LSR_ABS();
+	++emu.pc; emu.Op_ADC_ABY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_ZEX();
+}
+void seg_c1fe_c1fe(mos6502<GameState::EmulatorRunContext>& emu) {
+	++emu.pc; emu.Op_ADC_ABY();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDA_ZEX();
+	++emu.pc; emu.Op_ADC_ABY();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_ZEY();
+	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
-	++emu.pc; emu.Op_LDX_ZEY();
+	++emu.pc; emu.Op_AND_IMM();
 	if (emu.stopped) { return; }
 }
 void seg_c20c_stages_tileset_msb(mos6502<GameState::EmulatorRunContext>& emu) {
 	++emu.pc; emu.Op_LDX_ZEY();
 	if (emu.stopped) { return; }
 	++emu.pc; emu.Op_LDX_ZEY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDA_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDX_ZEY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDX_ZEY();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDY_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_LDY_ABS();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ORA_ZEX();
+	if (emu.stopped) { return; }
+	++emu.pc; emu.Op_ASL_ZEX();
 	if (emu.stopped) { return; }
 }
 void seg_c21b_stages_tileset_bank(mos6502<GameState::EmulatorRunContext>& emu) {
@@ -26166,7 +26214,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_c073_characters_netload_routine_msb,
-	&emulator_compiled_segments_funcs::seg_c074_fetch_one_controller,
+	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -26384,7 +26432,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_c14e_c14e,
+	nullptr,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -26560,7 +26608,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_c1fd_stages_tileset_lsb,
-	nullptr,
+	&emulator_compiled_segments_funcs::seg_c1fe_c1fe,
 	nullptr,
 	nullptr,
 	nullptr,
@@ -28441,7 +28489,7 @@ std::array<void(*)(mos6502<GameState::EmulatorRunContext>&), 0x4000> GameState::
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_c955_c955,
 	nullptr,
-	&emulator_compiled_segments_funcs::seg_c957_clbl_45,
+	nullptr,
 	nullptr,
 	&emulator_compiled_segments_funcs::seg_c959_credits_screen_tick,
 	nullptr,
