@@ -141,10 +141,10 @@ uint16_t const player_a_hitbox_top_msb = 0x32;
 uint16_t const player_b_hitbox_top_msb = 0x33;
 uint16_t const player_a_hitbox_bottom_msb = 0x34;
 uint16_t const player_b_hitbox_bottom_msb = 0x35;
-uint16_t const player_a_hitbox_force_v = 0x36;
-uint16_t const player_b_hitbox_force_v = 0x37;
-uint16_t const player_a_hitbox_force_h = 0x38;
-uint16_t const player_b_hitbox_force_h = 0x39;
+uint16_t const player_a_hitbox_unused = 0x36;
+uint16_t const player_b_hitbox_unused = 0x37;
+uint16_t const player_a_hitbox_hitstun = 0x38;
+uint16_t const player_b_hitbox_hitstun = 0x39;
 uint16_t const player_a_hitbox_damages = 0x3a;
 uint16_t const player_b_hitbox_damages = 0x3b;
 uint16_t const player_a_hitbox_force_v_low = 0x3c;
@@ -168,16 +168,16 @@ uint16_t const player_a_custom_hitbox_directional1_lsb = player_a_hitbox_base_kn
 uint16_t const player_b_custom_hitbox_directional1_lsb = player_b_hitbox_base_knock_up_h_low; // $47
 uint16_t const player_a_custom_hitbox_directional1_msb = player_a_hitbox_base_knock_up_h_high; // $42
 uint16_t const player_b_custom_hitbox_directional1_msb = player_b_hitbox_base_knock_up_h_high; // $43
-uint16_t const player_a_custom_hitbox_directional2_lsb = player_a_hitbox_force_h_low; // $3e
-uint16_t const player_b_custom_hitbox_directional2_lsb = player_b_hitbox_force_h_low; // $3f
-uint16_t const player_a_custom_hitbox_directional2_msb = player_a_hitbox_force_h; // $3e
-uint16_t const player_b_custom_hitbox_directional2_msb = player_b_hitbox_force_h; // $3f
+uint16_t const player_a_custom_hitbox_directional2 = player_a_hitbox_force_h_low; // $3e
+uint16_t const player_b_custom_hitbox_directional2 = player_b_hitbox_force_h_low; // $3f
 uint16_t const player_a_custom_hitbox_value1 = player_a_hitbox_force_v_low; // $3c
 uint16_t const player_b_custom_hitbox_value1 = player_b_hitbox_force_v_low; // $3d
-uint16_t const player_a_custom_hitbox_value2 = player_a_hitbox_force_v; // $3c
-uint16_t const player_b_custom_hitbox_value2 = player_b_hitbox_force_v; // $3d
+uint16_t const player_a_custom_hitbox_value2 = player_a_hitbox_unused; // $36
+uint16_t const player_b_custom_hitbox_value2 = player_b_hitbox_unused; // $37
 uint16_t const player_a_custom_hitbox_value3 = player_a_hitbox_damages; // $3a
 uint16_t const player_b_custom_hitbox_value3 = player_b_hitbox_damages; // $3b
+uint16_t const player_a_custom_hitbox_value4 = player_a_hitbox_hitstun; // $38
+uint16_t const player_b_custom_hitbox_value4 = player_b_hitbox_hitstun; // $39
 
 uint16_t const player_a_damages = 0x48;
 uint16_t const player_b_damages = 0x49;
@@ -853,9 +853,10 @@ uint16_t const config_ingame_track = 0x0546;
 uint16_t const config_player_a_present = 0x0547; // 0 - player is absent, and should not impact the screen, 1 - player is there as usual
 uint16_t const config_player_b_present = 0x0548; // 0 - player is absent, and should not impact the screen, 1 - player is there as usual
 
-//unused $0549-$054c
+//unused $0549-$054b
 
 // Arcade mode stuff expected to be preseved by the encounter
+uint16_t const arcade_mode_lvl_cap = 0x054c;
 uint16_t const arcade_mode_medals = 0x054d; // $054d to $054f
 uint16_t const arcade_mode_saved_counter_frames = 0x0550;
 uint16_t const arcade_mode_saved_counter_seconds = 0x0551;
