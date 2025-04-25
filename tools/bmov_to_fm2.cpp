@@ -143,7 +143,7 @@ std::vector<uint8_t> generate_savestate(
 	uint8_t const STAGE_DEEPROCK = 5;
 	//TODO extract those data from game's files
 	std::array<std::string, 5> char_names = {"sinbad", "kiki", "pepper", "vgsage", "sunny"};
-	std::array<std::string, 6> stage_names = {"plateau", "pit", "shelf", "gem", "theplank", "deeprock"};
+	std::array<std::string, 6> stage_names = {"flatland", "pit", "skyride", "thehunt", "theplank", "deeprock"};
 	std::array<std::string, 6> stage_tilesets = {"ruins", "jungle", "ruins", "magma", "jungle", "magma"};
 	std::array<std::string, 6> stage_sprite_tilesets = {"", "pit_ts_sprites", "", "gem_ts_sprites", "", ""};
 

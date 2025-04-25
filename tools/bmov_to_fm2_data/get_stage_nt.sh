@@ -9,17 +9,13 @@ xa_bin="${XA_BIN:-xa}"
 # Determine name of the interesting labels
 palette_lbl="stage_${stage_name}_palette"
 nametable_lbl="stage_${stage_name}_nametable"
-if [ "$stage_name" == "plateau" ]; then
-	palette_lbl="stage_flatland_palette"
+if [ "$stage_name" == "flatland" ]; then
 	nametable_lbl="nametable_flatland"
-elif [ "$stage_name" == "shelf" ]; then
-	palette_lbl="stage_skyride_palette"
+elif [ "$stage_name" == "skyride" ]; then
 	nametable_lbl="nametable_stage_skyride"
 elif [ "$stage_name" == "pit" ]; then
-	palette_lbl="stage_pit_palette"
 	nametable_lbl="nametable_stage_pit"
-elif [ "$stage_name" == "gem" ]; then
-	palette_lbl="stage_thehunt_palette"
+elif [ "$stage_name" == "thehunt" ]; then
 	nametable_lbl="nametable_stage_thehunt"
 fi
 

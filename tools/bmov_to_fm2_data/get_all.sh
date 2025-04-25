@@ -12,7 +12,7 @@ fi
 xa_bin="${XA_BIN:-xa}"
 
 # Stages "screen" file (palettes + zipped nametable)
-for stage in plateau pit shelf gem theplank deeprock; do
+for stage in flatland pit skyride thehunt theplank deeprock; do
 	./get_stage_nt.sh "$tilt_dir" "$stage"
 done
 
