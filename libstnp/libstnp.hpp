@@ -10,7 +10,7 @@
 
 namespace stnp {
 
-constexpr uint8_t LAST_VERSION = 7;
+constexpr uint8_t LAST_VERSION = 8;
 
 namespace message {
 
@@ -271,7 +271,7 @@ struct Connection {
 	}
 };
 
-std::ostream& operator<<(std::ostream& os, Connection::SupportType v) {
+inline std::ostream& operator<<(std::ostream& os, Connection::SupportType v) {
 	switch (v) {
 		case Connection::SupportType::CARTRIDGE:
 			os << "CARTRIDGE";
@@ -291,7 +291,7 @@ std::ostream& operator<<(std::ostream& os, Connection::SupportType v) {
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, Connection::ReleaseType v) {
+inline std::ostream& operator<<(std::ostream& os, Connection::ReleaseType v) {
 	switch (v) {
 		case Connection::ReleaseType::ALPHA:
 			os << "ALPHA";
@@ -335,6 +335,7 @@ struct StartGame {
 	std::array<uint8_t, 3> player_a_ping;
 	std::array<uint8_t, 3> player_b_ping;
 	uint8_t framerates = 0;
+	uint8_t countdown;
 
 	uint8_t player_a_connection_quality() const {
 		return this->connections_quality >> 4;
@@ -409,6 +410,9 @@ struct StartGame {
 		}
 		if (protocol_version >= 7) {
 			s.uint8(this->framerates);
+		}
+		if (protocol_version >= 8) {
+			s.uint8(this->countdown);
 		}
 	}
 };

@@ -21,6 +21,8 @@ The server should send a Connected message each time it receives a Connection me
 
 At any time during the initialization phase, the server may send a Disconnected message, in which case the initialization is aborted.
 
+At any time during the initialization phase, the client may send an AbortConnection message, in which case the initialization is aborted;
+
 ::
 
 	Connection {
@@ -42,7 +44,7 @@ At any time during the initialization phase, the server may send a Disconnected 
 
 * **client_id**: Identifier unique to this client.
 * **ranked_play**: 0: non-ranked, 1: ranked
-* **protocol_version**: Expected version of this protocol. This document describes version 7.
+* **protocol_version**: Expected version of this protocol. This document describes version 8.
 * **ping**: Measures of ICMP echo request from client to server, each measure on one byte. Timescale is four milliseconds per tick (ping_max=3 means 12ms of ping.)
 * **framerate**: 0: 50Hz, 1: 60Hz.
 * **support**: 0: physical cartridge, 1: native emulator, 2: web emulator, 3: unknown/other
@@ -75,7 +77,7 @@ At this stage Client1 may display a message indicating that it is waiting for an
 
 Client2 follows the same steps: sending Connection until a Connected is received.
 
-When both clients are connected, the server sends a StartGame message, ending the initialization phase, starting the in-game phase.
+When both clients are connected, the server sends StartGames message, ending the initialization phase, starting the in-game phase.
 
 ::
 
@@ -87,6 +89,17 @@ When both clients are connected, the server sends a StartGame message, ending th
 * **reason**: ascii characters explaining why the client is disconnected. Each 16 character sequence is to be displayed as a line on client's screen.
 
 Upon reception of this message, the client should display the message and stop sending connection requests.
+
+::
+
+	AbortConnection {
+		uint8  message_type = 3;
+		uint32 client_id;
+	}
+
+* **client_id**: Identifier unique to this client.
+
+Upon reception of this message, the server must stop sending messages to the client and considere it offline.
 
 ::
 
@@ -107,6 +120,7 @@ Upon reception of this message, the client should display the message and stop s
 		uint1 player_b_framerate;
 		uint1 game_framerate;
 		uint5 reserved = 0;
+		uint8 countdown;
 	}
 
 * **stage**: Stage on which the game will be played. 0 for Flatland, 1 for The Pit, 2 for Skyride or 3 for The Hunt.
@@ -123,8 +137,29 @@ Upon reception of this message, the client should display the message and stop s
 * **player_a_framerate**: Native framerate for player A. 0: 50Hz, 1: 60Hz.
 * **player_b_framerate**: Native framerate for player B. 0: 50Hz, 1: 60Hz.
 * **game_framerate**: Framerate at which the game will be played. 0: 50Hz, 1: 60Hz.
+* **countdown**: Time, in 50 Hz ticks before starting the game.
 
-Uppon reception of this message, clients should start a game on the selected stage. The game should start within a fixed timeframe shared by both clients (eg. the game starts 120 frames after message's reception).
+Uppon reception of this message, clients should start a game on the selected stage. The game must start after ``countdown`` 50 Hz tick have passed, NTSC system may approximate it to the nearest number of 60 Hz ticks (ex: ``countdown`` of ``200`` should be interpreted as 200 PAL frames or 240 NTSC frames.) When receiving a ``GameStart`` message while waiting the countdown of a previous one, the client should adjust its wait time to the smallest value between its current countdown counter and the one in the newest ``Gamestart`` message.
+
+.. note::
+
+	Example: An NTSC client receive a series of ``GameStart`` messages.
+
+	* Reception of a first ``GameStart`` message with ``countdown = 200``
+	  * The client sets its internal counter as ``200 + (200 * 6 / 5) == 240``
+	  * The client start counting down everyframe
+	* After 115 frames, reception of a second ``GameStart`` message with ``countdown = 100``
+	  * The client's internal counter is at ``125``
+	  * 60 Hz equivalent of the message's countdown is ``120``
+	    * The client adjusts its internal counter to ``120`` and continues to count down
+	* After 65 frames, reception of a second ``GameStart`` message with ``countdown = 50``
+	  * The client's internal counter is at ``55``
+	  * 60 Hz equivalent of the message's countdown is ``60``
+	    * The client continues, ignoring the message
+
+	This procedure ensures that the client use the countdown of the ``GameStart`` message with the lowest
+	travel time from server to client. Limiting error on unstable connections.
+
 
 The value of *player_number* must not be the same for Client1 and Client2.
 

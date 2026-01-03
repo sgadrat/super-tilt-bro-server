@@ -192,6 +192,7 @@ BOOST_AUTO_TEST_CASE(SerializeStartGame) {
 	message.player_a_is_ntsc(false);
 	message.player_b_is_ntsc(true);
 	message.game_is_ntsc(false);
+	message.countdown = 200;
 
 	// Serialize the message
 	stnp::message::MessageSerializer serializer;
@@ -223,6 +224,9 @@ BOOST_AUTO_TEST_CASE(SerializeStartGame) {
 
 		// player_a_framerate = 0 (50 Hz), player_b_framerate = 1 (60 Hz), game_framerate = 0 (50 Hz), reserved = 0
 		0b0'1'0'00000,
+
+		// countdown = 200
+		200,
 	};
 	BOOST_REQUIRE_EQUAL_COLLECTIONS(
 		serializer.serialized().begin(), serializer.serialized().end(),
@@ -257,6 +261,9 @@ BOOST_AUTO_TEST_CASE(DeserializeStartGame) {
 
 		// player_a_framerate = 0 (50 Hz), player_b_framerate = 1 (60 Hz), game_framerate = 0 (50 Hz), reserved = 0
 		0b0'1'0'00000,
+
+		// countdown = 200
+		200,
 	};
 
 	// Deserialize the message
@@ -273,6 +280,7 @@ BOOST_AUTO_TEST_CASE(DeserializeStartGame) {
 	BOOST_REQUIRE_EQUAL(message.player_a_palette, 3);
 	BOOST_REQUIRE_EQUAL(message.player_b_palette, 4);
 	BOOST_REQUIRE_EQUAL(message.framerates, 0b0'1'0'00000);
+	BOOST_REQUIRE_EQUAL(message.countdown, 200);
 
 	decltype(message.player_a_ping) expected_player_a_ping = {5, 7, 6};
 	BOOST_REQUIRE_EQUAL_COLLECTIONS(

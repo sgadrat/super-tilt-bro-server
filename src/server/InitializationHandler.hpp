@@ -6,6 +6,7 @@
 #include "network.hpp"
 #include "src/utils.hpp"
 
+#include <atomic>
 #include <memory>
 #include <string>
 
@@ -29,4 +30,5 @@ private:
 	std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages;
 	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> game_info_messages;
 	std::shared_ptr<ClientsDatagramRouting> clients_routing;
+	std::atomic<bool> keep_running;
 };

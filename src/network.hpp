@@ -19,8 +19,8 @@ public:
 
 private:
 	std::mutex mMutex;
-	// boost::asio::io_context mIoContext; // boost >= 1.66.0
-	boost::asio::io_service mIoContext; // boost <= 1.65.x (and after thanks to a typedef in boost)
+	boost::asio::io_context mIoContext; // boost >= 1.66.0
+	//boost::asio::io_service mIoContext; // boost <= 1.65.x (and after thanks to a typedef in boost)
 	std::vector<boost::asio::ip::udp::endpoint> mBindPoints;
 	std::vector<std::shared_ptr<boost::asio::ip::udp::socket>> mSockets;
 };

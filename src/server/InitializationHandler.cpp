@@ -174,13 +174,16 @@ void InitializationHandler::run() {
 
 	size_t client_with_stage_selection = 0;
 
-	while (true) {
+	this->keep_running = true;
+	while (this->keep_running) {
 		try {
 			// Wait for a message
 			std::shared_ptr<network::IncommingUdpMessage> in_message = nullptr;
 			try {
 				in_message = this->in_messages->pop_block(GAME_TIMEOUT);
-				srv_dbg(LOG_DEBUG, "InitializationHandler: received message of %zu bytes from %s:%d", in_message->data.size(), in_message->sender.address().to_string().c_str(), in_message->sender.port());
+				if (in_message != nullptr) {
+					srv_dbg(LOG_DEBUG, "InitializationHandler: received message of %zu bytes from %s:%d", in_message->data.size(), in_message->sender.address().to_string().c_str(), in_message->sender.port());
+				}
 			}catch (std::runtime_error const& e) {
 				// Timeout, noting special to do, we will just not process message bellow
 			}
@@ -463,30 +466,40 @@ void InitializationHandler::run() {
 						// Send StartGame messages
 						uint8_t const player_a_connection = compute_connection_indicator(matched_clients.at(0)->ping_min(), matched_clients.at(0)->ping_max());
 						uint8_t const player_b_connection = compute_connection_indicator(matched_clients.at(1)->ping_min(), matched_clients.at(1)->ping_max());
-						for (size_t client_index = 0; client_index <= 1; ++client_index) {
-							stnp::message::StartGame start_signal;
-							start_signal.stage = game_settings.stage_id;
-							start_signal.stocks = 3;
-							start_signal.player_number = client_index;
-							start_signal.player_a_connection_quality(player_a_connection);
-							start_signal.player_b_connection_quality(player_b_connection);
-							start_signal.player_a_character = game_settings.characters[0];
-							start_signal.player_b_character = game_settings.characters[1];
-							start_signal.player_a_palette = matched_clients.at(0)->selected_palette;
-							start_signal.player_b_palette = matched_clients.at(1)->selected_palette;
-							start_signal.player_a_ping = matched_clients.at(0)->ping;
-							start_signal.player_b_ping = matched_clients.at(1)->ping;
-							start_signal.player_a_is_ntsc(matched_clients.at(0)->is_ntsc);
-							start_signal.player_b_is_ntsc(matched_clients.at(1)->is_ntsc);
-							start_signal.game_is_ntsc(game_is_ntsc);
-							serializer.clear();
-							start_signal.serial(serializer, STNP_VERSION);
+						std::chrono::steady_clock::time_point const first_message_time = std::chrono::steady_clock::now();
+						uint8_t const countdown_start = 4;
+						for (uint8_t countdown = countdown_start; countdown >= 1; --countdown) {
+							// Wait for message time
+							std::chrono::steady_clock::time_point message_time = first_message_time + std::chrono::seconds(countdown_start - countdown);
+							std::this_thread::sleep_until(message_time);
 
-							std::shared_ptr<network::OutgoingUdpMessage> start_signal_udp(new network::OutgoingUdpMessage);
-							start_signal_udp->destination = matched_clients.at(client_index)->client.endpoint;
-							start_signal_udp->data = serializer.serialized();
-							srv_dbg(LOG_DEBUG, "send StartGame to %s:%d", start_signal_udp->destination.address().to_string().c_str(), start_signal_udp->destination.port());
-							this->out_messages->push(start_signal_udp);
+							// Send message to both clients
+							for (size_t client_index = 0; client_index <= 1; ++client_index) {
+								stnp::message::StartGame start_signal;
+								start_signal.stage = game_settings.stage_id;
+								start_signal.stocks = 3;
+								start_signal.player_number = client_index;
+								start_signal.player_a_connection_quality(player_a_connection);
+								start_signal.player_b_connection_quality(player_b_connection);
+								start_signal.player_a_character = game_settings.characters[0];
+								start_signal.player_b_character = game_settings.characters[1];
+								start_signal.player_a_palette = matched_clients.at(0)->selected_palette;
+								start_signal.player_b_palette = matched_clients.at(1)->selected_palette;
+								start_signal.player_a_ping = matched_clients.at(0)->ping;
+								start_signal.player_b_ping = matched_clients.at(1)->ping;
+								start_signal.player_a_is_ntsc(matched_clients.at(0)->is_ntsc);
+								start_signal.player_b_is_ntsc(matched_clients.at(1)->is_ntsc);
+								start_signal.game_is_ntsc(game_is_ntsc);
+								start_signal.countdown = countdown * 50;
+								serializer.clear();
+								start_signal.serial(serializer, STNP_VERSION);
+
+								std::shared_ptr<network::OutgoingUdpMessage> start_signal_udp(new network::OutgoingUdpMessage);
+								start_signal_udp->destination = matched_clients.at(client_index)->client.endpoint;
+								start_signal_udp->data = serializer.serialized();
+								srv_dbg(LOG_DEBUG, "send StartGame to %s:%d", start_signal_udp->destination.address().to_string().c_str(), start_signal_udp->destination.port());
+								this->out_messages->push(start_signal_udp);
+							}
 						}
 					}
 
@@ -502,6 +515,14 @@ void InitializationHandler::run() {
 			syslog(LOG_ERR, "InitializationHandler: failed to process a message: %s", e.what());
 		}
 	}
+
+	// Graceful stop
+	syslog(LOG_WARNING, "InitializationHandler: Graceful stop requested, stopping all game instances");
+	for (auto& game_instance: game_instances) {
+		game_instance.instance.stop();
+		game_instance.thread.join();
+	}
+	syslog(LOG_INFO, "InitializationHandler: Gracefully stopped");
 }
 
 void InitializationHandler::rejectConnection(std::string const& reason, boost::asio::ip::udp::endpoint const& client) {
@@ -522,5 +543,6 @@ void InitializationHandler::rejectConnection(std::string const& reason, boost::a
 }
 
 void InitializationHandler::stop() {
-	//TODO
+	this->keep_running = false;
+	this->in_messages->push(nullptr);
 }
