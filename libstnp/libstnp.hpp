@@ -271,6 +271,46 @@ struct Connection {
 	}
 };
 
+std::ostream& operator<<(std::ostream& os, Connection::SupportType v) {
+	switch (v) {
+		case Connection::SupportType::CARTRIDGE:
+			os << "CARTRIDGE";
+			break;
+		case Connection::SupportType::NATIVE_EMULATOR:
+			os << "NATIVE_EMULATOR";
+			break;
+		case Connection::SupportType::WEB_EMULATOR:
+			os << "WEB_EMULATOR";
+			break;
+		case Connection::SupportType::UNKNOWN:
+			os << "UNKNOWN";
+			break;
+		default:
+			os << "<invalid(" << static_cast<unsigned int>(v) << ')';
+	}
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, Connection::ReleaseType v) {
+	switch (v) {
+		case Connection::ReleaseType::ALPHA:
+			os << "ALPHA";
+			break;
+		case Connection::ReleaseType::BETA:
+			os << "BETA";
+			break;
+		case Connection::ReleaseType::RELEASE_CANDIDATE:
+			os << "RELEASE_CANDIDATE";
+			break;
+		case Connection::ReleaseType::RELEASE:
+			os << "RELEASE";
+			break;
+		default:
+			os << "<invalid(" << static_cast<unsigned int>(v) << ')';
+	}
+	return os;
+}
+
 struct Connected {
 	uint8_t connection_quality = 0;
 
@@ -324,7 +364,7 @@ struct StartGame {
 		return this->framerates & 0b1000'0000;
 	}
 
-	void player_a_is_ntsc(bool ntsc = true) {
+	void player_a_is_ntsc(bool ntsc) {
 		this->framerates = (this->framerates & 0b0111'1111) | (ntsc ? 0b1000'0000 : 0b0000'0000);
 	}
 
@@ -332,7 +372,7 @@ struct StartGame {
 		return this->framerates & 0b0100'0000;
 	}
 
-	void player_b_is_ntsc(bool ntsc = true) {
+	void player_b_is_ntsc(bool ntsc) {
 		this->framerates = (this->framerates & 0b1011'1111) | (ntsc ? 0b0100'0000 : 0b0000'0000);
 	}
 
@@ -340,7 +380,7 @@ struct StartGame {
 		return this->framerates & 0b0010'0000;
 	}
 
-	void game_is_ntsc(bool ntsc = true) {
+	void game_is_ntsc(bool ntsc) {
 		this->framerates = (this->framerates & 0b1101'1111) | (ntsc ? 0b0010'0000 : 0b0000'0000);
 	}
 

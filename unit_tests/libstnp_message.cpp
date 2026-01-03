@@ -9,6 +9,18 @@ BOOST_AUTO_TEST_CASE(SerializeConnection) {
 	// Create a Connection message
 	stnp::message::Connection message;
 	message.client_id = 513;
+	message.ranked_play = true;
+	message.protocol_version = stnp::LAST_VERSION;
+	message.flags_and_major_version = 0b0'00'11'010;
+	message.minor_version = 99;
+	message.selected_character = 3,
+	message.selected_palette = 0;
+	message.selected_stage = 7;
+	message.ping = {10, 11, 9};
+	message.password = {
+		0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+		0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
+	};
 
 	// Serialize the message
 	stnp::message::MessageSerializer serializer;
@@ -20,7 +32,29 @@ BOOST_AUTO_TEST_CASE(SerializeConnection) {
 		0x00,
 
 		// client_id = 513 (little endian)
-		0x01, 0x02, 0x00, 0x00
+		0x01, 0x02, 0x00, 0x00,
+
+		// protocol_version
+		stnp::LAST_VERSION,
+
+		// ping
+		10, 11, 9,
+
+		// framerate = 0, support = 0, release_type = 3, version_major = 2 (from flags_and_major_version)
+		0x1a,
+
+		// version_minor = 99
+		99,
+
+		// selected_character = 3, selected_palette = 0, selected_stage = 7
+		3, 0, 7,
+
+		// ranked_play = 1
+		0x01,
+
+		// password
+		0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+		0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
 	};
 	BOOST_REQUIRE_EQUAL_COLLECTIONS(
 		serializer.serialized().begin(), serializer.serialized().end(),
@@ -35,7 +69,29 @@ BOOST_AUTO_TEST_CASE(DeserializeConnection) {
 		0x00,
 
 		// client_id = 0xdeadbeef (little endian)
-		0xef, 0xbe, 0xad, 0xde
+		0xef, 0xbe, 0xad, 0xde,
+
+		// protocol_version
+		stnp::LAST_VERSION,
+
+		// ping
+		10, 11, 9,
+
+		// framerate = 0, support = 0, release_type = 3, version_major = 2 (from flags_and_major_version)
+		0x1a,
+
+		// version_minor = 99
+		99,
+
+		// selected_character = 3, selected_palette = 0, selected_stage = 7
+		3, 0, 7,
+
+		// ranked_play = 1
+		0x01,
+
+		// password
+		0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+		0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
 	};
 
 	// Deserialize the message
@@ -45,23 +101,53 @@ BOOST_AUTO_TEST_CASE(DeserializeConnection) {
 
 	// Check that deserialized message is as expected
 	BOOST_REQUIRE_EQUAL(message.client_id, 0xdeadbeef);
+	BOOST_REQUIRE_EQUAL(message.ranked_play, true);
+	BOOST_REQUIRE_EQUAL(message.protocol_version, stnp::LAST_VERSION);
+	BOOST_REQUIRE_EQUAL(message.flags_and_major_version, 0b0'00'11'010);
+	BOOST_REQUIRE_EQUAL(message.minor_version, 99);
+	BOOST_REQUIRE_EQUAL(message.selected_character, 3);
+	BOOST_REQUIRE_EQUAL(message.selected_palette, 0);
+	BOOST_REQUIRE_EQUAL(message.selected_stage, 7);
+
+	decltype(message.ping) expected_ping = {10, 11, 9};
+	BOOST_REQUIRE_EQUAL_COLLECTIONS(
+		message.ping.begin(), message.ping.end(),
+		expected_ping.begin(), expected_ping.end()
+	);
+
+	decltype(message.password) expected_password = {
+		0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+		0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
+	};
+	BOOST_REQUIRE_EQUAL_COLLECTIONS(
+		message.password.begin(), message.password.end(),
+		expected_password.begin(), expected_password.end()
+	);
+
+	// Check that ease of use function interpret data correctly
+	BOOST_REQUIRE_EQUAL(message.is_ntsc(), false);
+	BOOST_REQUIRE_EQUAL(message.get_support_type(), stnp::message::Connection::SupportType::CARTRIDGE);
+	BOOST_REQUIRE_EQUAL(message.get_release_type(), stnp::message::Connection::ReleaseType::RELEASE);
+	BOOST_REQUIRE_EQUAL(message.get_major_version(), 2);
+	BOOST_REQUIRE_EQUAL(message.get_ping_min(), 9);
+	BOOST_REQUIRE_EQUAL(message.get_ping_max(), 11);
 }
 
 BOOST_AUTO_TEST_CASE(SerializeConnected) {
 	// Create a Connected message
 	stnp::message::Connected message;
-	message.player_number = 1;
+	message.connection_quality = 1;
 
 	// Serialize the message
 	stnp::message::MessageSerializer serializer;
-	message.serial(serializer);
+	message.serial(serializer, stnp::LAST_VERSION);
 
 	// Check that serialized form meets expectation
 	std::vector<uint8_t> expected = {
 		// message_type = 0
 		0x00,
 
-		// player_number = 1
+		// reserved = 0, connection_quality = 1
 		0x01
 	};
 	BOOST_REQUIRE_EQUAL_COLLECTIONS(
@@ -76,17 +162,17 @@ BOOST_AUTO_TEST_CASE(DeserializeConnected) {
 		// message_type = 0
 		0x00,
 
-		// player_number = 1
+		// reserved = 0, connection_quality = 1
 		0x01
 	};
 
 	// Deserialize the message
 	stnp::message::MessageDeserializer deserializer(raw_message);
 	stnp::message::Connected message;
-	message.serial(deserializer);
+	message.serial(deserializer, stnp::LAST_VERSION);
 
 	// Check that deserialized message is as expected
-	BOOST_REQUIRE_EQUAL(message.player_number, 1);
+	BOOST_REQUIRE_EQUAL(message.connection_quality, 1);
 }
 
 BOOST_AUTO_TEST_CASE(SerializeStartGame) {
@@ -94,10 +180,22 @@ BOOST_AUTO_TEST_CASE(SerializeStartGame) {
 	stnp::message::StartGame message;
 	message.stage = 2;
 	message.stocks = 3;
+	message.player_number = 1;
+	message.player_a_connection_quality(0);
+	message.player_b_connection_quality(3);
+	message.player_a_character = 1;
+	message.player_b_character = 2;
+	message.player_a_palette = 3;
+	message.player_b_palette = 4;
+	message.player_a_ping = {5, 7, 6};
+	message.player_b_ping = {8, 10, 9};
+	message.player_a_is_ntsc(false);
+	message.player_b_is_ntsc(true);
+	message.game_is_ntsc(false);
 
 	// Serialize the message
 	stnp::message::MessageSerializer serializer;
-	message.serial(serializer);
+	message.serial(serializer, stnp::LAST_VERSION);
 
 	// Check that serialized form meets expectation
 	std::vector<uint8_t> expected = {
@@ -105,7 +203,26 @@ BOOST_AUTO_TEST_CASE(SerializeStartGame) {
 		0x01,
 
 		// stage = 2, stocks = 3
-		0x02, 0x03
+		0x02, 0x03,
+
+		// player_number = 1
+		0x01,
+
+		// player_a_connection_quality = 0, player_b_connection_quality = 3
+		0x03,
+
+		// player_a_character = 1, player_b_character = 2
+		0x01, 0x02,
+
+		// player_a_palette = 3, player_b_palette = 4
+		0x03, 0x04,
+
+		// player_a_ping = 5-7-6, player_b_ping = 8-10-9
+		0x05, 0x07, 0x06,
+		0x08, 0x0a, 0x09,
+
+		// player_a_framerate = 0 (50 Hz), player_b_framerate = 1 (60 Hz), game_framerate = 0 (50 Hz), reserved = 0
+		0b0'1'0'00000,
 	};
 	BOOST_REQUIRE_EQUAL_COLLECTIONS(
 		serializer.serialized().begin(), serializer.serialized().end(),
@@ -119,18 +236,62 @@ BOOST_AUTO_TEST_CASE(DeserializeStartGame) {
 		// message_type = 1
 		0x01,
 
-		// stage = 0, stocks = 4
-		0x00, 0x04
+		// stage = 0, stocks = 3
+		0x00, 0x03,
+
+		// player_number = 1
+		0x01,
+
+		// player_a_connection_quality = 0, player_b_connection_quality = 3
+		0x03,
+
+		// player_a_character = 1, player_b_character = 2
+		0x01, 0x02,
+
+		// player_a_palette = 3, player_b_palette = 4
+		0x03, 0x04,
+
+		// player_a_ping = 5-7-6, player_b_ping = 8-10-9
+		0x05, 0x07, 0x06,
+		0x08, 0x0a, 0x09,
+
+		// player_a_framerate = 0 (50 Hz), player_b_framerate = 1 (60 Hz), game_framerate = 0 (50 Hz), reserved = 0
+		0b0'1'0'00000,
 	};
 
 	// Deserialize the message
 	stnp::message::MessageDeserializer deserializer(raw_message);
 	stnp::message::StartGame message;
-	message.serial(deserializer);
+	message.serial(deserializer, stnp::LAST_VERSION);
 
 	// Check that deserialized message is as expected
 	BOOST_REQUIRE_EQUAL(message.stage, 0);
-	BOOST_REQUIRE_EQUAL(message.stocks, 4);
+	BOOST_REQUIRE_EQUAL(message.player_number, 1);
+	BOOST_REQUIRE_EQUAL(message.connections_quality, 0x03);
+	BOOST_REQUIRE_EQUAL(message.player_a_character, 1);
+	BOOST_REQUIRE_EQUAL(message.player_b_character, 2);
+	BOOST_REQUIRE_EQUAL(message.player_a_palette, 3);
+	BOOST_REQUIRE_EQUAL(message.player_b_palette, 4);
+	BOOST_REQUIRE_EQUAL(message.framerates, 0b0'1'0'00000);
+
+	decltype(message.player_a_ping) expected_player_a_ping = {5, 7, 6};
+	BOOST_REQUIRE_EQUAL_COLLECTIONS(
+		message.player_a_ping.begin(), message.player_a_ping.end(),
+		expected_player_a_ping.begin(), expected_player_a_ping.end()
+	);
+
+	decltype(message.player_b_ping) expected_player_b_ping = {8, 10, 9};
+	BOOST_REQUIRE_EQUAL_COLLECTIONS(
+		message.player_b_ping.begin(), message.player_b_ping.end(),
+		expected_player_b_ping.begin(), expected_player_b_ping.end()
+	);
+
+	// Check that ease of use function interpret data correctly
+	BOOST_REQUIRE_EQUAL(message.player_a_connection_quality(), 0);
+	BOOST_REQUIRE_EQUAL(message.player_b_connection_quality(), 3);
+	BOOST_REQUIRE_EQUAL(message.player_a_is_ntsc(), false);
+	BOOST_REQUIRE_EQUAL(message.player_b_is_ntsc(), true);
+	BOOST_REQUIRE_EQUAL(message.game_is_ntsc(), false);
 }
 
 BOOST_AUTO_TEST_CASE(SerializeControllerState) {
@@ -210,7 +371,7 @@ BOOST_AUTO_TEST_CASE(SerializeNewGameState) {
 
 	// Serialize the message
 	stnp::message::MessageSerializer serializer;
-	message.serial(serializer);
+	message.serial(serializer, stnp::LAST_VERSION);
 
 	// Check that serialized form meets expectation
 	std::vector<uint8_t> expected = {
@@ -247,7 +408,7 @@ BOOST_AUTO_TEST_CASE(DeserializeNewGameState) {
 	// Deserialize the message
 	stnp::message::MessageDeserializer deserializer(raw_message);
 	stnp::message::NewGameState message;
-	message.serial(deserializer);
+	message.serial(deserializer, stnp::LAST_VERSION);
 
 	// Check that deserialized message is as expected
 	BOOST_CHECK_EQUAL(message.prediction_id, 42);
