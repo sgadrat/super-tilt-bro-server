@@ -18,6 +18,7 @@ enum class ClientMessageType : uint8_t {
 	Connection = 0,
 	ControllerState = 1,
 	Ping = 2,
+	AbortConnection = 3,
 };
 
 enum class ServerMessageType : uint8_t {
@@ -176,14 +177,14 @@ private:
 };
 
 struct Connection {
-	uint32_t client_id;
-	bool ranked_play;
-	uint8_t protocol_version;
-	uint8_t flags_and_major_version;
-	uint8_t minor_version;
-	uint8_t selected_character;
-	uint8_t selected_palette;
-	uint8_t selected_stage;
+	uint32_t client_id = 0;
+	bool ranked_play = false;
+	uint8_t protocol_version = 0;
+	uint8_t flags_and_major_version = 0;
+	uint8_t minor_version = 0;
+	uint8_t selected_character = 0;
+	uint8_t selected_palette = 0;
+	uint8_t selected_stage = 0;
 	std::array<uint8_t, 3> ping;
 	std::array<uint8_t, 16> password;
 
@@ -324,18 +325,18 @@ struct Connected {
 };
 
 struct StartGame {
-	uint8_t stage;
-	uint8_t stocks;
-	uint8_t player_number;
+	uint8_t stage = 0;
+	uint8_t stocks = 0;
+	uint8_t player_number = 0;
 	uint8_t connections_quality = 0;
-	uint8_t player_a_character;
-	uint8_t player_b_character;
-	uint8_t player_a_palette;
-	uint8_t player_b_palette;
+	uint8_t player_a_character = 0;
+	uint8_t player_b_character = 0;
+	uint8_t player_a_palette = 0;
+	uint8_t player_b_palette = 0;
 	std::array<uint8_t, 3> player_a_ping;
 	std::array<uint8_t, 3> player_b_ping;
 	uint8_t framerates = 0;
-	uint8_t countdown;
+	uint8_t countdown = 0;
 
 	uint8_t player_a_connection_quality() const {
 		return this->connections_quality >> 4;
@@ -418,16 +419,16 @@ struct StartGame {
 };
 
 struct ControllerState {
-	uint32_t client_id;
-	uint32_t timestamp;
-	bool a_pressed;
-	bool b_pressed;
-	bool select_pressed;
-	bool start_pressed;
-	bool up_pressed;
-	bool down_pressed;
-	bool left_pressed;
-	bool right_pressed;
+	uint32_t client_id = 0;
+	uint32_t timestamp = 0;
+	bool a_pressed = false;
+	bool b_pressed = false;
+	bool select_pressed = false;
+	bool start_pressed = false;
+	bool up_pressed = false;
+	bool down_pressed = false;
+	bool left_pressed = false;
+	bool right_pressed = false;
 
 	template <typename SerializationHandler>
 	void serial(SerializationHandler& s) {
@@ -451,8 +452,8 @@ struct NewGameState {
 	std::vector<uint8_t> next_local_inputs;
 	std::vector<uint8_t> next_opponent_inputs;
 	std::vector<uint8_t> state;
-	uint32_t timestamp;
-	uint8_t prediction_id;
+	uint32_t timestamp = 0;
+	uint8_t prediction_id = 0;
 
 	template <typename SerializationHandler>
 	void serial(SerializationHandler& s, uint8_t protocol_version) {
@@ -476,7 +477,7 @@ struct NewGameState {
 };
 
 struct GameOver {
-	uint8_t winner_player_number;
+	uint8_t winner_player_number = 0;
 
 	template <typename SerializationHandler>
 	void serial(SerializationHandler& s) {
@@ -512,6 +513,16 @@ struct Pong {
     void serial(SerializationHandler& s) {
 		s.type(ServerMessageType::Pong);
 		s.dataFill(this->client_data);
+	}
+};
+
+struct AbortConnection {
+	uint32_t client_id = 0;
+
+	template <typename SerializationHandler>
+	void serial(SerializationHandler& s) {
+		s.type(ClientMessageType::AbortConnection);
+		s.uint32(this->client_id);
 	}
 };
 

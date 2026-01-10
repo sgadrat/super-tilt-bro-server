@@ -8,14 +8,27 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  test:
-
+  build:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Install dependencies
-      run: sudo apt-get install -y libboost-all-dev uuid-dev
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libboost-all-dev uuid-dev
+    - name: Build server
+      run: |
+        cd src/server
+        ./build.sh
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libboost-all-dev uuid-dev
     - name: unit_tests
       run: |
         cd unit_tests

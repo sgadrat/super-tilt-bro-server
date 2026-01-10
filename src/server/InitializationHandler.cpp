@@ -271,244 +271,261 @@ void InitializationHandler::run() {
 			}
 
 			// Process message
-			if (in_message != nullptr) {
-				// Parse message
-				stnp::message::Connection connection_request;
-				stnp::message::MessageDeserializer deserializer(in_message->data);
-				uint8_t client_protocol_version = 0xff;
-				try {
-					connection_request.serial(deserializer);
-					client_protocol_version = connection_request.protocol_version;
-				}catch (std::out_of_range const&) {
-					// First protype was using a version of the protocol missing the
-					// protocol_version field in connected message, hence the out_of_range
-					// error when trying to deserialize it
-				}
+			if (in_message != nullptr && in_message->data.size() > 0) {
+				if (in_message->data[0] == static_cast<uint8_t>(stnp::message::ClientMessageType::AbortConnection)) {
+					// Parse message
+					stnp::message::AbortConnection abort_message;
+					stnp::message::MessageDeserializer deserializer(in_message->data);
+					abort_message.serial(deserializer);
 
-				if (client_protocol_version != STNP_VERSION) {
-					// Send error
-					syslog(LOG_NOTICE, "InitializationHandler: connection request with bad protocol: requested protocol %d", client_protocol_version);
-					this->rejectConnection(
-						"bad protocol version    "
-						"                        "
-						"you seem to run an old  "
-						"version of the game     "
-						"                        "
-						"please download latest  "
-						"version                 "
-						"                        ",
-						in_message->sender
-					);
-#ifndef BETA_SERVER
-				}else if (getVersionTuple(connection_request) < std::make_tuple(2, stnp::message::Connection::ReleaseType::RELEASE, 5)) {
-#else
-				}else if (getVersionTuple(connection_request) > std::make_tuple(0, stnp::message::Connection::ReleaseType::ALPHA, 0)) {
-#endif
-					// Send error
-					syslog(LOG_NOTICE, "InitializationHandler: connection request with old client: client version %s", computeVersionName(connection_request).c_str());
-					this->rejectConnection(
-						"bad version             "
-						"                        "
-						"you run an old version  "
-						"of the game             "
-						"                        "
-						"please download latest  "
-						"version                 "
-						"                        ",
-						in_message->sender
-					);
-				}else {
-					// Add client
-					bool found = false;
-					ClientData client = {
-						.client = {
-							.endpoint = in_message->sender,
-							.id = connection_request.client_id
-						},
-						.ping = connection_request.ping,
-						.selected_character = connection_request.selected_character,
-						.selected_palette = connection_request.selected_palette,
-						.selected_stage = connection_request.selected_stage,
-						.is_ntsc = connection_request.is_ntsc(),
-						.ranked = connection_request.ranked_play,
-						.password = connection_request.password,
-						.last_heartbeat = now
-					};
-					for (ClientData& existing_client: clients) {
-						if (existing_client.client.endpoint == client.client.endpoint && existing_client.client.id == client.client.id) {
-							existing_client.last_heartbeat = client.last_heartbeat;
-							found = true;
-							break;
-						}
-					}
-					if (!found) {
-						syslog(
-							LOG_INFO,
-							"InitializationHandler: new client: %s:%d id=%08x ping=%d/%d/%dms version=%s ranked=%s password=%s",
-							client.client.endpoint.address().to_string().c_str(),
-							client.client.endpoint.port(),
-							client.client.id,
-							client.ping[0] * 4,
-							client.ping[1] * 4,
-							client.ping[2] * 4,
-							computeVersionName(connection_request).c_str(),
-							client.ranked ? "true" : "false",
-							client.password == std::array<uint8_t, 16>{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} ? "no" : "yes"
-						);
-						clients.push_back(client);
-					}
-
-					// Send response
-					stnp::message::Connected connection_response;
-					connection_response.connection_quality = compute_connection_indicator(client.ping_min(), client.ping_max());
-					stnp::message::MessageSerializer serializer;
-					connection_response.serial(serializer, STNP_VERSION);
-
-					std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
-					out_message->destination = client.client.endpoint;
-					out_message->data = serializer.serialized();
-					this->out_messages->push(out_message);
-
-					// Clear timeouted clients
+					// Remove client from waiting queue
 					for (std::list<ClientData>::iterator client_it = clients.begin(); client_it != clients.end(); ++client_it) {
-						if (now - client_it->last_heartbeat >= CLIENT_TIMEOUT) {
-							syslog(LOG_INFO, "InitializationHandler: client timeouted: %s:%d id=%08x", client_it->client.endpoint.address().to_string().c_str(), client_it->client.endpoint.port(), client_it->client.id);
+						if (client_it->client.id == abort_message.client_id) {
+							syslog(LOG_INFO, "InitializationHandler: client quit the matchmaking queue: %s:%d id=%08x", client_it->client.endpoint.address().to_string().c_str(), client_it->client.endpoint.port(), client_it->client.id);
 							client_it = clients.erase(client_it);
 						}
 					}
+				}else if (in_message->data[0] == static_cast<uint8_t>(stnp::message::ClientMessageType::Connection)) {
+					// Parse message
+					stnp::message::Connection connection_request;
+					stnp::message::MessageDeserializer deserializer(in_message->data);
+					uint8_t client_protocol_version = 0xff;
+					try {
+						connection_request.serial(deserializer);
+						client_protocol_version = connection_request.protocol_version;
+					}catch (std::out_of_range const&) {
+						// First protype was using a version of the protocol missing the
+						// protocol_version field in connected message, hence the out_of_range
+						// error when trying to deserialize it
+					}
 
-					//
-					// Start a match if there are enough clients
-					//
+					if (client_protocol_version != STNP_VERSION) {
+						// Send error
+						syslog(LOG_NOTICE, "InitializationHandler: connection request with bad protocol: requested protocol %d", client_protocol_version);
+						this->rejectConnection(
+							"bad protocol version    "
+							"                        "
+							"you seem to run an old  "
+							"version of the game     "
+							"                        "
+							"please download latest  "
+							"version                 "
+							"                        ",
+							in_message->sender
+						);
+	#ifndef BETA_SERVER
+					}else if (getVersionTuple(connection_request) < std::make_tuple(2, stnp::message::Connection::ReleaseType::RELEASE, 5)) {
+	#else
+					}else if (getVersionTuple(connection_request) > std::make_tuple(0, stnp::message::Connection::ReleaseType::ALPHA, 0)) {
+	#endif
+						// Send error
+						syslog(LOG_NOTICE, "InitializationHandler: connection request with old client: client version %s", computeVersionName(connection_request).c_str());
+						this->rejectConnection(
+							"bad version             "
+							"                        "
+							"you run an old version  "
+							"of the game             "
+							"                        "
+							"please download latest  "
+							"version                 "
+							"                        ",
+							in_message->sender
+						);
+					}else {
+						// Add client
+						bool found = false;
+						ClientData client = {
+							.client = {
+								.endpoint = in_message->sender,
+								.id = connection_request.client_id
+							},
+							.ping = connection_request.ping,
+							.selected_character = connection_request.selected_character,
+							.selected_palette = connection_request.selected_palette,
+							.selected_stage = connection_request.selected_stage,
+							.is_ntsc = connection_request.is_ntsc(),
+							.ranked = connection_request.ranked_play,
+							.password = connection_request.password,
+							.last_heartbeat = now
+						};
+						for (ClientData& existing_client: clients) {
+							if (existing_client.client.endpoint == client.client.endpoint && existing_client.client.id == client.client.id) {
+								existing_client.last_heartbeat = client.last_heartbeat;
+								found = true;
+								break;
+							}
+						}
+						if (!found) {
+							syslog(
+								LOG_INFO,
+								"InitializationHandler: new client: %s:%d id=%08x ping=%d/%d/%dms version=%s ranked=%s password=%s",
+								client.client.endpoint.address().to_string().c_str(),
+								client.client.endpoint.port(),
+								client.client.id,
+								client.ping[0] * 4,
+								client.ping[1] * 4,
+								client.ping[2] * 4,
+								computeVersionName(connection_request).c_str(),
+								client.ranked ? "true" : "false",
+								client.password == std::array<uint8_t, 16>{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0} ? "no" : "yes"
+							);
+							clients.push_back(client);
+						}
 
-					std::this_thread::sleep_for(std::chrono::milliseconds(200)); //HACK avoid spamming messages. It would be better to handle matchmaking independently of messages reception
+						// Send response
+						stnp::message::Connected connection_response;
+						connection_response.connection_quality = compute_connection_indicator(client.ping_min(), client.ping_max());
+						stnp::message::MessageSerializer serializer;
+						connection_response.serial(serializer, STNP_VERSION);
 
-					// Select clients to match
-					std::vector<std::array<std::list<ClientData>::iterator, 2>> const match_list = [&]() {
-						std::vector<std::array<std::list<ClientData>::iterator, 2>> match_list;
+						std::shared_ptr<network::OutgoingUdpMessage> out_message(new network::OutgoingUdpMessage);
+						out_message->destination = client.client.endpoint;
+						out_message->data = serializer.serialized();
+						this->out_messages->push(out_message);
 
-						for (std::list<ClientData>::iterator client = clients.begin(); client != clients.end(); ++client) {
-							// Search a possible match with a previous client
-							bool matched = false;
-							for (std::array<std::list<ClientData>::iterator, 2>& match: match_list) {
-								if (
-									match[1] == clients.end() &&
-									match[0]->password == client->password
-								) {
-									match[1] = client;
-									matched = true;
-									break;
+						// Clear timeouted clients
+						for (std::list<ClientData>::iterator client_it = clients.begin(); client_it != clients.end(); ++client_it) {
+							if (now - client_it->last_heartbeat >= CLIENT_TIMEOUT) {
+								syslog(LOG_INFO, "InitializationHandler: client timeouted: %s:%d id=%08x", client_it->client.endpoint.address().to_string().c_str(), client_it->client.endpoint.port(), client_it->client.id);
+								client_it = clients.erase(client_it);
+							}
+						}
+
+						//
+						// Start a match if there are enough clients
+						//
+
+						std::this_thread::sleep_for(std::chrono::milliseconds(200)); //HACK avoid spamming messages. It would be better to handle matchmaking independently of messages reception
+
+						// Select clients to match
+						std::vector<std::array<std::list<ClientData>::iterator, 2>> const match_list = [&]() {
+							std::vector<std::array<std::list<ClientData>::iterator, 2>> match_list;
+
+							for (std::list<ClientData>::iterator client = clients.begin(); client != clients.end(); ++client) {
+								// Search a possible match with a previous client
+								bool matched = false;
+								for (std::array<std::list<ClientData>::iterator, 2>& match: match_list) {
+									if (
+										match[1] == clients.end() &&
+										match[0]->password == client->password
+									) {
+										match[1] = client;
+										matched = true;
+										break;
+									}
+								}
+
+								if (matched) {
+									continue;
+								}
+
+								// Create a match for this client, with room for a rival
+								match_list.push_back({client, clients.end()});
+							}
+
+							// Remove match not fully filled
+							prune_if(match_list, [&](std::array<std::list<ClientData>::iterator, 2> const& match) {
+								return match[1] == clients.end();
+							});
+
+							return match_list;
+						}();
+
+						for (std::array<std::list<ClientData>::iterator, 2> const& matched_clients: match_list) {
+							// Deduce game's framerate
+							bool const game_is_ntsc = matched_clients.at(0)->is_ntsc && matched_clients.at(1)->is_ntsc;
+
+							// Compute antilag prediction
+							//   total_ping / 2 = transmission time from one client to another
+							auto ttime = [&](size_t client_a, size_t client_b) -> uint32_t {
+								uint_fast8_t const frame_duration = (game_is_ntsc ? 4 : 5);
+								return ((matched_clients.at(client_a)->ping_min() + matched_clients.at(client_b)->ping_min()) / 2) / frame_duration;
+							};
+							std::array<std::array<uint32_t, 2>, 2> const transit_time = {{
+								{ttime(0, 0), ttime(0, 1)},
+								{ttime(1, 0), ttime(1, 1)}
+							}};
+							syslog(
+								LOG_NOTICE,
+								"starting a game between %08x and %08x (%d/%d/%d/%d antilag)",
+								matched_clients.at(0)->client.id,
+								matched_clients.at(1)->client.id,
+								transit_time[0][0], transit_time[0][1], transit_time[1][0], transit_time[1][1]
+							);
+
+							// Prepare game instance
+							GameInstance::GameSettings game_settings = {
+								.characters = {matched_clients.at(0)->selected_character, matched_clients.at(1)->selected_character},
+								.character_palettes = {matched_clients.at(0)->selected_palette, matched_clients.at(1)->selected_palette},
+								.ranked = {matched_clients.at(0)->ranked, matched_clients.at(1)->ranked},
+								.stage_id = matched_clients.at(client_with_stage_selection)->selected_stage,
+								.video_system = uint8_t(game_is_ntsc ? 1 : 0),
+							};
+							client_with_stage_selection = (client_with_stage_selection + 1) % 2;
+							std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> game_in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
+							game_instances.emplace_back(
+								game_in_messages,
+								this->out_messages,
+								this->game_info_messages,
+								transit_time,
+								matched_clients.at(0)->client,
+								matched_clients.at(1)->client,
+								game_settings
+							);
+
+							// Adapt message routing
+							this->clients_routing->set_queue(matched_clients.at(0)->client.endpoint, game_in_messages);
+							this->clients_routing->set_queue(matched_clients.at(1)->client.endpoint, game_in_messages);
+
+							// Send StartGame messages
+							uint8_t const player_a_connection = compute_connection_indicator(matched_clients.at(0)->ping_min(), matched_clients.at(0)->ping_max());
+							uint8_t const player_b_connection = compute_connection_indicator(matched_clients.at(1)->ping_min(), matched_clients.at(1)->ping_max());
+							std::chrono::steady_clock::time_point const first_message_time = std::chrono::steady_clock::now();
+							uint8_t const countdown_start = 4;
+							for (uint8_t countdown = countdown_start; countdown >= 1; --countdown) {
+								// Wait for message time
+								std::chrono::steady_clock::time_point message_time = first_message_time + std::chrono::seconds(countdown_start - countdown);
+								std::this_thread::sleep_until(message_time);
+
+								// Send message to both clients
+								for (size_t client_index = 0; client_index <= 1; ++client_index) {
+									stnp::message::StartGame start_signal;
+									start_signal.stage = game_settings.stage_id;
+									start_signal.stocks = 3;
+									start_signal.player_number = client_index;
+									start_signal.player_a_connection_quality(player_a_connection);
+									start_signal.player_b_connection_quality(player_b_connection);
+									start_signal.player_a_character = game_settings.characters[0];
+									start_signal.player_b_character = game_settings.characters[1];
+									start_signal.player_a_palette = matched_clients.at(0)->selected_palette;
+									start_signal.player_b_palette = matched_clients.at(1)->selected_palette;
+									start_signal.player_a_ping = matched_clients.at(0)->ping;
+									start_signal.player_b_ping = matched_clients.at(1)->ping;
+									start_signal.player_a_is_ntsc(matched_clients.at(0)->is_ntsc);
+									start_signal.player_b_is_ntsc(matched_clients.at(1)->is_ntsc);
+									start_signal.game_is_ntsc(game_is_ntsc);
+									start_signal.countdown = countdown * 50;
+									serializer.clear();
+									start_signal.serial(serializer, STNP_VERSION);
+
+									std::shared_ptr<network::OutgoingUdpMessage> start_signal_udp(new network::OutgoingUdpMessage);
+									start_signal_udp->destination = matched_clients.at(client_index)->client.endpoint;
+									start_signal_udp->data = serializer.serialized();
+									srv_dbg(LOG_DEBUG, "send StartGame to %s:%d", start_signal_udp->destination.address().to_string().c_str(), start_signal_udp->destination.port());
+									this->out_messages->push(start_signal_udp);
 								}
 							}
-
-							if (matched) {
-								continue;
-							}
-
-							// Create a match for this client, with room for a rival
-							match_list.push_back({client, clients.end()});
 						}
 
-						// Remove match not fully filled
-						prune_if(match_list, [&](std::array<std::list<ClientData>::iterator, 2> const& match) {
-							return match[1] == clients.end();
-						});
-
-						return match_list;
-					}();
-
-					for (std::array<std::list<ClientData>::iterator, 2> const& matched_clients: match_list) {
-						// Deduce game's framerate
-						bool const game_is_ntsc = matched_clients.at(0)->is_ntsc && matched_clients.at(1)->is_ntsc;
-
-						// Compute antilag prediction
-						//   total_ping / 2 = transmission time from one client to another
-						auto ttime = [&](size_t client_a, size_t client_b) -> uint32_t {
-							uint_fast8_t const frame_duration = (game_is_ntsc ? 4 : 5);
-							return ((matched_clients.at(client_a)->ping_min() + matched_clients.at(client_b)->ping_min()) / 2) / frame_duration;
-						};
-						std::array<std::array<uint32_t, 2>, 2> const transit_time = {{
-							{ttime(0, 0), ttime(0, 1)},
-							{ttime(1, 0), ttime(1, 1)}
-						}};
-						syslog(
-							LOG_NOTICE,
-							"starting a game between %08x and %08x (%d/%d/%d/%d antilag)",
-							matched_clients.at(0)->client.id,
-							matched_clients.at(1)->client.id,
-							transit_time[0][0], transit_time[0][1], transit_time[1][0], transit_time[1][1]
-						);
-
-						// Prepare game instance
-						GameInstance::GameSettings game_settings = {
-							.characters = {matched_clients.at(0)->selected_character, matched_clients.at(1)->selected_character},
-							.character_palettes = {matched_clients.at(0)->selected_palette, matched_clients.at(1)->selected_palette},
-							.ranked = {matched_clients.at(0)->ranked, matched_clients.at(1)->ranked},
-							.stage_id = matched_clients.at(client_with_stage_selection)->selected_stage,
-							.video_system = uint8_t(game_is_ntsc ? 1 : 0),
-						};
-						client_with_stage_selection = (client_with_stage_selection + 1) % 2;
-						std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> game_in_messages(new ThreadSafeFifo<network::IncommingUdpMessage>(5));
-						game_instances.emplace_back(
-							game_in_messages,
-							this->out_messages,
-							this->game_info_messages,
-							transit_time,
-							matched_clients.at(0)->client,
-							matched_clients.at(1)->client,
-							game_settings
-						);
-
-						// Adapt message routing
-						this->clients_routing->set_queue(matched_clients.at(0)->client.endpoint, game_in_messages);
-						this->clients_routing->set_queue(matched_clients.at(1)->client.endpoint, game_in_messages);
-
-						// Send StartGame messages
-						uint8_t const player_a_connection = compute_connection_indicator(matched_clients.at(0)->ping_min(), matched_clients.at(0)->ping_max());
-						uint8_t const player_b_connection = compute_connection_indicator(matched_clients.at(1)->ping_min(), matched_clients.at(1)->ping_max());
-						std::chrono::steady_clock::time_point const first_message_time = std::chrono::steady_clock::now();
-						uint8_t const countdown_start = 4;
-						for (uint8_t countdown = countdown_start; countdown >= 1; --countdown) {
-							// Wait for message time
-							std::chrono::steady_clock::time_point message_time = first_message_time + std::chrono::seconds(countdown_start - countdown);
-							std::this_thread::sleep_until(message_time);
-
-							// Send message to both clients
-							for (size_t client_index = 0; client_index <= 1; ++client_index) {
-								stnp::message::StartGame start_signal;
-								start_signal.stage = game_settings.stage_id;
-								start_signal.stocks = 3;
-								start_signal.player_number = client_index;
-								start_signal.player_a_connection_quality(player_a_connection);
-								start_signal.player_b_connection_quality(player_b_connection);
-								start_signal.player_a_character = game_settings.characters[0];
-								start_signal.player_b_character = game_settings.characters[1];
-								start_signal.player_a_palette = matched_clients.at(0)->selected_palette;
-								start_signal.player_b_palette = matched_clients.at(1)->selected_palette;
-								start_signal.player_a_ping = matched_clients.at(0)->ping;
-								start_signal.player_b_ping = matched_clients.at(1)->ping;
-								start_signal.player_a_is_ntsc(matched_clients.at(0)->is_ntsc);
-								start_signal.player_b_is_ntsc(matched_clients.at(1)->is_ntsc);
-								start_signal.game_is_ntsc(game_is_ntsc);
-								start_signal.countdown = countdown * 50;
-								serializer.clear();
-								start_signal.serial(serializer, STNP_VERSION);
-
-								std::shared_ptr<network::OutgoingUdpMessage> start_signal_udp(new network::OutgoingUdpMessage);
-								start_signal_udp->destination = matched_clients.at(client_index)->client.endpoint;
-								start_signal_udp->data = serializer.serialized();
-								srv_dbg(LOG_DEBUG, "send StartGame to %s:%d", start_signal_udp->destination.address().to_string().c_str(), start_signal_udp->destination.port());
-								this->out_messages->push(start_signal_udp);
-							}
+						// Forget matched clients
+						//NOTE expects that clients.erase() does not invalidate other iterators. Works while clients is a list, may segfault with other containers
+						for (std::array<std::list<ClientData>::iterator, 2> const& matched_clients: match_list) {
+							clients.erase(matched_clients[0]);
+							clients.erase(matched_clients[1]);
 						}
 					}
-
-					// Forget matched clients
-					//NOTE expects that clients.erase() does not invalidate other iterators. Works while clients is a list, may segfault with other containers
-					for (std::array<std::list<ClientData>::iterator, 2> const& matched_clients: match_list) {
-						clients.erase(matched_clients[0]);
-						clients.erase(matched_clients[1]);
-					}
+				}else {
+					syslog(LOG_WARNING, "InitializationHandler: unhandled message type `%u`", (unsigned)(in_message->data[0]));
 				}
 			}
 		}catch (std::exception const& e) {
