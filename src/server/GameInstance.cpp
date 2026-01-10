@@ -269,7 +269,7 @@ void GameInstance::run(
 			while (this->keep_running) {
 				// Get next incomming message
 				try {
-					in_message = in_messages->pop_block(microseconds(1'000'000));
+					in_message = in_messages->pop_block(microseconds(100'000));
 					last_input_clock_time = steady_clock::now();
 					++batch_size;
 					if (new_input_batch) {
@@ -295,11 +295,14 @@ void GameInstance::run(
 						current_time,
 						gamestate_history, controller_a_history, controller_b_history
 					);
-					if (computed_gamestate.second.is_gameover() && n_frames_since_last_input > 500) {
+
+					uint32_t const gameover_delay = 32; // Arbitraty number, reasoning for "32" is that it match the client's input buffer size
+					if (computed_gamestate.second.is_gameover() && n_frames_since_last_input > gameover_delay) {
 						syslog(LOG_INFO, "GameInstance: gameover found while emulating inactivity");
 						this->keep_running = false;
 						break;
 					}
+
 					gamestate_history.insert(computed_gamestate);
 
 					break; //TODO simplify uselessly doubled while loop
