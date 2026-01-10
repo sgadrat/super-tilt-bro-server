@@ -1,0 +1,22 @@
+name: Test
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+  workflow_dispatch: {}
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install dependencies
+      run: sudo apt-get install -y libboost-all-dev uuid-dev
+    - name: unit_tests
+      run: |
+        cd unit_tests
+        ./tests.sh
