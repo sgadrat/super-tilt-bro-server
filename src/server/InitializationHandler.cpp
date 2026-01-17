@@ -33,13 +33,14 @@ namespace {
 				std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages,
 				std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages,
 				std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> game_info_queue,
+				std::shared_ptr<ClientsDatagramRouting> clients_routing,
 				std::array<std::array<uint32_t, 2>, 2> transit_time,
 				GameInstance::ClientInfo client_a,
 				GameInstance::ClientInfo client_b,
 				GameInstance::GameSettings game_settings
 			)
 			: instance()
-			, thread(&GameInstance::run, &instance, in_messages, out_messages, game_info_queue, transit_time, client_a, client_b, game_settings)
+			, thread(&GameInstance::run, &instance, in_messages, out_messages, game_info_queue, clients_routing, transit_time, client_a, client_b, game_settings)
 			, creation_time(std::chrono::steady_clock::now())
 			, clients(client_a, client_b)
 			{
@@ -261,10 +262,6 @@ void InitializationHandler::run() {
 				if (!instance->thread.joinable()) {
 					srv_dbg(LOG_DEBUG, "InitializationHandler: destroying joined game");
 
-					// Remove game's clients from routing table
-					this->clients_routing->remove_client(instance->get_clients().first.endpoint);
-					this->clients_routing->remove_client(instance->get_clients().second.endpoint);
-
 					// Delete game from our list of games
 					instance = game_instances.erase(instance);
 				}
@@ -467,6 +464,7 @@ void InitializationHandler::run() {
 								game_in_messages,
 								this->out_messages,
 								this->game_info_messages,
+								this->clients_routing,
 								transit_time,
 								matched_clients.at(0)->client,
 								matched_clients.at(1)->client,

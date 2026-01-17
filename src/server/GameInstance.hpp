@@ -1,5 +1,6 @@
 #pragma once
 
+#include "server/ClientsDatagramRouting.hpp"
 #include "server/StatisticsSink.hpp"
 #include "network.hpp"
 #include "src/utils.hpp"
@@ -40,6 +41,7 @@ public:
 		std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages,
 		std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages,
 		std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> game_info_queue,
+		std::shared_ptr<ClientsDatagramRouting> clients_routing,
 		std::array<std::array<uint32_t, 2>, 2> transit_time,
 		ClientInfo client_a,
 		ClientInfo client_b,

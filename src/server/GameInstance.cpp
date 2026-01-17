@@ -200,6 +200,7 @@ void GameInstance::run(
 	std::shared_ptr<ThreadSafeFifo<network::IncommingUdpMessage>> in_messages,
 	std::shared_ptr<ThreadSafeFifo<network::OutgoingUdpMessage>> out_messages,
 	std::shared_ptr<ThreadSafeFifo<StatisticsSink::GameInfo>> game_info_queue,
+	std::shared_ptr<ClientsDatagramRouting> clients_routing,
 	std::array<std::array<uint32_t, 2>, 2> transit_time,
 	ClientInfo client_a,
 	ClientInfo client_b,
@@ -510,7 +511,11 @@ void GameInstance::run(
 		syslog(LOG_ERR, "GameInstance: game crashed: %s", e.what());
 	}
 
-	//TODO Remove clients from routing table (or better, send an event in game_info_queue and let somebody else clean things like the routing table)
+	// Disconnect clients
+	srv_dbg(LOG_DEBUG, "GameInstance: deconnecting clients from server");
+	clients_routing->remove_client(client_a.endpoint);
+	clients_routing->remove_client(client_b.endpoint);
+
 	this->over = true;
 }
 
