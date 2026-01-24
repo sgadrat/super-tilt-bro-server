@@ -317,6 +317,7 @@ uint16_t const game_winner = 0x05db; // Set to winner's player number after the 
 
 uint16_t const game_mode_state_begin = 0x05dc;
 
+// Local mode stuff
 uint16_t const local_mode_paused = game_mode_state_begin; // $05dc
 uint16_t const local_mode_state_end = local_mode_paused+1;
 
@@ -330,6 +331,12 @@ uint16_t const arcade_mode_target_break_animation_timer = 0x05ff;
 
 uint16_t const arcade_mode_run_teleport_animation = 0x05f2; // $05f2 to $05fe
 uint16_t const arcade_mode_run_teleport_timer = 0x05ff;
+
+// Network mode stuff
+uint16_t const network_received_gameover = game_mode_state_begin; // $05dc
+uint16_t const network_resend_btns_clock = network_received_gameover+1; // $05dd
+
+uint16_t const game_mode_state_end = 0x05ff; // Inclusive (game mode can safely write here)
 
 uint16_t const player_a_projectile_1_flags = 0x0600;
 uint16_t const player_b_projectile_1_flags = 0x0601;
@@ -354,8 +361,6 @@ uint16_t const player_b_projectile_1_hitbox_bottom_msb = 0x611;
 //$0614-$0635 unused (reserved for projectile 3)
 
 //$0636-$067f unused
-
-uint16_t const game_mode_state_end = 0x067f; // Inclusive (game mode can safely write here)
 
 //
 // Stage specific labels
@@ -556,6 +561,7 @@ uint16_t const netplay_launch_rival_ping_quality = netplay_launch_rival_ping_val
 uint16_t const netplay_launch_countdown = netplay_launch_rival_ping_quality+1; // $56
 uint16_t const netplay_launch_original_music_state = netplay_launch_countdown+1; // $57
 uint16_t const netplay_launch_rival_system = netplay_launch_original_music_state+1; // $58
+uint16_t const netplay_launch_disconnect_on_quit = netplay_launch_rival_system+1; // $59
 
 uint16_t const netplay_launch_bg_mem_buffer = 0x0580; // $0580 to $???? (current biggest usage, 3+16 bytes, map illustration draw)
 
@@ -884,6 +890,8 @@ uint16_t const screen_shake_speed_v = 0x055f;
 //$0600 to $067f may be used by game states
 
 //$0680 to $06ff may be used by audio engine, see "Audio engine labels"
+
+//$0700 to $0741 may be used by SHA computation
 
 uint16_t const network_last_known_remote_input = 0x07bf;
 uint16_t const network_player_local_btns_history = 0x07c0; // one byte per frame, circular buffers, 32 entries
